@@ -19,13 +19,14 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["luassert.util"] = "util.lua",
-    ["luassert.spy"] = "spy.lua",
-    ["luassert.stub"] = "stub.lua",
-    ["luassert.assert"] = "assert.lua",
-    ["luassert.modifiers"] = "modifiers.lua",
-    ["luassert.assertions"] = "assertions.lua",
-    ["luassert.mock"] = "mock.lua",
-    ["luassert.all"] = "all.lua"
+    ["luassert.util"] = "src/util.lua",
+    ["luassert.spy"] = "src/spy.lua",
+    ["luassert.stub"] = "src/stub.lua",
+    ["luassert.assert"] = "src/assert.lua",
+    ["luassert.modifiers"] = "src/modifiers.lua",
+    ["luassert.assertions"] = "src/assertions.lua",
+    ["luassert.mock"] = "src/mock.lua",
+    ["luassert.all"] = "src/all.lua",
+    ["luassert.languages.en"] = "src/languages/en.lua"
   }
 }
