@@ -1,4 +1,4 @@
-local s = require 'say.s'
+s = require 'say.s'
 
 local __assertion_meta = {
   __call = function(self, ...)
