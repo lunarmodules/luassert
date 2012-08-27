@@ -1,7 +1,8 @@
 package = "luassert"
 version = "1.0-1"
 source = {
-  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.0.tar.gz"
+  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.0.tar.gz",
+  dir = "luassert"
 }
 description = {
   summary = "Lua Assertions Extension",
