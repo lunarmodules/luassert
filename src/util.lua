@@ -12,9 +12,10 @@ function util.deepcompare(t1,t2,ignore_mt)
     local v2 = t2[k1]
     if v2 == nil or not util.deepcompare(v1,v2) then return false end
   end
-  for k2,v2 in pairs(t2) do
-    local v1 = t1[k2]
-    if v1 == nil or not util.deepcompare(v1,v2) then return false end
+  for k2,_ in pairs(t2) do
+    -- only check wether each element has a t1 counterpart, actual comparison
+    -- has been done in first loop above
+    if t1[k2] == nil then return false end
   end
   return true
 end
