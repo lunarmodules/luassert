@@ -1,3 +1,5 @@
+-- module will return spy table, and register its assertions with the main assert engine
+local assert = require('luassert.assert')
 local util = require 'luassert.util'
 
 local spy = {
