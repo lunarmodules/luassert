@@ -15,7 +15,7 @@ function util.deepcompare(t1,t2,ignore_mt)
   for k2,_ in pairs(t2) do
     -- only check wether each element has a t1 counterpart, actual comparison
     -- has been done in first loop above
-    if not t1[k2] then return false end
+    if t1[k2] == nil then return false end
   end
   return true
 end
