@@ -1,7 +1,6 @@
 -- module will not return anything, only register assertions with the main assert engine
 local assert = require('luassert.assert')
 local util = require 'luassert.util'
-local s = require 'say.s'
 
 local function unique(state, list, deep)
   for k,v in pairs(list) do
@@ -22,7 +21,7 @@ end
 
 local function equals(state, ...)
   local prev = nil
-  for k,v in pairs({...}) do
+  for _,v in pairs({...}) do
     if prev ~= nil and prev ~= v then
       return false, {...}
     end
@@ -33,7 +32,7 @@ end
 
 local function same(state, ...)
   local prev = nil
-  for k,v in pairs({...}) do
+  for _,v in pairs({...}) do
     if prev ~= nil then
       if type(prev) == 'table' and type(v) == 'table' then
         if not util.deepcompare(prev, v, true) then
