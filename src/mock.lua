@@ -1,7 +1,7 @@
 local spy = require 'luassert.spy'
 local stub = require 'luassert.stub'
 
-return function(object, dostub, func, self, key)
+local function mock(object, dostub, func, self, key)
   local data_type = type(object)
   if data_type == "table" then
     for k,v in pairs(object) do
@@ -18,3 +18,5 @@ return function(object, dostub, func, self, key)
   end
   return object
 end
+
+return mock
