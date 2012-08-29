@@ -1,3 +1,5 @@
+-- module will not return anything, only register assertions with the main assert engine
+local assert = require('luassert.assert')
 local util = require 'luassert.util'
 local s = require 'say.s'
 
