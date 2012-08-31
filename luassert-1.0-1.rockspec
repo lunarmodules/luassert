@@ -27,7 +27,7 @@ build = {
     ["luassert.modifiers"] = "src/modifiers.lua",
     ["luassert.assertions"] = "src/assertions.lua",
     ["luassert.mock"] = "src/mock.lua",
-    ["luassert.all"] = "src/all.lua",
+    ["luassert.init"] = "src/init.lua",
     ["luassert.languages.en"] = "src/languages/en.lua"
   }
 }
