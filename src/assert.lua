@@ -30,14 +30,14 @@ local __state_meta = {
   end,
 
   __index = function(self, key)
-    if rawget(assert, "modifier")[key] then
-      rawget(assert, "modifier")[key].state = self
+    if rawget(self.parent, "modifier")[key] then
+      rawget(self.parent, "modifier")[key].state = self
       return self(nil,
-      rawget(assert, "modifier")[key]
+      rawget(self.parent, "modifier")[key]
       )
     else
-      rawget(assert, "assertion")[key].state = self
-      return rawget(assert, "assertion")[key]
+      rawget(self.parent, "assertion")[key].state = self
+      return rawget(self.parent, "assertion")[key]
     end
   end
 
@@ -47,7 +47,7 @@ local obj = {
   -- list of registered assertions
   assertion = {},
 
-  state = function() return setmetatable({mod=true, payload=nil}, __state_meta) end,
+  state = function(obj) return setmetatable({mod=true, payload=nil, parent=obj}, __state_meta) end,
 
   -- list of registered modifiers
   modifier = {},
@@ -56,10 +56,10 @@ local obj = {
   register = function(self, namespace, name, callback, positive_message, negative_message)
     -- register
     local lowername = name:lower()
-    if not assert[namespace] then
-      assert[namespace] = {}
+    if not self[namespace] then
+      self[namespace] = {}
     end
-    assert[namespace][lowername] = setmetatable({
+    self[namespace][lowername] = setmetatable({
       callback = callback,
       name = lowername,
       positive_message=positive_message,
@@ -78,7 +78,7 @@ local __meta = {
     return bool
   end,
 
-  __index = function(self, key) return self.state()[key] end,
+  __index = function(self, key) return self.state(self)[key] end,
 
 }
 
