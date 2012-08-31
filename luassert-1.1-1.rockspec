@@ -1,7 +1,7 @@
 package = "luassert"
-version = "1.0-1"
+version = "1.1-1"
 source = {
-  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.0.tar.gz",
+  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.1.tar.gz",
   dir = "luassert"
 }
 description = {
