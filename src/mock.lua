@@ -1,3 +1,4 @@
+-- module will return a single mock function, no table nor register any assertions
 local spy = require 'luassert.spy'
 local stub = require 'luassert.stub'
 

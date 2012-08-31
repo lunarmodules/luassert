@@ -1,6 +1,8 @@
+-- module will return spy table, and register its assertions with the main assert engine
+local assert = require('luassert.assert')
 local util = require 'luassert.util'
-
-local spy = {
+local spy   -- must make local before defining table, because table contents refers to the table (recursion)
+spy = {
   new = function(self, callback)
     return setmetatable(
     {
@@ -16,7 +18,7 @@ local spy = {
       end,
 
       called_with = function(self, args)
-        for k,v in ipairs(self.calls) do
+        for _,v in ipairs(self.calls) do
           if util.deepcompare(v, args) then
             return true
           end
