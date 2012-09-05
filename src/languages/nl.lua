@@ -1,6 +1,6 @@
 local s = require('say')
 
-s:set_namespace('en')
+s:set_namespace('nl')
 
 s:set("assertion.same.positive", "Verwachtte objecten die vergelijkbaar zijn. Aangeboden:\n%s\nVerwachtte:\n%s")
 s:set("assertion.same.negative", "Verwachtte objecten die niet vergelijkbaar zijn. Aangeboden:\n%s\nVerwachtte niet:\n%s")
