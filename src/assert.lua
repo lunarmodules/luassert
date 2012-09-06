@@ -9,9 +9,9 @@ local __assertion_meta = {
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, {...}) or "assertion failed!")
+          error(s(self.positive_message, {...}) or "assertion failed!", 2)
         else
-          error(s(self.negative_message, {...}) or "assertion failed!")
+          error(s(self.negative_message, {...}) or "assertion failed!", 2)
         end
       else
         return state
@@ -73,7 +73,7 @@ local __meta = {
 
   __call = function(self, bool, message)
     if not bool then
-      error(message or "assertion failed!")
+      error(message or "assertion failed!", 2)
     end
     return bool
   end,
