@@ -35,9 +35,11 @@ local __state_meta = {
       return self(nil,
       rawget(self.parent, "modifier")[key]
       )
-    else
+    elseif rawget(self.parent, "assertion")[key] then
       rawget(self.parent, "assertion")[key].state = self
       return rawget(self.parent, "assertion")[key]
+    else
+      error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", 2)
     end
   end
 
