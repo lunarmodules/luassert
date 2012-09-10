@@ -89,9 +89,8 @@ local obj = {
   end,
   
   format = function(self, args)
-    if #args == 0 then return end
-
-    for i, val in ipairs(args) do
+    for i = 1, #args do -- cannot use pairs because table might have nils
+      local val = args[i]
       local valfmt = nil
       for n, fmt in ipairs(self.formatter) do
         valfmt = fmt(val)
