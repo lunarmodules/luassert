@@ -9,9 +9,9 @@ local __assertion_meta = {
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, {...}) or "assertion failed!", 2)
+          error(s(self.positive_message, assert:format({...})) or "assertion failed!", 2)
         else
-          error(s(self.negative_message, {...}) or "assertion failed!", 2)
+          error(s(self.negative_message, assert:format({...})) or "assertion failed!", 2)
         end
       else
         return state
@@ -52,6 +52,9 @@ local obj = {
   -- list of registered modifiers
   modifier = {},
 
+  -- list of registered formatters
+  formatter = {},
+
   -- registers a function in namespace
   register = function(self, namespace, name, callback, positive_message, negative_message)
     -- register
@@ -65,6 +68,37 @@ local obj = {
       positive_message=positive_message,
       negative_message=negative_message
     }, __assertion_meta)
+  end,
+
+  -- registers a formatter
+  -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
+  addformatter = function(self, callback)
+    table.insert(self.formatter, callback)
+  end,
+  
+  -- unregisters a formatter
+  removeformatter = function(self, formatter)
+    for i, v in ipairs(self.formatter) do
+      if v == formatter then
+        table.remove(self.formatter, i)
+        break
+      end
+    end
+  end,
+  
+  format = function(self, args)
+    if #args == 0 then return end
+
+    for i, val in ipairs(args) do
+      local valfmt = nil
+      for n, fmt in ipairs(self.formatter) do
+        valfmt = fmt(val)
+        if valfmt ~= nil then break end
+      end
+      if valfmt == nil then valfmt = tostring(val) end -- no formatter found
+      args[i] = valfmt
+    end
+    return args
   end
 
 }
