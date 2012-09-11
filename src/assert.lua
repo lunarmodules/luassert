@@ -1,5 +1,19 @@
 local s = require 'say'
 
+local errorlevel = function()
+  -- find the first level, not defined in the same file as this 
+  -- code file to properly report the error
+  local level = 1
+  local info = debug.getinfo(level)
+  local thisfile = (info or {}).source
+  while thisfile and thisfile == (info or {}).source do
+    level = level + 1
+    info = debug.getinfo(level)
+  end
+  if level > 1 then level = level - 1 end -- deduct call to errorlevel() itself
+  return level
+end
+
 local __assertion_meta = {
   __call = function(self, ...)
     local state = self.state
@@ -9,9 +23,9 @@ local __assertion_meta = {
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, assert:format({...})) or "assertion failed!", 2)
+          error(s(self.positive_message, assert:format({...})) or "assertion failed!", errorlevel())
         else
-          error(s(self.negative_message, assert:format({...})) or "assertion failed!", 2)
+          error(s(self.negative_message, assert:format({...})) or "assertion failed!", errorlevel())
         end
       else
         return state
@@ -39,7 +53,7 @@ local __state_meta = {
       rawget(self.parent, "assertion")[key].state = self
       return rawget(self.parent, "assertion")[key]
     else
-      error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", 2)
+      error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", errorlevel())
     end
   end
 
