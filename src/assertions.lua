@@ -59,6 +59,7 @@ local function falsy(state, var)
 end
 
 local function has_error(state, func, err_expected)
+  assert(type(func) == "function", "the 'has_error' assertion requires a function as an argument, got;" .. type(func)) -- should this be localized using 'say'??
   local err_actual = nil
   --must swap error functions to get the actual error message
   local old_error = error
