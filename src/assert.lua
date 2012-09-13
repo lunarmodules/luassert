@@ -23,9 +23,9 @@ local __assertion_meta = {
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, assert:format({...})) or "assertion failed!", errorlevel())
+          error(s(self.positive_message, assert:format({...}, select('#',...))) or "assertion failed!", errorlevel())
         else
-          error(s(self.negative_message, assert:format({...})) or "assertion failed!", errorlevel())
+          error(s(self.negative_message, assert:format({...}, select('#',...))) or "assertion failed!", errorlevel())
         end
       else
         return state
@@ -102,8 +102,9 @@ local obj = {
     end
   end,
   
-  format = function(self, args)
-    for i = 1, #args do -- cannot use pairs because table might have nils
+  format = function(self, args, argcnt)
+    -- argcnt specifies the number of arguments in case of 'trailing nil' arguments which get lost
+    for i = 1, (argcnt or #args) do -- cannot use pairs because table might have nils
       local val = args[i]
       local valfmt = nil
       for n, fmt in ipairs(self.formatter) do

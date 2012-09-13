@@ -6,6 +6,7 @@ describe("Test Assertions", function()
   end)
 
   it("Checks same() assertion to handle nils properly", function()
+    assert.is.error(function() assert.same(nil) end)  -- minimum 2 arguments
     assert.same(nil, nil)
     assert.is_not.same("a string", nil)
     assert.is_not.same(nil, "a string")
@@ -18,6 +19,7 @@ describe("Test Assertions", function()
   end)
 
   it("Checks equals() assertion to handle nils properly", function()
+    assert.is.error(function() assert.equals(nil) end)  -- minimum 2 arguments
     assert.equals(nil, nil)
     assert.is_not.equals("a string", nil)
     assert.is_not.equals(nil, "a string")

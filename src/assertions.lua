@@ -20,31 +20,30 @@ local function unique(state, list, deep)
 end
 
 local function equals(state, ...)
-  local prev = nil
-  for _,v in pairs({...}) do
-    if prev ~= nil and prev ~= v then
-      return false, {...}
-    end
-    prev = v
+  local args = {...}
+  local argcnt = select('#',...)
+  assert(argcnt > 1, "the 'equals' assertion requires a minimum of 2 arguments, got;" .. tostring(argcnt)) -- should this be localized using 'say'??
+  for i = 2,argcnt  do
+    if args[1] ~= args[i] then return false, args end
   end
   return true
 end
 
 local function same(state, ...)
+  local args = {...}
+  local argcnt = select('#',...)
+  assert(argcnt > 1, "the 'same' assertion requires a minimum of 2 arguments, got;" .. tostring(argcnt)) -- should this be localized using 'say'??
   local prev = nil
-  for _,v in pairs({...}) do
-    if prev ~= nil then
-      if type(prev) == 'table' and type(v) == 'table' then
-        if not util.deepcompare(prev, v, true) then
-          return false, {...}
-        end
-      else
-        if prev ~= v then
-          return false, {...}
-        end
+  for i = 2,argcnt  do
+    if type(args[1]) == 'table' and type(args[i]) == 'table' then
+      if not util.deepcompare(args[1], args[i], true) then
+        return false, args
+      end
+    else
+      if args[1] ~= args[i] then
+        return false, args
       end
     end
-    prev = v
   end
   return true
 end
