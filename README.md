@@ -1,7 +1,7 @@
 Luassert
 ========
 
-[![travis-ci status](https://secure.travis-ci.org/Olivine-Labs/luassert.png)](http://travis-ci.org/#!/Olivine-Labs/luassert/builds)
+[![Build Status](https://secure.travis-ci.org/Olivine-Labs/luassert.png)](http://secure.travis-ci.org/Olivine-Labs/luassert)
 
 luassert extends Lua's built-in assertions to provide additional tests and the
 ability to create your own. You can modify chains of assertions with `not`.
@@ -10,7 +10,7 @@ Check out [busted](http://www.olivinelabs.com/busted#asserts) for
 extended examples.
 
 ```lua
-require("luassert")
+assert = require("luassert")
 
 assert.true(true)
 assert.is.true(true)
