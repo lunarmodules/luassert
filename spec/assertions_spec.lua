@@ -67,6 +67,20 @@ describe("Test Assertions", function()
     assert.is_not.falsy("")
     assert.is.falsy(false)
   end)
+  
+  it("tests the error outputted for same() with multiple arguments, to report the failing value", function()
+    local old_assertformat = assert.format
+    local arg1, arg2
+    assert.format = function(self, args, argcnt)
+      args = old_assertformat(self, args, argcnt)
+      arg1 = args[1]      
+      arg2 = args[2]      
+      return args
+    end
+    pcall(assert.are.same,"ok", "ok","not ok")
+    assert.format = old_assertformat
+    assert.are_not.equal(arg1, arg2)
+  end)
 
 end)
 
