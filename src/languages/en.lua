@@ -19,3 +19,7 @@ s:set("assertion.truthy.negative", "Expected to not be truthy, but value was:\n%
 
 s:set("assertion.falsy.positive", "Expected to be falsy, but value was:\n%s")
 s:set("assertion.falsy.negative", "Expected to not be falsy, but value was:\n%s")
+
+-- errors
+s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got; %s\n")
+s:set("assertion.internal.badargtype", "the '%s' function requires a %s as an argument, got; %s\n")
