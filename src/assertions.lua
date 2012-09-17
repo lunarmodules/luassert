@@ -1,6 +1,7 @@
 -- module will not return anything, only register assertions with the main assert engine
 local assert = require('luassert.assert')
 local util = require 'luassert.util'
+local s = require('say')
 
 local function unique(state, list, deep)
   for k,v in pairs(list) do
@@ -20,31 +21,30 @@ local function unique(state, list, deep)
 end
 
 local function equals(state, ...)
-  local prev = nil
-  for _,v in pairs({...}) do
-    if prev ~= nil and prev ~= v then
-      return false, {...}
-    end
-    prev = v
+  local args = {...}
+  local argcnt = select('#',...)
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
+  for i = 2,argcnt  do
+    if args[1] ~= args[i] then return false, args end
   end
   return true
 end
 
 local function same(state, ...)
+  local args = {...}
+  local argcnt = select('#',...)
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
   local prev = nil
-  for _,v in pairs({...}) do
-    if prev ~= nil then
-      if type(prev) == 'table' and type(v) == 'table' then
-        if not util.deepcompare(prev, v, true) then
-          return false, {...}
-        end
-      else
-        if prev ~= v then
-          return false, {...}
-        end
+  for i = 2,argcnt  do
+    if type(args[1]) == 'table' and type(args[i]) == 'table' then
+      if not util.deepcompare(args[1], args[i], true) then
+        return false, args
+      end
+    else
+      if args[1] ~= args[i] then
+        return false, args
       end
     end
-    prev = v
   end
   return true
 end
@@ -59,6 +59,7 @@ local function falsy(state, var)
 end
 
 local function has_error(state, func, err_expected)
+  assert(type(func) == "function", s("assertion.internal.badargtype", { "error", "function", type(func) }))
   local err_actual = nil
   --must swap error functions to get the actual error message
   local old_error = error

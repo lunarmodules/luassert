@@ -5,10 +5,24 @@ describe("Test Assertions", function()
     assert.same(table1, table2)
   end)
 
+  it("Checks same() assertion to handle nils properly", function()
+    assert.is.error(function() assert.same(nil) end)  -- minimum 2 arguments
+    assert.same(nil, nil)
+    assert.is_not.same("a string", nil)
+    assert.is_not.same(nil, "a string")
+  end)
+
   it("Checks to see if tables 1 and 2 are equal", function()
     local table1 = { derp = false}
     local table2 = table1
     assert.equals(table1, table2)
+  end)
+
+  it("Checks equals() assertion to handle nils properly", function()
+    assert.is.error(function() assert.equals(nil) end)  -- minimum 2 arguments
+    assert.equals(nil, nil)
+    assert.is_not.equals("a string", nil)
+    assert.is_not.equals(nil, "a string")
   end)
 
   it("Checks to see if table1 only contains unique elements", function()

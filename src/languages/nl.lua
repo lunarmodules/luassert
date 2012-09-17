@@ -19,3 +19,7 @@ s:set("assertion.truthy.negative", "Verwachtte een niet 'warige' (thruthy) waard
 
 s:set("assertion.falsy.positive", "Verwachtte een 'onwarige' (falsy) waarde, maar was:\n%s")
 s:set("assertion.falsy.negative", "Verwachtte een niet 'onwarige' (falsy) waarde, maar was:\n%s")
+
+-- errors
+s:set("assertion.internal.argtolittle", "de '%s' functie verwacht minimaal %s parameters, maar kreeg er; %s\n")
+s:set("assertion.internal.badargtype", "de '%s' functie verwacht een %s als parameter, maar kreeg een; %s\n")
