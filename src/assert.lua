@@ -88,8 +88,8 @@ local obj = {
 
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
-  addformatter = function(self, callback)
-    table.insert(self.formatter, callback)
+  addformatter = function(self, callback, data_type)
+    self.formatter[data_type] = callback
   end,
   
   -- unregisters a formatter
@@ -107,11 +107,8 @@ local obj = {
     for i = 1, (argcnt or #args) do -- cannot use pairs because table might have nils
       local val = args[i]
       local valfmt = nil
-      for n, fmt in ipairs(self.formatter) do
-        valfmt = fmt(val)
-        if valfmt ~= nil then break end
-      end
-      if valfmt == nil then valfmt = tostring(val) end -- no formatter found
+
+      valfmt = self.formatter[type(val)](val)
       args[i] = valfmt
     end
     return args
