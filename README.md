@@ -21,6 +21,8 @@ assert.has.errors(function() error("this should fail") end)
 Extend your own:
 
 ```lua
+s = require("say") --our i18n lib, installed through luarocks, included as a luassert dependency
+
 local function has_property(table, prop)
   for _, value in pairs(table) do
     if value == prop then
