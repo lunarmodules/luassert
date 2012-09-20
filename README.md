@@ -34,7 +34,7 @@ end
 
 s:set("en", "assertion.has_property.positive", "Expected property %s in:\n%s")
 s:set("en", "assertion.has_property.negative", "Expected property %s to not be in:\n%s")
-assert:register("has_property", has_property, "assertion.has_property.positive", "assertion.has_property.negative")
+assert:register("assertion", "has_property", has_property, "assertion.has_property.positive", "assertion.has_property.negative")
 
 assert.has_property({ name = "jack" }, "name")
 ```
