@@ -4,7 +4,7 @@ local function returnnils()
   -- force the return of nils in an argument array
   local a,b
   return a, b, "this is not nil"
-end 
+end
 
 describe("Test Formatters", function()
   it("Checks to see if types are returned as strings", function()
@@ -12,7 +12,7 @@ describe("Test Formatters", function()
     assert.is.same(type(assert:format({ true })[1]), "string")
     assert.is.same(type(assert:format({ 1234 })[1]), "string")
     assert.is.same(type(assert:format({ function() end })[1]), "string")
-    assert.is.same(type(assert:format({ returnnils })[1]), "string")
+    assert.is.same(type(assert:format({ returnnils() })[1]), "string")
   end)
 
   it("Checks to see if empty table is returned empty", function()
