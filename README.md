@@ -21,7 +21,8 @@ assert.has.errors(function() error("this should fail") end)
 Extend your own:
 
 ```lua
-s = require("say") --our i18n lib, installed through luarocks, included as a luassert dependency
+local assert = require("luassert")
+local say    = require("say") --our i18n lib, installed through luarocks, included as a luassert dependency
 
 local function has_property(table, prop)
   for _, value in pairs(table) do
@@ -32,8 +33,9 @@ local function has_property(table, prop)
   return false, {prop, table}
 end
 
-s:set("en", "assertion.has_property.positive", "Expected property %s in:\n%s")
-s:set("en", "assertion.has_property.negative", "Expected property %s to not be in:\n%s")
+say:set_namespace("en")
+say:set("assertion.has_property.positive", "Expected property %s in:\n%s")
+say:set("assertion.has_property.negative", "Expected property %s to not be in:\n%s")
 assert:register("assertion", "has_property", has_property, "assertion.has_property.positive", "assertion.has_property.negative")
 
 assert.has_property({ name = "jack" }, "name")
