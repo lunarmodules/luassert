@@ -71,8 +71,8 @@ describe("Test Assertions", function()
   it("tests the error outputted for same() with multiple arguments, to report the failing value", function()
     local old_assertformat = assert.format
     local arg1, arg2
-    assert.format = function(self, args, argcnt)
-      args = old_assertformat(self, args, argcnt)
+    assert.format = function(self, args)
+      args = old_assertformat(self, args)
       arg1 = args[1]      
       arg2 = args[2]      
       return args

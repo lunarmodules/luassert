@@ -91,7 +91,7 @@ local obj = {
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
   addformatter = function(self, callback)
-    table.insert(self.formatter, callback)
+    table.insert(self.formatter, 1, callback)
   end,
   
   -- unregisters a formatter

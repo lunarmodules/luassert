@@ -31,4 +31,24 @@ describe("Test Formatters", function()
     assert.is.same(type(formatted[3]), "string")
     assert.is.same(type(formatted[4]), "nil")
   end)
+  
+  it("checks arguments not being formatted if set to do so", function()
+    local arg1 = "argument1"
+    local arg2 = "argument2"
+    local arguments = { arg1, arg2 , ["n"] = 2}
+    arguments.nofmt = { true } -- fisrt arg not to be formatted
+    arguments = assert:format(arguments)
+    assert.is.same(arg1, arguments[1])
+  end)
+  
+  it("checks extra formatters inserted to be called first", function()
+    local bstring = require("luassert.format.binarystring")
+    assert:addformatter(bstring)
+    assert(assert.formatter[1] == bstring, "Expected formatter to be inserted at position 1")
+    local mySpy = spy.on(assert.formatter, 1)
+    assert:format({ "Binary Hello", ["n"] = 1 })
+    assert.spy(mySpy).was.called(1)
+    assert:removeformatter(bstring)
+  end)
+  
 end)

@@ -37,9 +37,9 @@ spy = {
     })
   end,
 
-  on = function(self, callback_string)
-    self[callback_string] = spy:new(self[callback_string])
-    return self[callback_string]
+  on = function(target_table, target_key)
+    target_table[target_key] = spy:new(target_table[target_key])
+    return target_table[target_key]
   end
 }
 
@@ -56,9 +56,11 @@ end
 
 local function called(state, arguments)
   local num_times = arguments[1]
-  if state.payload and state.payload.called then
+  if state.payload and type(state.payload) == "table" and state.payload.called then
     return state.payload:called(num_times)
-  else
+  elseif state.payload and type(state.payload) == "function" then
+    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
+  else  
     error("'called_with' must be chained after 'spy(aspy)'")
   end
 end
