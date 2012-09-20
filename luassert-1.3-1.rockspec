@@ -1,7 +1,7 @@
 package = "luassert"
-version = "1.2-1"
+version = "1.3-1"
 source = {
-  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.2.tar.gz",
+  url = "https://github.com/downloads/Olivine-Labs/luassert/luassert-1.3.tar.gz",
   dir = "luassert"
 }
 description = {
@@ -15,7 +15,7 @@ description = {
 }
 dependencies = {
   "lua >= 5.1",
-  "say >= 1.0-1"
+  "say >= 1.1-1"
 }
 build = {
   type = "builtin",
@@ -28,6 +28,7 @@ build = {
     ["luassert.assertions"] = "src/assertions.lua",
     ["luassert.mock"] = "src/mock.lua",
     ["luassert.init"] = "src/init.lua",
+    ["luassert.formatters"] = "src/formatters.lua",
     ["luassert.languages.en"] = "src/languages/en.lua",
     ["luassert.languages.ar"] = "src/languages/ar.lua",
     ["luassert.languages.fr"] = "src/languages/fr.lua",

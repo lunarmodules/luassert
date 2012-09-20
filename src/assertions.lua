@@ -1,6 +1,7 @@
 -- module will not return anything, only register assertions with the main assert engine
 local assert = require('luassert.assert')
 local util = require 'luassert.util'
+local s = require('say')
 
 local function unique(state, list, deep)
   for k,v in pairs(list) do
@@ -22,7 +23,7 @@ end
 local function equals(state, ...)
   local args = {...}
   local argcnt = select('#',...)
-  assert(argcnt > 1, "the 'equals' assertion requires a minimum of 2 arguments, got;" .. tostring(argcnt)) -- should this be localized using 'say'??
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
   for i = 2,argcnt  do
     if args[1] ~= args[i] then return false, args end
   end
@@ -32,7 +33,7 @@ end
 local function same(state, ...)
   local args = {...}
   local argcnt = select('#',...)
-  assert(argcnt > 1, "the 'same' assertion requires a minimum of 2 arguments, got;" .. tostring(argcnt)) -- should this be localized using 'say'??
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
   local prev = nil
   for i = 2,argcnt  do
     if type(args[1]) == 'table' and type(args[i]) == 'table' then
@@ -58,7 +59,7 @@ local function falsy(state, var)
 end
 
 local function has_error(state, func, err_expected)
-  assert(type(func) == "function", "the 'has_error' assertion requires a function as an argument, got;" .. type(func)) -- should this be localized using 'say'??
+  assert(type(func) == "function", s("assertion.internal.badargtype", { "error", "function", type(func) }))
   local err_actual = nil
   --must swap error functions to get the actual error message
   local old_error = error
