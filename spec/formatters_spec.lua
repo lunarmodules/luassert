@@ -42,7 +42,7 @@ describe("Test Formatters", function()
   end)
   
   it("checks extra formatters inserted to be called first", function()
-    local bstring = require("luassert.format.binarystring")
+    local bstring = require("luassert.formatters.binarystring")
     assert:addformatter(bstring)
     assert(assert.formatter[1] == bstring, "Expected formatter to be inserted at position 1")
     local mySpy = spy.on(assert.formatter, 1)
