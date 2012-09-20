@@ -30,26 +30,35 @@ end
 
 local function equals(state, arguments)
   local argcnt = arguments.n
-  assert(type(argcnt) == "number", "Equals: argument table provided has no length indicator; 'n'")
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
   for i = 2,argcnt  do
-    if arguments[1] ~= arguments[i] then return false end
+    if arguments[1] ~= arguments[i] then
+      -- switch arguments for proper output message
+      table.insert(arguments, 1, arguments[i])
+      table.remove(arguments, i + 1)
+      return false
+    end
   end
   return true
 end
 
 local function same(state, arguments)
   local argcnt = arguments.n
-  assert(type(argcnt) == "number", "Same: argument table provided has no length indicator; 'n'")
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
   local prev = nil
   for i = 2,argcnt  do
     if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
       if not util.deepcompare(arguments[1], arguments[i], true) then
+        -- switch arguments for proper output message
+        table.insert(arguments, 1, arguments[i])
+        table.remove(arguments, i + 1)
         return false
       end
     else
       if arguments[1] ~= arguments[i] then
+        -- switch arguments for proper output message
+        table.insert(arguments, 1, arguments[i])
+        table.remove(arguments, i + 1)
         return false
       end
     end

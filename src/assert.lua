@@ -18,7 +18,7 @@ local __assertion_meta = {
   __call = function(self, ...)
     local state = self.state
     local arguments = {...}
-    arguments.n =  select('#',...)  -- add argument count for trailing nils
+    arguments.n = select('#',...)  -- add argument count for trailing nils
     local val = self.callback(state, arguments)
     local data_type = type(val)
 
