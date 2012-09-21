@@ -17,15 +17,17 @@ end
 local __assertion_meta = {
   __call = function(self, ...)
     local state = self.state
-    local val = self.callback(state, ...)
+    local arguments = {...}
+    arguments.n = select('#',...)  -- add argument count for trailing nils
+    local val = self.callback(state, arguments)
     local data_type = type(val)
 
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, assert:format({...}, select('#',...))) or "assertion failed!", errorlevel())
+          error(s(self.positive_message, assert:format(arguments)) or "assertion failed!", errorlevel())
         else
-          error(s(self.negative_message, assert:format({...}, select('#',...))) or "assertion failed!", errorlevel())
+          error(s(self.negative_message, assert:format(arguments)) or "assertion failed!", errorlevel())
         end
       else
         return state
@@ -88,8 +90,8 @@ local obj = {
 
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
-  addformatter = function(self, callback, data_type)
-    self.formatter[data_type] = callback
+  addformatter = function(self, callback)
+    table.insert(self.formatter, 1, callback)
   end,
   
   -- unregisters a formatter
@@ -102,14 +104,20 @@ local obj = {
     end
   end,
   
-  format = function(self, args, argcnt)
-    -- argcnt specifies the number of arguments in case of 'trailing nil' arguments which get lost
-    for i = 1, (argcnt or #args) do -- cannot use pairs because table might have nils
-      local val = args[i]
-      local valfmt = nil
-
-      valfmt = self.formatter[type(val)](val)
-      args[i] = valfmt
+  format = function(self, args)
+    -- args.n specifies the number of arguments in case of 'trailing nil' arguments which get lost
+    local nofmt = args.nofmt or {}  -- arguments in this list should not be formatted
+    for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
+      if not nofmt[i] then
+        local val = args[i]
+        local valfmt = nil
+        for n, fmt in ipairs(self.formatter) do
+          valfmt = fmt(val)
+          if valfmt ~= nil then break end
+        end
+        if valfmt == nil then valfmt = tostring(val) end -- no formatter found
+        args[i] = valfmt
+      end
     end
     return args
   end

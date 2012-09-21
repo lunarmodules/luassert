@@ -1,17 +1,25 @@
 -- module will not return anything, only register assertions with the main assert engine
+
+-- assertions take 2 parameters;
+-- 1) state
+-- 2) arguments list. The list has a member 'n' with the argument count to check for trailing nils
+-- returns; boolean; whether assertion passed
+
 local assert = require('luassert.assert')
 local util = require 'luassert.util'
 local s = require('say')
 
-local function unique(state, list, deep)
+local function unique(state, arguments)
+  local list = arguments[1]
+  local deep = arguments[2]
   for k,v in pairs(list) do
     for k2, v2 in pairs(list) do
       if k ~= k2 then
         if deep and util.deepcompare(v, v2, true) then
-          return false, { v, v2 }
+          return false
         else
           if v == v2 then
-            return false, { v, v2 }
+            return false
           end
         end
       end
@@ -20,45 +28,56 @@ local function unique(state, list, deep)
   return true
 end
 
-local function equals(state, ...)
-  local args = {...}
-  local argcnt = select('#',...)
+local function equals(state, arguments)
+  local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
   for i = 2,argcnt  do
-    if args[1] ~= args[i] then return false, args end
+    if arguments[1] ~= arguments[i] then
+      -- switch arguments for proper output message
+      table.insert(arguments, 1, arguments[i])
+      table.remove(arguments, i + 1)
+      return false
+    end
   end
   return true
 end
 
-local function same(state, ...)
-  local args = {...}
-  local argcnt = select('#',...)
+local function same(state, arguments)
+  local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
   local prev = nil
   for i = 2,argcnt  do
-    if type(args[1]) == 'table' and type(args[i]) == 'table' then
-      if not util.deepcompare(args[1], args[i], true) then
-        return false, args
+    if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
+      if not util.deepcompare(arguments[1], arguments[i], true) then
+        -- switch arguments for proper output message
+        table.insert(arguments, 1, arguments[i])
+        table.remove(arguments, i + 1)
+        return false
       end
     else
-      if args[1] ~= args[i] then
-        return false, args
+      if arguments[1] ~= arguments[i] then
+        -- switch arguments for proper output message
+        table.insert(arguments, 1, arguments[i])
+        table.remove(arguments, i + 1)
+        return false
       end
     end
   end
   return true
 end
 
-local function truthy(state, var)
-  local val = var ~= false and var ~= nil
-  return val, var
+local function truthy(state, arguments)
+  return arguments[1] ~= false and arguments[1] ~= nil
 end
 
-local function falsy(state, var)
-  return not truthy(state, var), var
+local function falsy(state, arguments)
+  return not truthy(state, arguments)
 end
 
-local function has_error(state, func, err_expected)
+local function has_error(state, arguments)
+  local func = arguments[1]
+  local err_expected = arguments[2]
+  
   assert(type(func) == "function", s("assertion.internal.badargtype", { "error", "function", type(func) }))
   local err_actual = nil
   --must swap error functions to get the actual error message
@@ -69,9 +88,9 @@ local function has_error(state, func, err_expected)
   end
   local status = pcall(func)
   error = old_error
-  local val = not status and (err_expected == nil or same(state, err_expected, err_actual))
+  local val = not status and (err_expected == nil or same(state, {err_expected, err_actual, ["n"] = 2}))
 
-  return val, func
+  return val
 end
 
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")

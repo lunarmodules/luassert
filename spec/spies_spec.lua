@@ -14,7 +14,7 @@ describe("Tests dealing with spies", function()
 ]]
   it("checks to see if spy keeps track of arguments", function()
 
-    test.key = spy.on(test, "key")
+    spy.on(test, "key")
 
     test.key("derp")
     assert.spy(test.key).was.called_with("derp")
@@ -22,7 +22,7 @@ describe("Tests dealing with spies", function()
   end)
 
   it("checks to see if spy keeps track of number of calls", function()
-     test.key = spy.on(test, "key")
+     spy.on(test, "key")
      test.key()
      test.key("test")
      assert.spy(test.key).was.called(2)
