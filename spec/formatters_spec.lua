@@ -8,11 +8,13 @@ end
 
 describe("Test Formatters", function()
   it("Checks to see if types are returned as strings", function()
-    assert.is.same(type(assert:format({ "a string", ["n"] = 1 })[1]), "string")
-    assert.is.same(type(assert:format({ true, ["n"] = 1 })[1]), "string")
-    assert.is.same(type(assert:format({ 1234, ["n"] = 1 })[1]), "string")
-    assert.is.same(type(assert:format({ function() end, ["n"] = 1 })[1]), "string")
-    assert.is.same(type(assert:format({ returnnils(), ["n"] = 3 })[1]), "string")
+    assert.is.same(assert:format({ "a string", ["n"] = 1 })[1], "(string) 'a string'")
+    assert.is.same(assert:format({ true, ["n"] = 1 })[1], "(boolean) true")
+    assert.is.same(assert:format({ 1234, ["n"] = 1 })[1], "(number) 1234")
+    assert.is.same(assert:format({ returnnils(), ["n"] = 3 })[1], "(nil)")
+    local f = function() end
+    local expected = tostring(f)
+    assert.is.same(assert:format({ f, ["n"] = 1 })[1]:sub(1, #expected), expected)
   end)
 
   it("Checks to see if table with 0 count is returned empty/0-count", function()
