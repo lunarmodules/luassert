@@ -29,33 +29,38 @@ spy = {
     },
     {
       __call = function(self, ...)
-        table.insert(self.calls, { ... })
+        local arguments = {...}
+        arguments.n = select('#',...)  -- add argument count for trailing nils
+        table.insert(self.calls, arguments)
         return self.callback(...)
       end
     })
   end,
 
-  on = function(self, callback_string)
-    self[callback_string] = spy:new(self[callback_string])
-    return self[callback_string]
+  on = function(target_table, target_key)
+    target_table[target_key] = spy:new(target_table[target_key])
+    return target_table[target_key]
   end
 }
 
 local function set_spy(state)
 end
 
-local function called_with(state, ...)
+local function called_with(state, arguments)
   if rawget(state, "payload") and rawget(state, "payload").called_with then
-    return state.payload:called_with({...})
+    return state.payload:called_with(arguments)
   else
     error("'called_with' must be chained after 'spy(aspy)'")
   end
 end
 
-local function called(state, num_times)
-  if state.payload and state.payload.called then
+local function called(state, arguments)
+  local num_times = arguments[1]
+  if state.payload and type(state.payload) == "table" and state.payload.called then
     return state.payload:called(num_times)
-  else
+  elseif state.payload and type(state.payload) == "function" then
+    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
+  else  
     error("'called_with' must be chained after 'spy(aspy)'")
   end
 end

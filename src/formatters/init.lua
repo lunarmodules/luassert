@@ -2,25 +2,32 @@
 local assert = require('luassert.assert')
 
 local function fmt_string(arg)
-  return string.format("(string) '%s'", arg)
+  if type(arg) == "string" then
+    return string.format("(string) '%s'", arg)
+  end
 end
 
 local function fmt_number(arg)
-  return string.format("(number) %s", tostring(arg))
+  if type(arg) == "number" then
+    return string.format("(number) %s", tostring(arg))
+  end
 end
 
 local function fmt_boolean(arg)
-  return string.format("(boolean) %s", tostring(arg))
+  if type(arg) == "boolean" then
+    return string.format("(boolean) %s", tostring(arg))
+  end
 end
 
 local function fmt_nil(arg)
-  return "(nil)"
+  if type(arg) == "nil" then
+    return "(nil)"
+  end
 end
 
 local function fmt_table(arg)
   local tmax = 3    -- max nesting-level displayed
   local ft
-
   ft = function(t, l)
     local result = ""
     for k, v in pairs(t) do
@@ -37,21 +44,24 @@ local function fmt_table(arg)
     end
     return result
   end
-
-  local result = "(table): {\n" .. ft(arg, 1):sub(1,-2) .. " }\n"
-  result = result:gsub("{\n }\n", "{ }\n") -- cleanup empty tables
-  result = result:sub(1,-2)                -- remove trailing newline
-  return result
+  if type(arg) == "table" then
+    local result = "(table): {\n" .. ft(arg, 1):sub(1,-2) .. " }\n"
+    result = result:gsub("{\n }\n", "{ }\n") -- cleanup empty tables
+    result = result:sub(1,-2)                -- remove trailing newline
+    return result
+  end
 end
 
 local function fmt_function(arg)
-  local debug_info = debug.getinfo(arg)
-  return string.format("%s @ line %s in %s", tostring(arg), tostring(debug_info.linedefined), tostring(debug_info.source))
+  if type(arg) == "function" then
+    local debug_info = debug.getinfo(arg)
+    return string.format("%s @ line %s in %s", tostring(arg), tostring(debug_info.linedefined), tostring(debug_info.source))
+  end
 end
 
-assert:addformatter(fmt_string, "string")
-assert:addformatter(fmt_number, "number")
-assert:addformatter(fmt_boolean, "boolean")
-assert:addformatter(fmt_nil, "nil")
-assert:addformatter(fmt_table, "table")
-assert:addformatter(fmt_function, "function")
+assert:addformatter(fmt_string)
+assert:addformatter(fmt_number)
+assert:addformatter(fmt_boolean)
+assert:addformatter(fmt_nil)
+assert:addformatter(fmt_table)
+assert:addformatter(fmt_function)
