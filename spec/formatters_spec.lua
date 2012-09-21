@@ -8,11 +8,19 @@ end
 
 describe("Test Formatters", function()
   it("Checks to see if types are returned as strings", function()
-    assert.is.same(type(assert:format({ "a string" })[1]), "string")
-    assert.is.same(type(assert:format({ true })[1]), "string")
-    assert.is.same(type(assert:format({ 1234 })[1]), "string")
-    assert.is.same(type(assert:format({ function() end })[1]), "string")
-    assert.is.same(type(assert:format({ returnnils() })[1]), "string")
+    assert.is.same(type(assert:format({ "a string", ["n"] = 1 })[1]), "string")
+    assert.is.same(type(assert:format({ true, ["n"] = 1 })[1]), "string")
+    assert.is.same(type(assert:format({ 1234, ["n"] = 1 })[1]), "string")
+    assert.is.same(type(assert:format({ function() end, ["n"] = 1 })[1]), "string")
+    assert.is.same(type(assert:format({ returnnils(), ["n"] = 3 })[1]), "string")
+  end)
+
+  it("Checks to see if table with 0 count is returned empty/0-count", function()
+    local t = { ["n"] = 0 }
+    local formatted = assert:format(t)
+    assert.equals(type(formatted), "table")
+    formatted.n = nil
+    assert.equals(next(formatted), nil)
   end)
 
   it("Checks to see if empty table is returned empty", function()
@@ -23,9 +31,8 @@ describe("Test Formatters", function()
   end)
 
   it("Checks to see if table containing nils is returned with same number of entries #test", function()
-    local t = { returnnils() }
-    formatted = assert:format(t, 3)
-    assert.equals(#t,3)
+    local t = { returnnils(), ["n"] = 3 }
+    formatted = assert:format(t)
     assert.is.same(type(formatted[1]), "string")
     assert.is.same(type(formatted[2]), "string")
     assert.is.same(type(formatted[3]), "string")
