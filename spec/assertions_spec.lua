@@ -38,7 +38,7 @@ describe("Test Assertions", function()
     assert.is.equals(true, true)
   end)
 
-  it("Ensures the not operator does change the behavior of equals", function()
+  it("Ensures the is_not operator does change the behavior of equals", function()
     assert.is_not.equals(true, false)
   end)
 
@@ -80,6 +80,10 @@ describe("Test Assertions", function()
     pcall(assert.are.same,"ok", "ok","not ok")
     assert.format = old_assertformat
     assert.are_not.equal(arg1, arg2)
+  end)
+
+  it("Ensures the Not operator does change the behavior of equals", function()
+    assert.is.Not.equal(true, false)
   end)
 
 end)

@@ -46,6 +46,7 @@ local __state_meta = {
   end,
 
   __index = function(self, key)
+    key = key:lower()
     if rawget(self.parent, "modifier")[key] then
       rawget(self.parent, "modifier")[key].state = self
       return self(nil,
