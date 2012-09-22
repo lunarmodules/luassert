@@ -12,12 +12,15 @@ extended examples.
 ```lua
 assert = require("luassert")
 
-assert.true(true)
-assert.is.true(true)
-assert.is_not.true(false)
+assert.True(true)
+assert.is.True(true)
+assert.is_not.True(false)
+assert.is.Not.True(false)
 assert.are.equal(1, 1)
 assert.has.errors(function() error("this should fail") end)
 ```
+Small note: assertion/modifiers that are Lua keywords (true, false, nil, function, not) need at least one capital when using them to prevent compilation errors.
+
 Extend your own:
 
 ```lua
