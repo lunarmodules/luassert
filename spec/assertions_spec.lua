@@ -148,7 +148,7 @@ describe("Test Assertions", function()
 
   it("Checks userdata() assertion", function()
     local myfile = io.tmpfile()
-    assert.is.Not.userdata(myfile)
+    assert.is.userdata(myfile)
     myfile:close()
     assert.is.Not.userdata(nil)
     assert.is.Not.userdata(123)
