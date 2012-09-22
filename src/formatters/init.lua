@@ -59,9 +59,16 @@ local function fmt_function(arg)
   end
 end
 
+local function fmt_userdata(arg)
+  if type(arg) == "userdata" then
+    return string.format("(userdata) '%s'", tostring(arg))
+  end
+end
+
 assert:addformatter(fmt_string)
 assert:addformatter(fmt_number)
 assert:addformatter(fmt_boolean)
 assert:addformatter(fmt_nil)
 assert:addformatter(fmt_table)
 assert:addformatter(fmt_function)
+assert:addformatter(fmt_userdata)
