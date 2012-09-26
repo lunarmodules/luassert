@@ -64,7 +64,7 @@ local __state_meta = {
 }
 
 local obj = {
-  state = function(obj) return setmetatable({mod=true, payload=nil, parent=obj}, __state_meta) end,
+  state = function() return setmetatable({mod=true, payload=nil}, __state_meta) end,
 
   -- list of registered formatters
   formatter = {},
@@ -129,7 +129,7 @@ local __meta = {
     return bool
   end,
 
-  __index = function(self, key) return self.state(self)[key] end,
+  __index = function(self, key) return self.state()[key] end,
 
 }
 
