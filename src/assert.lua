@@ -14,6 +14,9 @@ local errorlevel = function()
   return level
 end
 
+-- list of namespaces
+local namespace = {}
+
 local __assertion_meta = {
   __call = function(self, ...)
     local state = self.state
@@ -47,14 +50,12 @@ local __state_meta = {
 
   __index = function(self, key)
     key = key:lower()
-    if rawget(self.parent, "modifier")[key] then
-      rawget(self.parent, "modifier")[key].state = self
-      return self(nil,
-      rawget(self.parent, "modifier")[key]
-      )
-    elseif rawget(self.parent, "assertion")[key] then
-      rawget(self.parent, "assertion")[key].state = self
-      return rawget(self.parent, "assertion")[key]
+    if namespace.modifier[key] then
+      namespace.modifier[key].state = self
+      return self(nil, namespace.modifier[key])
+    elseif namespace.assertion[key] then
+      namespace.assertion[key].state = self
+      return namespace.assertion[key]
     else
       error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", errorlevel())
     end
@@ -63,25 +64,19 @@ local __state_meta = {
 }
 
 local obj = {
-  -- list of registered assertions
-  assertion = {},
-
   state = function(obj) return setmetatable({mod=true, payload=nil, parent=obj}, __state_meta) end,
-
-  -- list of registered modifiers
-  modifier = {},
 
   -- list of registered formatters
   formatter = {},
 
   -- registers a function in namespace
-  register = function(self, namespace, name, callback, positive_message, negative_message)
+  register = function(self, nspace, name, callback, positive_message, negative_message)
     -- register
     local lowername = name:lower()
-    if not self[namespace] then
-      self[namespace] = {}
+    if not namespace[nspace] then
+      namespace[nspace] = {}
     end
-    self[namespace][lowername] = setmetatable({
+    namespace[nspace][lowername] = setmetatable({
       callback = callback,
       name = lowername,
       positive_message=positive_message,
