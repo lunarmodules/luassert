@@ -157,6 +157,11 @@ describe("Test Assertions", function()
     assert.is.Not.userdata(function() end)
   end)
 
+  it("Checks '_' chaining of modifiers and assertions", function()
+    assert.is_string("abc")
+    assert.is_not_string(123)
+  end)
+
 end)
 
 

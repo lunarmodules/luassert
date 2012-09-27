@@ -12,8 +12,10 @@ assert = require("luassert")
 
 assert.True(true)
 assert.is.True(true)
+assert.is_true(true)
 assert.is_not.True(false)
 assert.is.Not.True(false)
+assert.is_not_true(false)
 assert.are.equal(1, 1)
 assert.has.errors(function() error("this should fail") end)
 ```
@@ -43,6 +45,6 @@ assert.has_property({ name = "jack" }, "name")
 
 Implementation notes:
 
-* assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) need at least one capital when using them to prevent compilation errors
+* assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
 * assertions `same` and `equal` will compare all arguments provided, the other assertions will only take 1 or 2 parameters and ignore all additional arguments
 
