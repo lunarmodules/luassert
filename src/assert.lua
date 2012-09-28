@@ -53,7 +53,7 @@ local __state_meta = {
 
   __index = function(self, key)
     key = key:lower()
-    -- chcek whether its a chained call using '_' and handle
+    -- check whether its a chained call using '_' and handle
     local rev = key:reverse()
     local pos = #key
     while pos do
