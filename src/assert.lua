@@ -1,4 +1,10 @@
 local s = require 'say'
+local obj
+
+-- list of namespaces
+local namespace = {}
+-- list of registered formatters
+local formatter = {}
 
 local errorlevel = function()
   -- find the first level, not defined in the same file as this 
@@ -25,9 +31,9 @@ local __assertion_meta = {
     if data_type == "boolean" then
       if val ~= state.mod then
         if state.mod then
-          error(s(self.positive_message, assert:format(arguments)) or "assertion failed!", errorlevel())
+          error(s(self.positive_message, obj:format(arguments)) or "assertion failed!", errorlevel())
         else
-          error(s(self.negative_message, assert:format(arguments)) or "assertion failed!", errorlevel())
+          error(s(self.negative_message, obj:format(arguments)) or "assertion failed!", errorlevel())
         end
       else
         return state
@@ -46,14 +52,39 @@ local __state_meta = {
   end,
 
   __index = function(self, key)
-    if rawget(self.parent, "modifier")[key] then
-      rawget(self.parent, "modifier")[key].state = self
-      return self(nil,
-      rawget(self.parent, "modifier")[key]
-      )
-    elseif rawget(self.parent, "assertion")[key] then
-      rawget(self.parent, "assertion")[key].state = self
-      return rawget(self.parent, "assertion")[key]
+    key = key:lower()
+    -- check whether its a chained call using '_' and handle
+    local rev = key:reverse()
+    local pos = #key
+    while pos do
+      -- start with full key
+      local skey = key:sub(1,pos)
+      local nextpart = key:sub(#skey + 2,-1)
+      if namespace.modifier[skey] or namespace.assertion[skey] then
+          if nextpart ~= "" then
+            -- inital modifier extracted, now call on remainder of chain
+            local _ = self[nextpart]   -- just index self to update state
+          end
+          -- update key to only be the extracted initial modifier on chain, will be executed below
+          key = skey
+          break
+      else
+        -- work back from the end -> one '_' at a time
+        local n = rev:find("_", #key - (pos - 1))
+        if n then
+          pos = #key - n
+        else
+          break
+        end
+      end
+    end
+    -- execute modifiers and assertions (unchained from '_')
+    if namespace.modifier[key] then
+      namespace.modifier[key].state = self
+      return self(nil, namespace.modifier[key])
+    elseif namespace.assertion[key] then
+      namespace.assertion[key].state = self
+      return namespace.assertion[key]
     else
       error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", errorlevel())
     end
@@ -61,26 +92,17 @@ local __state_meta = {
 
 }
 
-local obj = {
-  -- list of registered assertions
-  assertion = {},
-
-  state = function(obj) return setmetatable({mod=true, payload=nil, parent=obj}, __state_meta) end,
-
-  -- list of registered modifiers
-  modifier = {},
-
-  -- list of registered formatters
-  formatter = {},
+obj = {
+  state = function() return setmetatable({mod=true, payload=nil}, __state_meta) end,
 
   -- registers a function in namespace
-  register = function(self, namespace, name, callback, positive_message, negative_message)
+  register = function(self, nspace, name, callback, positive_message, negative_message)
     -- register
     local lowername = name:lower()
-    if not self[namespace] then
-      self[namespace] = {}
+    if not namespace[nspace] then
+      namespace[nspace] = {}
     end
-    self[namespace][lowername] = setmetatable({
+    namespace[nspace][lowername] = setmetatable({
       callback = callback,
       name = lowername,
       positive_message=positive_message,
@@ -91,14 +113,14 @@ local obj = {
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
   addformatter = function(self, callback)
-    table.insert(self.formatter, 1, callback)
+    table.insert(formatter, 1, callback)
   end,
   
   -- unregisters a formatter
-  removeformatter = function(self, formatter)
-    for i, v in ipairs(self.formatter) do
-      if v == formatter then
-        table.remove(self.formatter, i)
+  removeformatter = function(self, fmtr)
+    for i, v in ipairs(formatter) do
+      if v == fmtr then
+        table.remove(formatter, i)
         break
       end
     end
@@ -111,7 +133,7 @@ local obj = {
       if not nofmt[i] then
         local val = args[i]
         local valfmt = nil
-        for n, fmt in ipairs(self.formatter) do
+        for _, fmt in ipairs(formatter) do
           valfmt = fmt(val)
           if valfmt ~= nil then break end
         end
@@ -133,8 +155,15 @@ local __meta = {
     return bool
   end,
 
-  __index = function(self, key) return self.state(self)[key] end,
+  __index = function(self, key)
+    return rawget(self, key) or self.state()[key]
+  end,
 
 }
+
+-- export locals to test alias
+if _TEST then
+  obj._formatter = formatter
+end
 
 return setmetatable(obj, __meta)
