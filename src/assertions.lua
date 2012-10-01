@@ -93,6 +93,42 @@ local function has_error(state, arguments)
   return val
 end
 
+local function is_true(state, arguments)
+  table.insert(arguments, 2, true)
+  arguments.n = arguments.n + 1
+  return arguments[1] == arguments[2]
+end
+
+local function is_false(state, arguments)
+  table.insert(arguments, 2, false)
+  arguments.n = arguments.n + 1
+  return arguments[1] == arguments[2]
+end
+
+local function is_type(state, arguments, etype)
+  table.insert(arguments, 2, "type " .. etype)
+  arguments.nofmt = arguments.nofmt or {}
+  arguments.nofmt[2] = true
+  arguments.n = arguments.n + 1
+  return arguments.n > 1 and type(arguments[1]) == etype
+end
+
+local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
+local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
+local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
+local function is_nil(state, arguments)      return is_type(state, arguments, "nil")      end
+local function is_userdata(state, arguments) return is_type(state, arguments, "userdata") end
+local function is_function(state, arguments) return is_type(state, arguments, "function") end
+
+assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "false", is_false, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "boolean", is_boolean, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "number", is_number, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "string", is_string, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
+
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
 assert:register("assertion", "equal", equals, "assertion.equals.positive", "assertion.equals.negative")

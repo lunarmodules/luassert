@@ -1,4 +1,4 @@
-local assert = require("luassert")
+local assert
 
 local function returnnils()
   -- force the return of nils in an argument array
@@ -7,6 +7,21 @@ local function returnnils()
 end
 
 describe("Test Formatters", function()
+  setup(function()
+    _TEST = true
+    -- must reload luassert with _TEST defined to test private elements
+    for k,v in pairs(package.loaded) do 
+      if k:find("luassert") == 1 then package.loaded[k] = false end 
+    end    
+    assert = require("luassert")
+    require('luassert.spy')
+    require('luassert.mock')
+  end)
+  
+  teardown(function()
+    _TEST = nil
+  end)
+  
   it("Checks to see if types are returned as strings", function()
     assert.is.same(assert:format({ "a string", ["n"] = 1 })[1], "(string) 'a string'")
     assert.is.same(assert:format({ true, ["n"] = 1 })[1], "(boolean) true")
@@ -53,8 +68,8 @@ describe("Test Formatters", function()
   it("checks extra formatters inserted to be called first", function()
     local bstring = require("luassert.formatters.binarystring")
     assert:addformatter(bstring)
-    assert(assert.formatter[1] == bstring, "Expected formatter to be inserted at position 1")
-    local mySpy = spy.on(assert.formatter, 1)
+    assert(assert._formatter[1] == bstring, "Expected formatter to be inserted at position 1")
+    local mySpy = spy.on(assert._formatter, 1)
     assert:format({ "Binary Hello", ["n"] = 1 })
     assert.spy(mySpy).was.called(1)
     assert:removeformatter(bstring)
