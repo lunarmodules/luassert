@@ -119,6 +119,7 @@ local function is_string(state, arguments)   return is_type(state, arguments, "s
 local function is_nil(state, arguments)      return is_type(state, arguments, "nil")      end
 local function is_userdata(state, arguments) return is_type(state, arguments, "userdata") end
 local function is_function(state, arguments) return is_type(state, arguments, "function") end
+local function is_thread(state, arguments)   return is_type(state, arguments, "thread")   end
 
 assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "false", is_false, "assertion.same.positive", "assertion.same.negative")
@@ -128,6 +129,7 @@ assert:register("assertion", "string", is_string, "assertion.same.positive", "as
 assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "thread", is_thread, "assertion.same.positive", "assertion.same.negative")
 
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
