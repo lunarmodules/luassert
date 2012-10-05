@@ -27,4 +27,17 @@ describe("Tests dealing with spies", function()
      test.key("test")
      assert.spy(test.key).was.called(2)
   end)
+  
+  it("checks called() and called_with() assertions", function()
+    local s = spy.new()
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy(s).was.called()
+    assert.spy(s).was.called(2) -- twice!
+    assert.spy(s).was_not.called(3)
+    assert.spy(s).was_not.called_with({1, 2, 3}) -- mind the accolades
+    assert.spy(s).was.called_with(1, 2, 3)
+  end)
+  
 end)
