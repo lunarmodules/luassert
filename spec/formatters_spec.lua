@@ -8,7 +8,6 @@ end
 
 describe("Test Formatters", function()
   setup(function()
-    _TEST = true
     -- must reload luassert with _TEST defined to test private elements
     for k,v in pairs(package.loaded) do 
       if k:find("luassert") == 1 then package.loaded[k] = false end 
@@ -16,10 +15,6 @@ describe("Test Formatters", function()
     assert = require("luassert")
     require('luassert.spy')
     require('luassert.mock')
-  end)
-  
-  teardown(function()
-    _TEST = nil
   end)
   
   it("Checks to see if types are returned as strings", function()
