@@ -3,7 +3,7 @@ local assert = require('luassert.assert')
 local util = require('luassert.util')
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
-  new = function(self, callback)
+  new = function(callback)
     return setmetatable(
     {
       calls = {},
@@ -37,7 +37,7 @@ spy = {
   end,
 
   on = function(target_table, target_key)
-    target_table[target_key] = spy:new(target_table[target_key])
+    target_table[target_key] = spy.new(target_table[target_key])
     return target_table[target_key]
   end
 }
@@ -66,7 +66,7 @@ local function called(state, arguments)
     return result
   elseif state.payload and type(state.payload) == "function" then
     error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
-  else  
+  else
     error("'called_with' must be chained after 'spy(aspy)'")
   end
 end
