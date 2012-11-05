@@ -7,7 +7,7 @@ local namespace = {}
 local formatter = {}
 
 local errorlevel = function()
-  -- find the first level, not defined in the same file as this 
+  -- find the first level, not defined in the same file as this
   -- code file to properly report the error
   local level = 1
   local info = debug.getinfo(level)
@@ -18,6 +18,33 @@ local errorlevel = function()
   end
   if level > 1 then level = level - 1 end -- deduct call to errorlevel() itself
   return level
+end
+
+local function extract_keys(assert_string)
+  -- get a list of token separated by _
+  local tokens = {}
+  for token in assert_string:lower():gmatch('[^_]+') do
+    table.insert(tokens, token)
+  end
+
+  -- find valid keys by coalescing tokens as needed, starting from the end
+  local keys = {}
+  local key = nil
+  for i = #tokens, 1, -1 do
+    token = tokens[i]
+    key = key and (token .. '_' .. key) or token
+    if namespace.modifier[key] or namespace.assertion[key] then
+      table.insert(keys, 1, key)
+      key = nil
+    end
+  end
+
+  -- if there's anything left we didn't recognize it
+  if key then
+    error("luassert: unknown modifier/assertion: '" .. key .."'", errorlevel())
+  end
+
+  return keys
 end
 
 local __assertion_meta = {
@@ -52,44 +79,21 @@ local __state_meta = {
   end,
 
   __index = function(self, key)
-    key = key:lower()
-    -- check whether its a chained call using '_' and handle
-    local rev = key:reverse()
-    local pos = #key
-    while pos do
-      -- start with full key
-      local skey = key:sub(1,pos)
-      local nextpart = key:sub(#skey + 2,-1)
-      if namespace.modifier[skey] or namespace.assertion[skey] then
-          if nextpart ~= "" then
-            -- inital modifier extracted, now call on remainder of chain
-            local _ = self[nextpart]   -- just index self to update state
-          end
-          -- update key to only be the extracted initial modifier on chain, will be executed below
-          key = skey
-          break
-      else
-        -- work back from the end -> one '_' at a time
-        local n = rev:find("_", #key - (pos - 1))
-        if n then
-          pos = #key - n
-        else
-          break
-        end
+    local keys = extract_keys(key)
+
+    -- execute modifiers and assertions
+    local ret = nil
+    for _, key in ipairs(keys) do
+      if namespace.modifier[key] then
+        namespace.modifier[key].state = self
+        ret = self(nil, namespace.modifier[key])
+      elseif namespace.assertion[key] then
+        namespace.assertion[key].state = self
+        ret = namespace.assertion[key]
       end
     end
-    -- execute modifiers and assertions (unchained from '_')
-    if namespace.modifier[key] then
-      namespace.modifier[key].state = self
-      return self(nil, namespace.modifier[key])
-    elseif namespace.assertion[key] then
-      namespace.assertion[key].state = self
-      return namespace.assertion[key]
-    else
-      error("luassert: unknown modifier/assertion: '" .. tostring(key).."'", errorlevel())
-    end
+    return ret
   end
-
 }
 
 obj = {
@@ -115,7 +119,7 @@ obj = {
   addformatter = function(self, callback)
     table.insert(formatter, 1, callback)
   end,
-  
+
   -- unregisters a formatter
   removeformatter = function(self, fmtr)
     for i, v in ipairs(formatter) do
@@ -125,7 +129,7 @@ obj = {
       end
     end
   end,
-  
+
   format = function(self, args)
     -- args.n specifies the number of arguments in case of 'trailing nil' arguments which get lost
     local nofmt = args.nofmt or {}  -- arguments in this list should not be formatted
