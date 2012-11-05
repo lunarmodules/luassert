@@ -67,14 +67,14 @@ describe("Test Assertions", function()
     assert.is_not.falsy("")
     assert.is.falsy(false)
   end)
-  
+
   it("tests the error outputted for same() with multiple arguments, to report the failing value", function()
     local old_assertformat = assert.format
     local arg1, arg2
     assert.format = function(self, args)
       args = old_assertformat(self, args)
-      arg1 = args[1]      
-      arg2 = args[2]      
+      arg1 = args[1]
+      arg2 = args[2]
       return args
     end
     pcall(assert.are.same,"ok", "ok","not ok")
@@ -169,7 +169,21 @@ describe("Test Assertions", function()
 
   it("Checks '_' chaining of modifiers and assertions", function()
     assert.is_string("abc")
+    assert.is_true(true)
     assert.is_not_string(123)
+    assert.is_nil(nil)
+    assert.is_not_nil({})
+    assert.is_not_true(false)
+    assert.is_not_false(true)
+
+    -- verify that failing assertions actually fail
+    assert.has_error(function() assert.is_string(1) end)
+    assert.has_error(function() assert.is_true(false) end)
+    assert.has_error(function() assert.is_not_string('string!') end)
+    assert.has_error(function() assert.is_nil({}) end)
+    assert.has_error(function() assert.is_not_nil(nil) end)
+    assert.has_error(function() assert.is_not_true(true) end)
+    assert.has_error(function() assert.is_not_false(false) end)
   end)
 
 end)
