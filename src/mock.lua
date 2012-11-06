@@ -12,7 +12,7 @@ local function mock(object, dostub, func, self, key)
     if dostub then
       return stub(self, key, func)
     elseif self==nil then
-      return spy:new(object)
+      return spy.new(object)
     else
       return spy.on(self, key)
     end
