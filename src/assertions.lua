@@ -116,6 +116,7 @@ end
 local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
 local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
 local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
+local function is_table(state, arguments)    return is_type(state, arguments, "table")    end
 local function is_nil(state, arguments)      return is_type(state, arguments, "nil")      end
 local function is_userdata(state, arguments) return is_type(state, arguments, "userdata") end
 local function is_function(state, arguments) return is_type(state, arguments, "function") end
@@ -126,6 +127,7 @@ assert:register("assertion", "false", is_false, "assertion.same.positive", "asse
 assert:register("assertion", "boolean", is_boolean, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "number", is_number, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "string", is_string, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "table", is_table, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
