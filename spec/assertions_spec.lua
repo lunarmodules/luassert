@@ -1,4 +1,15 @@
 describe("Test Assertions", function()
+  it("Tests backward compatible assert() functionality", function()
+    local test = true
+    local message = "the message"
+    local third_arg = "three"
+    local fourth_arg = "four"
+    one, two, three, four, five = assert(test, message, third_arg, fourth_arg)
+    assert(one == test and two == message and three == third_arg and 
+           four == fourth_arg and five == nil, 
+           "Expected input values to be outputted as well when an assertion does not fail")
+  end)
+
   it("Checks to see if tables 1 and 2 are the same", function()
     local table1 = { derp = false}
     local table2 = { derp = false}
