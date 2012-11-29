@@ -152,11 +152,11 @@ obj = {
 
 local __meta = {
 
-  __call = function(self, bool, message)
+  __call = function(self, bool, message, ...)
     if not bool then
       error(message or "assertion failed!", 2)
     end
-    return bool
+    return bool , message , ...
   end,
 
   __index = function(self, key)
