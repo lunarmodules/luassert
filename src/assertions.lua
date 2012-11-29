@@ -34,8 +34,8 @@ local function equals(state, arguments)
   for i = 2,argcnt  do
     if arguments[1] ~= arguments[i] then
       -- switch arguments for proper output message
-      table.insert(arguments, 1, arguments[i])
-      table.remove(arguments, i + 1)
+      util.tinsert(arguments, 1, arguments[i])
+      util.tremove(arguments, i + 1)
       return false
     end
   end
@@ -50,15 +50,15 @@ local function same(state, arguments)
     if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
       if not util.deepcompare(arguments[1], arguments[i], true) then
         -- switch arguments for proper output message
-        table.insert(arguments, 1, arguments[i])
-        table.remove(arguments, i + 1)
+        util.tinsert(arguments, 1, arguments[i])
+        util.tremove(arguments, i + 1)
         return false
       end
     else
       if arguments[1] ~= arguments[i] then
         -- switch arguments for proper output message
-        table.insert(arguments, 1, arguments[i])
-        table.remove(arguments, i + 1)
+        util.tinsert(arguments, 1, arguments[i])
+        util.tremove(arguments, i + 1)
         return false
       end
     end
