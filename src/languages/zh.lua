@@ -2,30 +2,30 @@ local s = require('say')
 
 s:set_namespace('zh')
 
-s:set("assertion.same.positive", "Ï£Íû¶ÔÏóÓ¦¸ÃÏàÍ¬. Êµ¼Ê:\n%s\nÏ£Íû:\n%s")
-s:set("assertion.same.negative", "Ï£Íû¶ÔÏóÓ¦¸Ã²»ÏàÍ¬. Êµ¼Ê:\n%s\n²»Ï£ÍûÊÇ:\n%s")
+s:set("assertion.same.positive", "å¸Œæœ›å¯¹è±¡åº”è¯¥ç›¸åŒ. å®é™…:\n%s\nå¸Œæœ›:\n%s")
+s:set("assertion.same.negative", "å¸Œæœ›å¯¹è±¡åº”è¯¥ä¸ç›¸åŒ. å®é™…:\n%s\nä¸å¸Œæœ›æ˜¯:\n%s")
 
-s:set("assertion.equals.positive", "Ï£Íû¶ÔÏóÓ¦¸ÃÏàµÈ. Êµ¼Ê:\n%s\nÏ£Íû:\n%s")
-s:set("assertion.equals.negative", "Ï£Íû¶ÔÏóÓ¦¸Ã²»ÏàµÈ. Êµ¼Ê:\n%s\n²»Ï£ÍûÊÇ:\n%s")
+s:set("assertion.equals.positive", "å¸Œæœ›å¯¹è±¡åº”è¯¥ç›¸ç­‰. å®é™…:\n%s\nå¸Œæœ›:\n%s")
+s:set("assertion.equals.negative", "å¸Œæœ›å¯¹è±¡åº”è¯¥ä¸ç›¸ç­‰. å®é™…:\n%s\nä¸å¸Œæœ›æ˜¯:\n%s")
 
-s:set("assertion.unique.positive", "Ï£Íû¶ÔÏóÊÇÎ¨Ò»µÄ:\n%s")
-s:set("assertion.unique.negative", "Ï£Íû¶ÔÏó²»ÊÇÎ¨Ò»µÄ:\n%s")
+s:set("assertion.unique.positive", "å¸Œæœ›å¯¹è±¡æ˜¯å”¯ä¸€çš„:\n%s")
+s:set("assertion.unique.negative", "å¸Œæœ›å¯¹è±¡ä¸æ˜¯å”¯ä¸€çš„:\n%s")
 
-s:set("assertion.error.positive", "Ï£ÍûÓĞ´íÎó±»Å×³ö.")
-s:set("assertion.error.negative", "Ï£ÍûÃ»ÓĞ´íÎó±»Å×³ö.\n%s")
+s:set("assertion.error.positive", "å¸Œæœ›æœ‰é”™è¯¯è¢«æŠ›å‡º.")
+s:set("assertion.error.negative", "å¸Œæœ›æ²¡æœ‰é”™è¯¯è¢«æŠ›å‡º.\n%s")
 
-s:set("assertion.truthy.positive", "Ï£Íû½á¹ûÎªÕæ£¬µ«ÊÇÊµ¼ÊÎª:\n%s")
-s:set("assertion.truthy.negative", "Ï£Íû½á¹û²»ÎªÕæ£¬µ«ÊÇÊµ¼ÊÎª:\n%s")
+s:set("assertion.truthy.positive", "å¸Œæœ›ç»“æœä¸ºçœŸï¼Œä½†æ˜¯å®é™…ä¸º:\n%s")
+s:set("assertion.truthy.negative", "å¸Œæœ›ç»“æœä¸ä¸ºçœŸï¼Œä½†æ˜¯å®é™…ä¸º:\n%s")
 
-s:set("assertion.falsy.positive", "Ï£Íû½á¹ûÎª¼Ù£¬µ«ÊÇÊµ¼ÊÎª:\n%s")
-s:set("assertion.falsy.negative", "Ï£Íû½á¹û²»Îª¼Ù£¬µ«ÊÇÊµ¼ÊÎª:\n%s")
+s:set("assertion.falsy.positive", "å¸Œæœ›ç»“æœä¸ºå‡ï¼Œä½†æ˜¯å®é™…ä¸º:\n%s")
+s:set("assertion.falsy.negative", "å¸Œæœ›ç»“æœä¸ä¸ºå‡ï¼Œä½†æ˜¯å®é™…ä¸º:\n%s")
 
-s:set("assertion.called.positive", "Ï£Íû±»µ÷ÓÃ%s´Î, µ«Êµ¼Ê±»µ÷ÓÃÁË%s´Î")
-s:set("assertion.called.negative", "²»Ï£ÍûÕıºÃ±»µ÷ÓÃ%s´Î, µ«ÊÇÕıºÃ±»µ÷ÓÃÁËÄÇÃ´¶à´Î.")
+s:set("assertion.called.positive", "å¸Œæœ›è¢«è°ƒç”¨%sæ¬¡, ä½†å®é™…è¢«è°ƒç”¨äº†%sæ¬¡")
+s:set("assertion.called.negative", "ä¸å¸Œæœ›æ­£å¥½è¢«è°ƒç”¨%sæ¬¡, ä½†æ˜¯æ­£å¥½è¢«è°ƒç”¨äº†é‚£ä¹ˆå¤šæ¬¡.")
 
-s:set("assertion.called_with.positive", "Ï£ÍûÃ»ÓĞ²ÎÊıµÄµ÷ÓÃº¯Êı")
-s:set("assertion.called_with.negative", "Ï£ÍûÓĞ²ÎÊıµÄµ÷ÓÃº¯Êı")
+s:set("assertion.called_with.positive", "å¸Œæœ›æ²¡æœ‰å‚æ•°çš„è°ƒç”¨å‡½æ•°")
+s:set("assertion.called_with.negative", "å¸Œæœ›æœ‰å‚æ•°çš„è°ƒç”¨å‡½æ•°")
 
 -- errors
-s:set("assertion.internal.argtolittle", "º¯Êı'%s'ĞèÒª×îÉÙ%s¸ö²ÎÊı, Êµ¼ÊÓĞ%s¸ö²ÎÊı\n")
-s:set("assertion.internal.badargtype", "º¯Êı'%s'ĞèÒªÒ»¸ö%s×÷Îª²ÎÊı, Êµ¼ÊÎª: %s\n")
+s:set("assertion.internal.argtolittle", "å‡½æ•°'%s'éœ€è¦æœ€å°‘%sä¸ªå‚æ•°, å®é™…æœ‰%sä¸ªå‚æ•°\n")
+s:set("assertion.internal.badargtype", "å‡½æ•°'%s'éœ€è¦ä¸€ä¸ª%sä½œä¸ºå‚æ•°, å®é™…ä¸º: %s\n")
