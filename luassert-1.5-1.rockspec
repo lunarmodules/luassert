@@ -36,5 +36,6 @@ build = {
     ["luassert.languages.nl"] = "src/languages/nl.lua",
     ["luassert.languages.ru"] = "src/languages/ru.lua",
     ["luassert.languages.ua"] = "src/languages/ua.lua",
+    ["luassert.languages.zh"] = "src/languages/zh.lua",
   }
 }
