@@ -5,8 +5,8 @@ function util.deepcompare(t1,t2,ignore_mt)
   if ty1 ~= ty2 then return false end
   -- non-table types can be directly compared
   if ty1 ~= 'table' and ty2 ~= 'table' then return t1 == t2 end
-  local mt1 = getmetatable(t1)
-  local mt2 = getmetatable(t2)
+  local mt1 = debug.getmetatable(t1)
+  local mt2 = debug.getmetatable(t2)
   -- would equality be determined by metatable __eq?
   if mt1 and mt1 == mt2 and mt1.__eq then
     -- then use that unless asked not to

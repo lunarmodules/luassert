@@ -15,7 +15,13 @@ describe("Test Assertions", function()
     local table2 = { derp = false}
     assert.same(table1, table2)
   end)
-
+  
+  it("Checks the same() assertion for tables with protected metatables", function()
+    local troubleSomeTable = {}
+    setmetatable(troubleSomeTable, {__metatable = 0})
+    assert.are.same(troubleSomeTable, troubleSomeTable)
+  end)
+  
   it("Checks same() assertion to handle nils properly", function()
     assert.is.error(function() assert.same(nil) end)  -- minimum 2 arguments
     assert.same(nil, nil)
@@ -139,6 +145,15 @@ describe("Test Assertions", function()
     assert.is.Not.string(nil)
     assert.is.Not.string(true)
     assert.is.Not.string(function() end)
+  end)
+
+  it("Checks table() assertion", function()
+    assert.is.table({})
+    assert.is.Not.table("abc")
+    assert.is.Not.table(123)
+    assert.is.Not.table(nil)
+    assert.is.Not.table(true)
+    assert.is.Not.table(function() end)
   end)
 
   it("Checks nil() assertion", function()
