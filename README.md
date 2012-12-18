@@ -43,8 +43,14 @@ assert:register("assertion", "has_property", has_property, "assertion.has_proper
 assert.has_property({ name = "jack" }, "name")
 ```
 
+##Implementation notes:
+
+* assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
+* assertions `same` and `equal` will compare all arguments provided, the other assertions will only take 1 or 2 parameters and ignore all additional arguments
+
+
 ##Customizing argument formatting
-luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own.
+luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own. Customizing them is especially useful for limiting table depth and for userdata types.
 
 ###Configuring table depth display
 The default table formatter allows you to customize the levels displayed by setting the `assert.fmttablelevels` value (setting it to -1 displays all levels). 
@@ -124,9 +130,4 @@ Binary string length; 24 bytes
 41 42 43 44 45 46 47 48   49 4a 4b 4c 4d 4e 4f 50  ABCDEFGH IJKLMNOP
 51 52 53 54 55 56 57 58                            QRSTUVWX
 ```
-
-##Implementation notes:
-
-* assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
-* assertions `same` and `equal` will compare all arguments provided, the other assertions will only take 1 or 2 parameters and ignore all additional arguments
 
