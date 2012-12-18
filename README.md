@@ -79,7 +79,7 @@ end)
 ```
 
 Will display the following output with the table pretty-printed to the requested depth:
-`Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 45tests display of 0 levels...ua projects\busted\formatter\spec\formatter_spec.lua:47: Expected objects to be the same. Passed in:(table): { }Expected:(table): { ... more }Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 50tests display of 2 levels...ua projects\busted\formatter\spec\formatter_spec.lua:52: Expected objects to be the same. Passed in:(table): { }Expected:(table): {  [hello] = 'hola'  [fruit] = {    [tropical] = { ... more }    [native] = { ... more } }  [liqour] = {    [1] = 'beer'    [2] = 'wine'    [3] = 'water' }  [world] = 'mundo' }`###Customized formatters
+```Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 45tests display of 0 levels...ua projects\busted\formatter\spec\formatter_spec.lua:47: Expected objects to be the same. Passed in:(table): { }Expected:(table): { ... more }Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 50tests display of 2 levels...ua projects\busted\formatter\spec\formatter_spec.lua:52: Expected objects to be the same. Passed in:(table): { }Expected:(table): {  [hello] = 'hola'  [fruit] = {    [tropical] = { ... more }    [native] = { ... more } }  [liqour] = {    [1] = 'beer'    [2] = 'wine'    [3] = 'water' }  [world] = 'mundo' }```###Customized formatters
 The formatters are functions taking a single argument that needs to be converted to a string representation. The formatter should examine the value provided, if it can format the value, it should return the formatted string, otherwise it should return `nil`.
 Formatters can be added through `assert:addformatter(formatter_func)`, and removed by calling `assert:removeformatter(formatter_func)`.
 
@@ -111,7 +111,7 @@ end)
 ```
 
 Because this formatter formats string values, and is added last, it will take precedence over the regular string formatter. The results will be:
-`
+```
 Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 13
 tests a string comparison with binary formatting
 ...ua projects\busted\formatter\spec\formatter_spec.lua:19: Expected objects to be the same. Passed in:
@@ -122,7 +122,8 @@ Binary string length; 24 bytes
 Expected:
 Binary string length; 24 bytes
 41 42 43 44 45 46 47 48   49 4a 4b 4c 4d 4e 4f 50  ABCDEFGH IJKLMNOP
-51 52 53 54 55 56 57 58                            QRSTUVWX`
+51 52 53 54 55 56 57 58                            QRSTUVWX
+```
 
 ##Implementation notes:
 
