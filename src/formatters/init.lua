@@ -26,13 +26,13 @@ local function fmt_nil(arg)
 end
 
 local function fmt_table(arg)
-  local tmax = 3    -- max nesting-level displayed
+  local tmax = tonumber(assert.fmttablelevels) or 3    -- max nesting-level displayed
   local ft
   ft = function(t, l)
     local result = ""
     for k, v in pairs(t) do
       if type(v) == "table" then
-        if l < tmax then
+        if l < tmax or tmax < 0 then
           result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = {\n%s }\n", tostring(k), tostring(ft(v, l + 1):sub(1,-2)))
         else
           result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = { ... more }\n", tostring(k))
@@ -45,9 +45,18 @@ local function fmt_table(arg)
     return result
   end
   if type(arg) == "table" then
-    local result = "(table): {\n" .. ft(arg, 1):sub(1,-2) .. " }\n"
-    result = result:gsub("{\n }\n", "{ }\n") -- cleanup empty tables
-    result = result:sub(1,-2)                -- remove trailing newline
+    local result
+    if tmax == 0 then
+      if next(arg) then
+        result = "(table): { ... more }"
+      else
+        result = "(table): { }"
+      end
+    else
+      result = "(table): {\n" .. ft(arg, 1):sub(1,-2) .. " }\n"
+      result = result:gsub("{\n }\n", "{ }\n") -- cleanup empty tables
+      result = result:sub(1,-2)                -- remove trailing newline
+    end
     return result
   end
 end
