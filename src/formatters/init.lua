@@ -25,6 +25,10 @@ local function fmt_nil(arg)
   end
 end
 
+-- register member to prevent lookup as a modifier/assertion
+-- sets the default table display depth
+assert.fmttablelevels = 3
+
 local function fmt_table(arg)
   local tmax = tonumber(assert.fmttablelevels) or 3    -- max nesting-level displayed
   local ft
