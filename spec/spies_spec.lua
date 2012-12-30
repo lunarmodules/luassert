@@ -53,4 +53,18 @@ describe("Tests dealing with spies", function()
     s = function() end; assert.has_no_error(testfunc)
   end)
 
+  it("checks reverting a spy", function()
+     local old = test.key
+     local s = spy.on(test, "key")
+     test.key()
+     test.key("test")
+     assert.spy(test.key).was.called(2)
+     -- revert and call again
+     s:revert()
+     assert.equals(old, test.key)
+     test.key()
+     test.key("test")
+     assert.spy(s).was.called(2) -- still two, spy was removed
+  end)
+
 end)
