@@ -22,6 +22,16 @@ spy = {
       calls = {},
       callback = callback,
       
+      target_table = nil, -- these will be set when using 'spy.on'
+      target_key = nil,
+      
+      revert = function(self)
+        if self.target_table and self.target_key then
+          self.target_table[self.target_key] = self.callback
+        end
+        return self.callback
+      end,
+      
       called = function(self, times)
         if times then
           return (#self.calls == times), #self.calls
@@ -48,20 +58,9 @@ spy = {
   on = function(target_table, target_key)
     local s = spy.new(target_table[target_key])
     target_table[target_key] = s
-    -- store original data and create revert function
+    -- store original data 
     s.target_table = target_table
     s.target_key = target_key
-    -- revert function returns original function
-    -- so creating is;
-    --   local s = spy.on(mytable, "thiskey")  -- returns spy function
-    --   s()                                   -- handled through spy
-    -- reverting is;
-    --   s = s:revert()                        -- returns original function
-    --   s()                                   -- handled without spy
-    s.revert = function(self)
-      self.target_table[self.target_key] = s.callback
-      return s.callback
-    end
     
     return s
   end
