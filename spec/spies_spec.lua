@@ -29,7 +29,7 @@ describe("Tests dealing with spies", function()
   end)
 
   it("checks called() and called_with() assertions", function()
-    local s = spy.new()
+    local s = spy.new(function() end)
 
     s(1, 2, 3)
     s("a", "b", "c")
@@ -39,6 +39,20 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.called_with({1, 2, 3}) -- mind the accolades
     assert.spy(s).was.called_with(1, 2, 3)
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
+  end)
+
+  it("checks spies to fail when spying on non-callable elements", function()
+    local s
+    local testfunc = function()
+      spy.new(s)
+    end
+    -- try some types to fail
+    s = "some string";  assert.has_error(testfunc)
+    s = 10;             assert.has_error(testfunc)
+    s = true;           assert.has_error(testfunc)
+    -- try some types to succeed
+    s = function() end; assert.has_no_error(testfunc)
+    s = setmetatable( {}, { __call = function() end } ); assert.has_no_error(testfunc)
   end)
 
 end)
