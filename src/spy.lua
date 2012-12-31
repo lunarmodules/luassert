@@ -4,10 +4,13 @@ local util = require('luassert.util')
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
   new = function(callback)
+    if not util.callable(callback) then
+      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
+    end
     return setmetatable(
     {
       calls = {},
-      callback = callback or function() end,
+      callback = callback,
 
       called = function(self, times)
         if times then

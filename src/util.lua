@@ -87,4 +87,14 @@ function util.tremove(t, pos)
   t.n = t.n - 1
 end
 
+-----------------------------------------------
+-- Checks an element to be callable.
+-- The type must either be a function or have a metatable
+-- containing an '__call' function.
+-- @param object element to inspect on being callable or not
+-- @return boolean, true if the object is callable
+function util.callable(object)
+  return type(object) == "function" or type((debug.getmetatable(object) or {}).__call) == "function"
+end
+
 return util
