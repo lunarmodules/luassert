@@ -81,4 +81,15 @@ describe("Tests dealing with stubs", function()
      assert.is_nil(s)
   end)
 
+  it("checks creating and reverting a 'blank' stub", function()
+     local s = stub.new()   -- use no parameters to create a blank
+     assert.is_table(s)
+     s()
+     s()
+     assert.spy(s).was.called(2)  
+     local old_s = s
+     s = s:revert()
+     assert.is_nil(s)
+  end)
+
 end)
