@@ -17,7 +17,7 @@ spy = {
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
     end
-    return setmetatable(
+    local s = setmetatable(
     {
       calls = {},
       callback = callback,
@@ -26,8 +26,11 @@ spy = {
       target_key = nil,
       
       revert = function(self)
-        if self.target_table and self.target_key then
-          self.target_table[self.target_key] = self.callback
+        if not self.reverted then
+          if self.target_table and self.target_key then
+            self.target_table[self.target_key] = self.callback
+          end
+          self.reverted = true
         end
         return self.callback
       end,
@@ -49,6 +52,8 @@ spy = {
         return false
       end
     }, spy_mt)
+    assert:addspy(s)  -- register with the current state
+    return s
   end,
 
   is_spy = function(object)

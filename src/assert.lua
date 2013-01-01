@@ -1,10 +1,9 @@
 local s = require 'say'
+local state = require 'luassert.state'
 local obj
 
 -- list of namespaces
 local namespace = {}
--- list of registered formatters
-local formatter = {}
 
 local errorlevel = function()
   -- find the first level, not defined in the same file as this
@@ -117,17 +116,12 @@ obj = {
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
   addformatter = function(self, callback)
-    table.insert(formatter, 1, callback)
+    state.addformatter(callback)
   end,
 
-  -- unregisters a formatter
+  -- unregisters a formatter (from the current state only)
   removeformatter = function(self, fmtr)
-    for i, v in ipairs(formatter) do
-      if v == fmtr then
-        table.remove(formatter, i)
-        break
-      end
-    end
+    state.removeformatter(fmtr)
   end,
 
   format = function(self, args)
@@ -136,18 +130,24 @@ obj = {
     for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
       if not nofmt[i] then
         local val = args[i]
-        local valfmt = nil
-        for _, fmt in ipairs(formatter) do
-          valfmt = fmt(val)
-          if valfmt ~= nil then break end
-        end
+        local valfmt = state.formatargument(val)
         if valfmt == nil then valfmt = tostring(val) end -- no formatter found
         args[i] = valfmt
       end
     end
     return args
-  end
+  end,
 
+  setparameter = function(self, name, value)
+    state.setparameter(name, value)
+  end,
+  getparameter = function(self, name)
+    return state.getparameter(name)
+  end,  
+  
+  addspy = function(self, spy)
+    state.addspy(spy)
+  end,
 }
 
 local __meta = {
@@ -166,8 +166,11 @@ local __meta = {
 }
 
 -- export locals to test alias
-if _TEST then
+--[[if _TEST then
   obj._formatter = formatter
 end
+]]
+
+state.snapshot()  -- create initial state
 
 return setmetatable(obj, __meta)
