@@ -1,6 +1,6 @@
 local s = require 'say'
-local state = require 'luassert.state'
-local obj
+local astate = require 'luassert.state'
+local obj   -- the returned module table
 
 -- list of namespaces
 local namespace = {}
@@ -116,12 +116,12 @@ obj = {
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
   addformatter = function(self, callback)
-    state.addformatter(callback)
+    astate.addformatter(callback)
   end,
 
   -- unregisters a formatter (from the current state only)
   removeformatter = function(self, fmtr)
-    state.removeformatter(fmtr)
+    astate.removeformatter(fmtr)
   end,
 
   format = function(self, args)
@@ -130,7 +130,7 @@ obj = {
     for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
       if not nofmt[i] then
         local val = args[i]
-        local valfmt = state.formatargument(val)
+        local valfmt = astate.formatargument(val)
         if valfmt == nil then valfmt = tostring(val) end -- no formatter found
         args[i] = valfmt
       end
@@ -139,18 +139,18 @@ obj = {
   end,
 
   setparameter = function(self, name, value)
-    state.setparameter(name, value)
+    astate.setparameter(name, value)
   end,
   getparameter = function(self, name)
-    return state.getparameter(name)
+    return astate.getparameter(name)
   end,  
   
   addspy = function(self, spy)
-    state.addspy(spy)
+    astate.addspy(spy)
   end,
   
   snapshot = function(self)
-    return state.snapshot()
+    return astate.snapshot()
   end,
 }
 

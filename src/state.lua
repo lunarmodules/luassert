@@ -20,35 +20,30 @@ local state = {}
 state.revert = function(self)
   if not self then
     -- no snapshot given, so move 1 up
-    self = current.previous
-    if not self then
+    self = current
+    if not self.previous then
       -- top of list, no previous one, nothing to do
       return
     end
   end
   if getmetatable(self) ~= state_mt then error("Value provided is not a valid snapshot", 2) end
   
-  local last = self
-  while last.next do last = last.next end
-  
-  while last ~= self do
-    -- revert formatters in 'last'
-    last.formatters = {}
-    -- revert parameters in 'last'
-    last.parameters = {}
-    -- revert spies/stubs in 'last'
-    while last.spies[1] do
-      last.spies[1]:revert()
-      table.remove(last.spies, 1)
-    end
-    
-    -- update state and linked list
-    setmetatable(last, nil) -- invalidate as a snapshot
-    last = last.previous
-    last.next = nil
+  local undolevel = self.next
+  if self.next then
+    self.next:revert()
   end
-  
+  -- revert formatters in 'last'
+  self.formatters = {}
+  -- revert parameters in 'last'
+  self.parameters = {}
+  -- revert spies/stubs in 'last'
+  while self.spies[1] do
+    self.spies[1]:revert()
+    table.remove(self.spies, 1)
+  end
+  setmetatable(self, nil) -- invalidate as a snapshot
   current = self.previous
+  current.next = nil
 end
 
 ------------------------------------------------------
@@ -57,16 +52,16 @@ end
 -- @return snapshot table
 state.snapshot = function()
   local s = current
-  current = setmetatable ({
+  local new = setmetatable ({
     formatters = {},
     parameters = {},
     spies = {},
-    previous = s,
+    previous = current,
     revert = state.revert,
   }, state_mt)
-  if s then s.next = current end
-  
-  return s
+  if current then current.next = new end
+  current = new
+  return current
 end
 
 
@@ -105,6 +100,7 @@ state.setparameter = function(name, value)
   current.parameters[name] = value
 end
 state.getparameter = function(name, s)
+  s = s or current
   local val = s.parameters[name]
   if val == nil and s.previous then
     -- not found, so check 1 up in list
@@ -113,6 +109,7 @@ state.getparameter = function(name, s)
   if val ~= nilvalue then
     return val
   end
+  return nil
 end
 
 --  SPIES / STUBS
@@ -121,6 +118,7 @@ state.addspy = function(spy)
 end
 
 state.snapshot()  -- create initial state
+
 if _TEST then
   assert._state = current
 end
