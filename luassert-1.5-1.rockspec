@@ -20,6 +20,7 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
+    ["luassert.state"] = "src/state.lua",
     ["luassert.util"] = "src/util.lua",
     ["luassert.spy"] = "src/spy.lua",
     ["luassert.stub"] = "src/stub.lua",
