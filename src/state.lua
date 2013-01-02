@@ -89,7 +89,7 @@ state.formatargument = function(val, s)
   s = s or current
   for _, fmt in ipairs(s.formatters) do
     valfmt = fmt(val)
-    if valfmt ~= nil then break end
+    if valfmt ~= nil then return valfmt end
   end
   -- nothing found, check snapshot 1 up in list
   if s.previous then
@@ -120,4 +120,8 @@ state.addspy = function(spy)
   table.insert(current.spies, 1, spy)
 end
 
+state.snapshot()  -- create initial state
+if _TEST then
+  assert._state = current
+end
 return state

@@ -148,6 +148,10 @@ obj = {
   addspy = function(self, spy)
     state.addspy(spy)
   end,
+  
+  snapshot = function(self)
+    return state.snapshot()
+  end,
 }
 
 local __meta = {
@@ -170,7 +174,5 @@ local __meta = {
   obj._formatter = formatter
 end
 ]]
-
-state.snapshot()  -- create initial state
 
 return setmetatable(obj, __meta)
