@@ -119,7 +119,7 @@ obj = {
     astate.addformatter(callback)
   end,
 
-  -- unregisters a formatter (from the current state only)
+  -- unregisters a formatter
   removeformatter = function(self, fmtr)
     astate.removeformatter(fmtr)
   end,
