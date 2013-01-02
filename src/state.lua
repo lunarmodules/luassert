@@ -70,13 +70,17 @@ state.addformatter = function(callback)
   table.insert(current.formatters, 1, callback)
 end
 
-state.removeformatter = function(callback)
-  -- NOTE: removes only from the current state, will not traverse the linked list
-  for i, v in ipairs(current.formatters) do
+state.removeformatter = function(callback, s)
+  s = s or current
+  for i, v in ipairs(s.formatters) do
     if v == fmtr then
-      table.remove(current.formatters, i)
+      table.remove(s.formatters, i)
       break
     end
+  end
+  -- wasn't found, so traverse up 1 state
+  if s.previous then
+    state.removeformatter(callback, s.previous)
   end
 end
 

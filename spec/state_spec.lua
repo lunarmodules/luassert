@@ -1,18 +1,5 @@
 describe("Tests states of the assert engine", function()
-  
---[[  local printformatters = function(s, desc)
-    print("\n" .. tostring(desc))
-    while s.previous do s = s.previous end
-    local i = 1
-    while true do
-      print("level ",i," has ", #s.formatters, "formatters")
-      i = i + 1
-      s = s.next
-      if not s then break end
-    end
-  end
-]]
-  
+    
   it("checks levels created/reverted", function()
     local start = assert:snapshot()
     assert.is_nil(start.next)
@@ -122,6 +109,39 @@ describe("Tests states of the assert engine", function()
     snapshot1:revert()
     assert.is_nil(assert:getparameter("Test_1"))
     assert.is_nil(assert:getparameter("Test_2"))
+  end)
+
+  it("checks to see if a spy/stub is reversed", function()
+
+    local c1, c2 = 0, 0
+    local test = {
+      f1 = function() c1 = c1 + 1 end,
+      f2 = function() c2 = c2 + 1 end,
+    }
+    local f1 = test.f1
+    local f2 = test.f2
+    -- add a state level by creating a snapshot
+    local snapshot1 = assert:snapshot()
+    -- create spy/stub
+    local s1 = spy.on(test, "f1")
+    local s2 = stub(test, "f2")
+    -- call them both
+    test.f1()
+    test.f2()
+    assert.spy(test.f1).was.called(1)
+    assert.spy(test.f2).was.called(1)
+    assert.is_equal(1, c1)
+    assert.is_equal(0, c2) -- 0, because it's a stub
+    
+    -- revert to initial level
+    snapshot1:revert()
+    test.f1()
+    test.f2()
+    -- check count is still 1 for both
+    assert.spy(s1).was.called(1)
+    assert.spy(s2).was.called(1)
+    assert.is_equal(2, c1)
+    assert.is_equal(1, c2) 
   end)
 
 end)
