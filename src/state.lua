@@ -8,7 +8,7 @@ local state_mt = {
 
 local nilvalue = {} -- unique ID to refer to nil values for parameters
 
--- will hold the current state (1 ahead of last snapshot)
+-- will hold the current state
 local current
 
 -- exported module table
@@ -28,7 +28,6 @@ state.revert = function(self)
   end
   if getmetatable(self) ~= state_mt then error("Value provided is not a valid snapshot", 2) end
   
-  local undolevel = self.next
   if self.next then
     self.next:revert()
   end
@@ -48,7 +47,6 @@ end
 
 ------------------------------------------------------
 -- Creates a new snapshot.
--- Current state becomes the new snapshot. Forwards the current state to 1 ahead of the new snapshot.
 -- @return snapshot table
 state.snapshot = function()
   local s = current
@@ -123,7 +121,4 @@ end
 
 state.snapshot()  -- create initial state
 
-if _TEST then
-  assert._state = current
-end
 return state

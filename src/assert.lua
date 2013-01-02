@@ -169,10 +169,4 @@ local __meta = {
 
 }
 
--- export locals to test alias
---[[if _TEST then
-  obj._formatter = formatter
-end
-]]
-
 return setmetatable(obj, __meta)
