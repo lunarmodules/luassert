@@ -69,10 +69,10 @@ describe("Test Formatters", function()
     end
     local s = spy.new(f)
     
-    assert:addformatter(s)
+    assert:add_formatter(s)
     assert.are_equal(expected, assert:format({"some string"})[1])
     assert.spy(s).was.called(1)
-    assert:removeformatter(s)
+    assert:remove_formatter(s)
   end)
   
 end)

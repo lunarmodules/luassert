@@ -115,13 +115,13 @@ obj = {
 
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
-  addformatter = function(self, callback)
-    astate.addformatter(callback)
+  add_formatter = function(self, callback)
+    astate.add_formatter(callback)
   end,
 
   -- unregisters a formatter
-  removeformatter = function(self, fmtr)
-    astate.removeformatter(fmtr)
+  remove_formatter = function(self, fmtr)
+    astate.remove_formatter(fmtr)
   end,
 
   format = function(self, args)
@@ -130,7 +130,7 @@ obj = {
     for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
       if not nofmt[i] then
         local val = args[i]
-        local valfmt = astate.formatargument(val)
+        local valfmt = astate.format_argument(val)
         if valfmt == nil then valfmt = tostring(val) end -- no formatter found
         args[i] = valfmt
       end
@@ -138,15 +138,16 @@ obj = {
     return args
   end,
 
-  setparameter = function(self, name, value)
-    astate.setparameter(name, value)
+  set_parameter = function(self, name, value)
+    astate.set_parameter(name, value)
   end,
-  getparameter = function(self, name)
-    return astate.getparameter(name)
+  
+  get_parameter = function(self, name)
+    return astate.get_parameter(name)
   end,  
   
-  addspy = function(self, spy)
-    astate.addspy(spy)
+  add_spy = function(self, spy)
+    astate.add_spy(spy)
   end,
   
   snapshot = function(self)

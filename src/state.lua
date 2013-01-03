@@ -64,11 +64,11 @@ end
 
 
 --  FORMATTERS
-state.addformatter = function(callback)
+state.add_formatter = function(callback)
   table.insert(current.formatters, 1, callback)
 end
 
-state.removeformatter = function(callback, s)
+state.remove_formatter = function(callback, s)
   s = s or current
   for i, v in ipairs(s.formatters) do
     if v == fmtr then
@@ -78,11 +78,11 @@ state.removeformatter = function(callback, s)
   end
   -- wasn't found, so traverse up 1 state
   if s.previous then
-    state.removeformatter(callback, s.previous)
+    state.remove_formatter(callback, s.previous)
   end
 end
 
-state.formatargument = function(val, s)
+state.format_argument = function(val, s)
   s = s or current
   for _, fmt in ipairs(s.formatters) do
     valfmt = fmt(val)
@@ -90,23 +90,24 @@ state.formatargument = function(val, s)
   end
   -- nothing found, check snapshot 1 up in list
   if s.previous then
-    return state.formatargument(val, s.previous)
+    return state.format_argument(val, s.previous)
   end
   return nil -- end of list, couldn't format
 end
 
 
 --  PARAMETERS
-state.setparameter = function(name, value)
+state.set_parameter = function(name, value)
   if value == nil then value = nilvalue end
   current.parameters[name] = value
 end
-state.getparameter = function(name, s)
+
+state.get_parameter = function(name, s)
   s = s or current
   local val = s.parameters[name]
   if val == nil and s.previous then
     -- not found, so check 1 up in list
-    return state.getparameter(name, s.previous)
+    return state.get_parameter(name, s.previous)
   end
   if val ~= nilvalue then
     return val
@@ -115,7 +116,7 @@ state.getparameter = function(name, s)
 end
 
 --  SPIES / STUBS
-state.addspy = function(spy)
+state.add_spy = function(spy)
   table.insert(current.spies, 1, spy)
 end
 

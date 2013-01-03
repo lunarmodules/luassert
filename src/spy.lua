@@ -52,7 +52,7 @@ spy = {
         return false
       end
     }, spy_mt)
-    assert:addspy(s)  -- register with the current state
+    assert:add_spy(s)  -- register with the current state
     return s
   end,
 
