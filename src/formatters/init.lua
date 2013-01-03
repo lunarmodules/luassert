@@ -25,12 +25,8 @@ local function fmt_nil(arg)
   end
 end
 
--- register member to prevent lookup as a modifier/assertion
--- sets the default table display depth
-assert.fmttablelevels = 3
-
 local function fmt_table(arg)
-  local tmax = tonumber(assert.fmttablelevels) or 3    -- max nesting-level displayed
+  local tmax = assert:get_parameter("TableFormatLevel")
   local ft
   ft = function(t, l)
     local result = ""
@@ -85,3 +81,5 @@ assert:add_formatter(fmt_nil)
 assert:add_formatter(fmt_table)
 assert:add_formatter(fmt_function)
 assert:add_formatter(fmt_userdata)
+-- Set default table display depth for table formatter
+assert:set_parameter("TableFormatLevel", 3)

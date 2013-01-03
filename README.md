@@ -53,7 +53,7 @@ assert.has_property({ name = "jack" }, "name")
 luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own. Customizing them is especially useful for limiting table depth and for userdata types.
 
 ###Configuring table depth display
-The default table formatter allows you to customize the levels displayed by setting the `assert.fmttablelevels` value (setting it to -1 displays all levels). 
+The default table formatter allows you to customize the levels displayed by setting the `TableFormatLevel` parameter (setting it to -1 displays all levels). 
 
 Example:
 ```lua
@@ -72,12 +72,12 @@ describe("Tests different levels of table display", function()
     }
     
   it("tests display of 0 levels", function()
-    assert.fmttablelevels = 0
+    assert:set_parameter("TableFormatLevel", 0)
     assert.are.same(testtable, {})
   end)
 
   it("tests display of 2 levels", function()
-    assert.fmttablelevels = 2 
+    assert:set_parameter("TableFormatLevel", 2)
     assert.are.same(testtable, {})
   end)
   
