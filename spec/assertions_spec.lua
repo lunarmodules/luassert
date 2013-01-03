@@ -217,7 +217,7 @@ describe("Test Assertions", function()
     end
 
     local fn1 = function()
-      return 1,2,3
+      return "something",2,3
     end
 
     local fn2 = function()

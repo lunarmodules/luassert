@@ -114,7 +114,13 @@ local function is_type(state, arguments, etype)
 end
 
 local function returned_arguments(state, arguments)
-  return arguments[1] == arguments.n - 1
+  arguments[1] = tostring(arguments[1])
+  arguments[2] = tostring(arguments.n - 1)
+  arguments.nofmt = arguments.nofmt or {}
+  arguments.nofmt[1] = true
+  arguments.nofmt[2] = true
+  if arguments.n < 2 then arguments.n = 2 end
+  return arguments[1] == arguments[2]
 end
 
 local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
