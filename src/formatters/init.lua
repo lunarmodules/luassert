@@ -65,10 +65,10 @@ local function fmt_userdata(arg)
   end
 end
 
-assert:addformatter(fmt_string)
-assert:addformatter(fmt_number)
-assert:addformatter(fmt_boolean)
-assert:addformatter(fmt_nil)
-assert:addformatter(fmt_table)
-assert:addformatter(fmt_function)
-assert:addformatter(fmt_userdata)
+assert:add_formatter(fmt_string)
+assert:add_formatter(fmt_number)
+assert:add_formatter(fmt_boolean)
+assert:add_formatter(fmt_nil)
+assert:add_formatter(fmt_table)
+assert:add_formatter(fmt_function)
+assert:add_formatter(fmt_userdata)

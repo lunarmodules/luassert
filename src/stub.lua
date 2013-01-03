@@ -18,8 +18,11 @@ function stub.new(object, key)
   local spy_revert = s.revert     -- keep created revert function
   
   s.revert = function(self)       -- wrap revert function to restore original element
-    spy_revert(self)
-    object[key] = old_elem
+    if not self.reverted then
+      spy_revert(self)
+      object[key] = old_elem
+      self.reverted = true
+    end
     return old_elem
   end
   
