@@ -26,6 +26,9 @@ s:set("assertion.called.negative", "Expected not to be called exactly %s time(s)
 s:set("assertion.called_with.positive", "Function was not called with the arguments")
 s:set("assertion.called_with.negative", "Function was called with the arguments")
 
+s:set("assertion.returned_arguments.positive", "Expected to be called with %s argument(s), but was called with %s")
+s:set("assertion.returned_arguments.negative", "Expected not to be called with %s argument(s), but was called with %s")
+
 -- errors
 s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got; %s\n")
 s:set("assertion.internal.badargtype", "the '%s' function requires a %s as an argument, got; %s\n")
