@@ -1,4 +1,4 @@
-describe("Tests dealing with spies", function()
+describe("Tests dealing with stubs", function()
   local test = {}
 
   before_each(function()
@@ -6,30 +6,25 @@ describe("Tests dealing with spies", function()
       return "derp"
     end}
   end)
---[[
-  it("checks if a spy actually executes the internal function", function()
-    spy.on(test, "key")
-    assert(test.key() == "derp")
-  end)
-]]
-  it("checks to see if spy keeps track of arguments", function()
+  
+  it("checks to see if stub keeps track of arguments", function()
 
-    spy.on(test, "key")
+    stub(test, "key")
 
     test.key("derp")
     assert.spy(test.key).was.called_with("derp")
     assert.errors(function() assert.spy(test.key).was.called_with("herp") end)
   end)
 
-  it("checks to see if spy keeps track of number of calls", function()
-     spy.on(test, "key")
+  it("checks to see if stub keeps track of number of calls", function()
+     stub(test, "key")
      test.key()
      test.key("test")
      assert.spy(test.key).was.called(2)
   end)
 
   it("checks called() and called_with() assertions", function()
-    local s = spy.new(function() end)
+    local s = stub.new(test, "key")
 
     s(1, 2, 3)
     s("a", "b", "c")
@@ -41,10 +36,11 @@ describe("Tests dealing with spies", function()
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 
-  it("checks spies to fail when spying on non-callable elements", function()
+  it("checks stub to fail when spying on non-callable elements", function()
     local s
     local testfunc = function()
-      spy.new(s)
+      local t = { key = s}
+      stub.new(t, "key")
     end
     -- try some types to fail
     s = "some string";  assert.has_error(testfunc)
@@ -55,35 +51,45 @@ describe("Tests dealing with spies", function()
     s = setmetatable( {}, { __call = function() end } ); assert.has_no_error(testfunc)
   end)
 
-  it("checks reverting a spy.on call", function()
-     local old = test.key
-     local s = spy.on(test, "key")
-     test.key()
-     test.key("test")
-     assert.spy(test.key).was.called(2)
-     -- revert and call again
-     s:revert()
-     assert.are.equal(old, test.key)
-     test.key()
-     test.key("test")
-     assert.spy(s).was.called(2) -- still two, spy was removed
-  end)
-
-  it("checks reverting a spy.new call", function()
+  it("checks reverting a stub call", function()
      local calls = 0
      local old = function() calls = calls + 1 end
-     local s = spy.new(old)
+     test.key = old
+     local s = stub.new(test, "key")
      assert.is_table(s)
      s()
      s()
-     assert.spy(s).was.called(2)
-     assert.are.equal(calls, 2)
+     assert.spy(s).was.called(2)  
+     assert.are.equal(calls, 0)   -- its a stub, so no calls
      local old_s = s
      s = s:revert()
-     assert.are.equal(s, old)
      s()
-     assert.spy(old_s).was.called(2)  -- still two, spy was removed
-     assert.are.equal(calls, 3)
+     assert.spy(old_s).was.called(2)  -- still two, stub was removed
+     assert.are.equal(s, old)
+     assert.are.equal(calls, 1)     -- restored, so now 1 call
+  end)
+
+  it("checks reverting a stub call on a nil value", function()
+     test = {}
+     local s = stub.new(test, "key")
+     assert.is_table(s)
+     s()
+     s()
+     assert.spy(s).was.called(2)  
+     local old_s = s
+     s = s:revert()
+     assert.is_nil(s)
+  end)
+
+  it("checks creating and reverting a 'blank' stub", function()
+     local s = stub.new()   -- use no parameters to create a blank
+     assert.is_table(s)
+     s()
+     s()
+     assert.spy(s).was.called(2)  
+     local old_s = s
+     s = s:revert()
+     assert.is_nil(s)
   end)
 
 end)

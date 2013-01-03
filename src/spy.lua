@@ -1,14 +1,40 @@
 -- module will return spy table, and register its assertions with the main assert engine
 local assert = require('luassert.assert')
 local util = require('luassert.util')
+
+-- Spy metatable
+local spy_mt = {
+  __call = function(self, ...)
+    local arguments = {...}
+    arguments.n = select('#',...)  -- add argument count for trailing nils
+    table.insert(self.calls, arguments)
+    return self.callback(...)
+  end }
+
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
   new = function(callback)
-    return setmetatable(
+    if not util.callable(callback) then
+      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
+    end
+    local s = setmetatable(
     {
       calls = {},
-      callback = callback or function() end,
-
+      callback = callback,
+      
+      target_table = nil, -- these will be set when using 'spy.on'
+      target_key = nil,
+      
+      revert = function(self)
+        if not self.reverted then
+          if self.target_table and self.target_key then
+            self.target_table[self.target_key] = self.callback
+          end
+          self.reverted = true
+        end
+        return self.callback
+      end,
+      
       called = function(self, times)
         if times then
           return (#self.calls == times), #self.calls
@@ -25,20 +51,23 @@ spy = {
         end
         return false
       end
-    },
-    {
-      __call = function(self, ...)
-        local arguments = {...}
-        arguments.n = select('#',...)  -- add argument count for trailing nils
-        table.insert(self.calls, arguments)
-        return self.callback(...)
-      end
-    })
+    }, spy_mt)
+    assert:add_spy(s)  -- register with the current state
+    return s
   end,
 
+  is_spy = function(object)
+    return type(object) == "table" and getmetatable(object) == spy_mt
+  end,
+    
   on = function(target_table, target_key)
-    target_table[target_key] = spy.new(target_table[target_key])
-    return target_table[target_key]
+    local s = spy.new(target_table[target_key])
+    target_table[target_key] = s
+    -- store original data 
+    s.target_table = target_table
+    s.target_key = target_key
+    
+    return s
   end
 }
 

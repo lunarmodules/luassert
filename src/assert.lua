@@ -1,10 +1,9 @@
 local s = require 'say'
-local obj
+local astate = require 'luassert.state'
+local obj   -- the returned module table
 
 -- list of namespaces
 local namespace = {}
--- list of registered formatters
-local formatter = {}
 
 local errorlevel = function()
   -- find the first level, not defined in the same file as this
@@ -116,18 +115,13 @@ obj = {
 
   -- registers a formatter
   -- a formatter takes a single argument, and converts it to a string, or returns nil if it cannot format the argument
-  addformatter = function(self, callback)
-    table.insert(formatter, 1, callback)
+  add_formatter = function(self, callback)
+    astate.add_formatter(callback)
   end,
 
   -- unregisters a formatter
-  removeformatter = function(self, fmtr)
-    for i, v in ipairs(formatter) do
-      if v == fmtr then
-        table.remove(formatter, i)
-        break
-      end
-    end
+  remove_formatter = function(self, fmtr)
+    astate.remove_formatter(fmtr)
   end,
 
   format = function(self, args)
@@ -136,18 +130,29 @@ obj = {
     for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
       if not nofmt[i] then
         local val = args[i]
-        local valfmt = nil
-        for _, fmt in ipairs(formatter) do
-          valfmt = fmt(val)
-          if valfmt ~= nil then break end
-        end
+        local valfmt = astate.format_argument(val)
         if valfmt == nil then valfmt = tostring(val) end -- no formatter found
         args[i] = valfmt
       end
     end
     return args
-  end
+  end,
 
+  set_parameter = function(self, name, value)
+    astate.set_parameter(name, value)
+  end,
+  
+  get_parameter = function(self, name)
+    return astate.get_parameter(name)
+  end,  
+  
+  add_spy = function(self, spy)
+    astate.add_spy(spy)
+  end,
+  
+  snapshot = function(self)
+    return astate.snapshot()
+  end,
 }
 
 local __meta = {
@@ -164,10 +169,5 @@ local __meta = {
   end,
 
 }
-
--- export locals to test alias
-if _TEST then
-  obj._formatter = formatter
-end
 
 return setmetatable(obj, __meta)
