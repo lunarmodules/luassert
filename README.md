@@ -48,6 +48,45 @@ assert.has_property({ name = "jack" }, "name")
 * assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
 * assertions `same` and `equal` will compare all arguments provided, the other assertions will only take 1 or 2 parameters and ignore all additional arguments
 
+##Snapshots
+To be able to revert changes created by tests, inserting spies and stubs for example, luassert supports 'snapshots'. A snapshot includes the following;
+
+1. spies and stubs
+1. parameters
+1. formatters
+
+Example:
+```lua
+describe("Showing use of snapshots", function()
+  local snapshot
+  
+  before_each(function()
+    snapshot = assert:snapshot()
+  end)
+  
+  after_each(function()
+    snapshot:revert()
+  end)
+  
+  it("does some test", function()
+    -- spies or stubs registered here, parameters changed, or formatters added
+    -- will be undone in the after_each() handler.
+  end)
+  
+end)
+```
+
+##Parameters
+To register state information 'parameters' can be used. The parameter is included in a snapshot and can hence be restored in between tests. For an example see `Configuring table depth display` below.
+
+Example:
+```lua
+assert:set_parameter("my_param_name", 1)
+local s = assert:snapshot()
+assert:set_parameter("my_param_name", 2)
+s:revert()
+assert.are.equal(1, assert:get_parameter("my_param_name"))
+```
 
 ##Customizing argument formatting
 luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own. Customizing them is especially useful for limiting table depth and for userdata types.
