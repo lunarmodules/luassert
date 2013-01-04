@@ -126,7 +126,7 @@ end)
 Will display the following output with the table pretty-printed to the requested depth:
 ```Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 45tests display of 0 levels...ua projects\busted\formatter\spec\formatter_spec.lua:47: Expected objects to be the same. Passed in:(table): { }Expected:(table): { ... more }Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 50tests display of 2 levels...ua projects\busted\formatter\spec\formatter_spec.lua:52: Expected objects to be the same. Passed in:(table): { }Expected:(table): {  [hello] = 'hola'  [fruit] = {    [tropical] = { ... more }    [native] = { ... more } }  [liqour] = {    [1] = 'beer'    [2] = 'wine'    [3] = 'water' }  [world] = 'mundo' }```###Customized formatters
 The formatters are functions taking a single argument that needs to be converted to a string representation. The formatter should examine the value provided, if it can format the value, it should return the formatted string, otherwise it should return `nil`.
-Formatters can be added through `assert:addformatter(formatter_func)`, and removed by calling `assert:removeformatter(formatter_func)`.
+Formatters can be added through `assert:add_formatter(formatter_func)`, and removed by calling `assert:remove_formatter(formatter_func)`.
 
 Example using the included binary string formatter:
 ```lua
@@ -135,11 +135,11 @@ local binstring = require("luassert.formatters.binarystring")
 describe("Tests using a binary string formatter", function()
     
   setup(function()
-    assert:addformatter(binstring)
+    assert:add_formatter(binstring)
   end)
 
   teardown(function()
-    assert:removeformatter(binstring)
+    assert:remove_formatter(binstring)
   end)
   
   it("tests a string comparison with binary formatting", function()
