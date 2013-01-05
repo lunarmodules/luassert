@@ -212,6 +212,34 @@ describe("Test Assertions", function()
     assert.has_error(function() assert.is_not_false(false) end)
   end)
 
+  it("Checks number of returned arguments", function()
+    local fn = function()
+    end
+
+    local fn1 = function()
+      return "something",2,3
+    end
+
+    local fn2 = function()
+      return nil
+    end
+
+    local fn3 = function()
+      return nil, nil
+    end
+
+    local fn4 = function()
+      return nil, 1, nil
+    end
+
+    assert.returned_arguments(0, fn())
+    assert.not_returned_arguments(2, fn1())
+    assert.returned_arguments(3, fn1())
+
+    assert.returned_arguments(1, fn2())
+    assert.returned_arguments(2, fn3())
+    assert.returned_arguments(3, fn4())
+  end)
 end)
 
 

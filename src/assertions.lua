@@ -113,6 +113,16 @@ local function is_type(state, arguments, etype)
   return arguments.n > 1 and type(arguments[1]) == etype
 end
 
+local function returned_arguments(state, arguments)
+  arguments[1] = tostring(arguments[1])
+  arguments[2] = tostring(arguments.n - 1)
+  arguments.nofmt = arguments.nofmt or {}
+  arguments.nofmt[1] = true
+  arguments.nofmt[2] = true
+  if arguments.n < 2 then arguments.n = 2 end
+  return arguments[1] == arguments[2]
+end
+
 local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
 local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
 local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
@@ -132,6 +142,7 @@ assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertio
 assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "thread", is_thread, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "returned_arguments", returned_arguments, "assertion.returned_arguments.positive", "assertion.returned_arguments.negative")
 
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
