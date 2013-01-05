@@ -27,5 +27,5 @@ s:set("assertion.called_with.positive", "Function was not called with the argume
 s:set("assertion.called_with.negative", "Function was called with the arguments")
 
 -- errors
-s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got; %s\n")
-s:set("assertion.internal.badargtype", "the '%s' function requires a %s as an argument, got; %s\n")
+s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got: %s")
+s:set("assertion.internal.badargtype", "the '%s' function requires a %s as an argument, got: %s")
