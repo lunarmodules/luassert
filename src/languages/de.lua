@@ -27,5 +27,5 @@ s:set("assertion.called_with.positive", "Erwarte, dass die Funktion mit den gege
 s:set("assertion.called_with.negative", "Erwarte, dass die Funktion nicht mit den gegebenen Parametern aufgerufen wird.")
 
 -- errors
-s:set("assertion.internal.argtolittle", "Die Funktion '%s' erwartet mindestens %s Parameter, gegeben; %s\n")
-s:set("assertion.internal.badargtype", "Die Funktion '%s' erwartet einen Parameter vom Typ '%s', gegeben; %s\n")
+s:set("assertion.internal.argtolittle", "Die Funktion '%s' erwartet mindestens %s Parameter, gegeben: %s")
+s:set("assertion.internal.badargtype", "Die Funktion '%s' erwartet einen Parameter vom Typ '%s', gegeben: %s")
