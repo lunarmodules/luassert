@@ -26,13 +26,15 @@ Extend your own:
 local assert = require("luassert")
 local say    = require("say") --our i18n lib, installed through luarocks, included as a luassert dependency
 
-local function has_property(table, prop)
-  for _, value in pairs(table) do
-    if value == prop then
+local function has_property(state, arguments)
+  local property = arguments[1]
+  local table = arguments[2]
+  for key, value in pairs(table) do
+    if key == property then
       return true
     end
   end
-  return false, {prop, table}
+  return false
 end
 
 say:set_namespace("en")
@@ -40,7 +42,8 @@ say:set("assertion.has_property.positive", "Expected property %s in:\n%s")
 say:set("assertion.has_property.negative", "Expected property %s to not be in:\n%s")
 assert:register("assertion", "has_property", has_property, "assertion.has_property.positive", "assertion.has_property.negative")
 
-assert.has_property({ name = "jack" }, "name")
+assert.has_property("name", { name = "jack" })
+
 ```
 
 ##Implementation notes:
@@ -124,7 +127,31 @@ end)
 ```
 
 Will display the following output with the table pretty-printed to the requested depth:
-```Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 45tests display of 0 levels...ua projects\busted\formatter\spec\formatter_spec.lua:47: Expected objects to be the same. Passed in:(table): { }Expected:(table): { ... more }Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 50tests display of 2 levels...ua projects\busted\formatter\spec\formatter_spec.lua:52: Expected objects to be the same. Passed in:(table): { }Expected:(table): {  [hello] = 'hola'  [fruit] = {    [tropical] = { ... more }    [native] = { ... more } }  [liqour] = {    [1] = 'beer'    [2] = 'wine'    [3] = 'water' }  [world] = 'mundo' }```###Customized formatters
+```
+Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 45
+tests display of 0 levels
+...ua projects\busted\formatter\spec\formatter_spec.lua:47: Expected objects to be the same. Passed in:
+(table): { }
+Expected:
+(table): { ... more }
+
+Failure: ...ua projects\busted\formatter\spec\formatter_spec.lua @ 50
+tests display of 2 levels
+...ua projects\busted\formatter\spec\formatter_spec.lua:52: Expected objects to be the same. Passed in:
+(table): { }
+Expected:
+(table): {
+  [hello] = 'hola'
+  [fruit] = {
+    [tropical] = { ... more }
+    [native] = { ... more } }
+  [liqour] = {
+    [1] = 'beer'
+    [2] = 'wine'
+    [3] = 'water' }
+  [world] = 'mundo' }
+```
+###Customized formatters
 The formatters are functions taking a single argument that needs to be converted to a string representation. The formatter should examine the value provided, if it can format the value, it should return the formatted string, otherwise it should return `nil`.
 Formatters can be added through `assert:add_formatter(formatter_func)`, and removed by calling `assert:remove_formatter(formatter_func)`.
 
