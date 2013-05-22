@@ -240,6 +240,19 @@ describe("Test Assertions", function()
     assert.returned_arguments(2, fn3())
     assert.returned_arguments(3, fn4())
   end)
+
+  it("checks has_error to accept only callable arguments", function()
+    local t_ok = setmetatable( {}, { __call = function() end } )
+    local t_nok = setmetatable( {}, { __call = function() error("some error") end } )
+    local f_ok = function() end
+    local f_nok = function() error("some error") end
+    
+    assert.has_error(f_nok)
+    assert.has_no_error(f_ok)
+    assert.has_error(t_nok)
+    assert.has_no_error(t_ok)
+  end)
+
 end)
 
 
