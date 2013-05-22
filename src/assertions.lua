@@ -6,7 +6,7 @@
 -- returns; boolean; whether assertion passed
 
 local assert = require('luassert.assert')
-local util = require 'luassert.util'
+local util = require ('luassert.util')
 local s = require('say')
 
 local function unique(state, arguments)
@@ -78,7 +78,7 @@ local function has_error(state, arguments)
   local func = arguments[1]
   local err_expected = arguments[2]
   
-  assert(type(func) == "function", s("assertion.internal.badargtype", { "error", "function", type(func) }))
+  assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local err_actual = nil
   --must swap error functions to get the actual error message
   local old_error = error
