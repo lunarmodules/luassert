@@ -33,6 +33,11 @@ function stub.is_stub(object)
   return spy.is_spy(object) and object.callback == stubfunc
 end
 
+local function set_stub(state)
+end
+
+assert:register("modifier", "stub", set_stub)
+
 return setmetatable( stub, {
     __call = function(self, ...)
       -- stub originally was a function only. Now that it is a module table
