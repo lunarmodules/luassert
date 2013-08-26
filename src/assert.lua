@@ -30,7 +30,7 @@ local function extract_keys(assert_string)
   local keys = {}
   local key = nil
   for i = #tokens, 1, -1 do
-    token = tokens[i]
+    local token = tokens[i]
     key = key and (token .. '_' .. key) or token
     if namespace.modifier[key] or namespace.assertion[key] then
       table.insert(keys, 1, key)
