@@ -94,19 +94,19 @@ local function has_error(state, arguments)
 end
 
 local function is_true(state, arguments)
-  table.insert(arguments, 2, true)
+  util.tinsert(arguments, 2, true)
   arguments.n = arguments.n + 1
   return arguments[1] == arguments[2]
 end
 
 local function is_false(state, arguments)
-  table.insert(arguments, 2, false)
+  util.tinsert(arguments, 2, false)
   arguments.n = arguments.n + 1
   return arguments[1] == arguments[2]
 end
 
 local function is_type(state, arguments, etype)
-  table.insert(arguments, 2, "type " .. etype)
+  util.tinsert(arguments, 2, "type " .. etype)
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[2] = true
   arguments.n = arguments.n + 1
