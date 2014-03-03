@@ -1,31 +1,22 @@
-language: erlang
+language: c
 
 env:
-  - LUA=""
-  - LUA="luajit"
+  - LUA="Lua 5.1"
+  - LUA="Lua 5.2"
+  - LUA="LuaJIT 2.0"
+
+before_install:
+  - bash .travis_setup.sh
+
+install:
+  - sudo luarocks make
+  - sudo luarocks install busted
+
+script: busted spec
 
 branches:
   only:
     - master
-
-install:
-  - sudo apt-get install luajit
-  - sudo apt-get install luarocks
-  - sudo luarocks install luafilesystem
-  - git clone git://github.com/Olivine-Labs/say.git
-  - cd say
-  - sudo luarocks make
-  - cd ../
-  - git clone git://github.com/Olivine-Labs/luassert.git
-  - cd luassert
-  - sudo luarocks make
-  - cd ../
-  - git clone git://github.com/Olivine-Labs/busted.git
-  - cd busted
-  - sudo luarocks make
-  - cd ../
-
-script: "sudo luarocks make && busted spec"
 
 notifications:
   webhooks:
