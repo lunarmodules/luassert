@@ -85,7 +85,7 @@ end
 state.format_argument = function(val, s)
   s = s or current
   for _, fmt in ipairs(s.formatters) do
-    valfmt = fmt(val)
+    local valfmt = fmt(val)
     if valfmt ~= nil then return valfmt end
   end
   -- nothing found, check snapshot 1 up in list
