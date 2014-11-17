@@ -71,7 +71,7 @@ end
 state.remove_formatter = function(callback, s)
   s = s or current
   for i, v in ipairs(s.formatters) do
-    if v == fmtr then
+    if v == callback then
       table.remove(s.formatters, i)
       break
     end
