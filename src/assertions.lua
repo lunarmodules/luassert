@@ -77,7 +77,7 @@ end
 local function has_error(state, arguments)
   local func = arguments[1]
   local err_expected = arguments[2]
-  
+
   assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local err_actual = nil
   --must swap error functions to get the actual error message
@@ -88,9 +88,9 @@ local function has_error(state, arguments)
   end
   local status = pcall(func)
   error = old_error
-  local val = not status and (err_expected == nil or same(state, {err_expected, err_actual, ["n"] = 2}))
-
-  return val
+  arguments[1] = err_actual
+  arguments[2] = err_expected
+  return not status and (err_expected == nil or same(state, {err_expected, err_actual, ["n"] = 2}))
 end
 
 local function is_true(state, arguments)

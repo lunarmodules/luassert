@@ -11,8 +11,8 @@ s:set("assertion.equals.negative", "Expected objects to not be equal. Passed in:
 s:set("assertion.unique.positive", "Expected object to be unique:\n%s")
 s:set("assertion.unique.negative", "Expected object to not be unique:\n%s")
 
-s:set("assertion.error.positive", "Expected error to be thrown.")
-s:set("assertion.error.negative", "Expected error to not be thrown.\n%s")
+s:set("assertion.error.positive", "Expected a different error. Caught: %s\nExpected: %s")
+s:set("assertion.error.negative", "Expected no error, but caught: %s")
 
 s:set("assertion.truthy.positive", "Expected to be truthy, but value was:\n%s")
 s:set("assertion.truthy.negative", "Expected to not be truthy, but value was:\n%s")
