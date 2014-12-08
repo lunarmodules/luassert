@@ -2,11 +2,11 @@ local s = require('say')
 
 s:set_namespace('ja')
 
-s:set("assertion.same.positive", "オブジェクトの内容が同一であることが期待されています。実際の値:\n%s\n期待されている値:\n%s")
-s:set("assertion.same.negative", "オブジェクトの内容が同一でないことが期待されています。実際の値:\n%s\n期待されていない値:\n%s")
+s:set("assertion.same.positive", "オブジェクトの内容が同一であることが期待されています。\n実際の値:\n%s\n期待されている値:\n%s")
+s:set("assertion.same.negative", "オブジェクトの内容が同一でないことが期待されています。\n実際の値:\n%s\n期待されていない値:\n%s")
 
-s:set("assertion.equals.positive", "オブジェクトが同一であることが期待されています。実際の値:\n%s\n期待されている値:\n%s")
-s:set("assertion.equals.negative", "オブジェクトが同一でないことが期待されています。実際の値:\n%s\n期待されていない値:\n%s")
+s:set("assertion.equals.positive", "オブジェクトが同一であることが期待されています。\n実際の値:\n%s\n期待されている値:\n%s")
+s:set("assertion.equals.negative", "オブジェクトが同一でないことが期待されています。\n実際の値:\n%s\n期待されていない値:\n%s")
 
 s:set("assertion.unique.positive", "オブジェクトがユニークであることが期待されています。:\n%s")
 s:set("assertion.unique.negative", "オブジェクトがユニークでないことが期待されています。:\n%s")
