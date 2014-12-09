@@ -122,6 +122,12 @@ local function fmt_userdata(arg)
   end
 end
 
+local function fmt_thread(arg)
+  if type(arg) == "thread" then
+    return string.format("(thread) '%s'", tostring(arg))
+  end
+end
+
 assert:add_formatter(fmt_string)
 assert:add_formatter(fmt_number)
 assert:add_formatter(fmt_boolean)
@@ -129,5 +135,6 @@ assert:add_formatter(fmt_nil)
 assert:add_formatter(fmt_table)
 assert:add_formatter(fmt_function)
 assert:add_formatter(fmt_userdata)
+assert:add_formatter(fmt_thread)
 -- Set default table display depth for table formatter
 assert:set_parameter("TableFormatLevel", 3)
