@@ -16,6 +16,16 @@ describe("Test Formatters", function()
     require('luassert.spy')
     require('luassert.mock')
   end)
+
+  local snapshot
+
+  before_each(function()
+    snapshot = assert:snapshot()
+  end)
+
+  after_each(function()
+    snapshot:revert()
+  end)
   
   it("Checks to see if types are returned as strings", function()
     assert.is.same(assert:format({ "a string", ["n"] = 1 })[1], "(string) 'a string'")
@@ -25,6 +35,36 @@ describe("Test Formatters", function()
     local f = function() end
     local expected = tostring(f)
     assert.is.same(assert:format({ f, ["n"] = 1 })[1]:sub(1, #expected), expected)
+  end)
+
+  it("Checks to see if tables are recursively serialized", function()
+    assert.is.same(assert:format({ {}, ["n"] = 1 })[1], "(table): { }")
+    assert.is.same(assert:format({ { 2, 3, 4, [-5] = 7}, ["n"] = 1 })[1], [[(table): {
+  [1] = 2
+  [2] = 3
+  [3] = 4
+  [-5] = 7 }]])
+    assert.is.same(assert:format({ { 1, ["k1"] = "v1", ["k2"] = "v2"}, ["n"] = 1 })[1], [[(table): {
+  [1] = 1
+  [k1] = 'v1'
+  [k2] = 'v2' }]])
+    assert.is.same(assert:format({ { "{\n }\n" }, ["n"] = 1 })[1], [[(table): {
+  [1] = '{
+ }
+' }]])
+  end)
+
+  it("Checks to see if TableFormatLevel parameter limits table formatting depth", function()
+    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table): {
+  [1] = {
+    [1] = {
+      [1] = { ... more } } } }]])
+    assert.is.same(assert:format({ { { { } } }, ["n"] = 1 })[1], [[(table): {
+  [1] = {
+    [1] = { } } }]])
+    assert:set_parameter("TableFormatLevel", 0)
+    assert.is.same(assert:format({ { }, ["n"] = 1 })[1], "(table): { }")
+    assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table): { ... more }")
   end)
 
   it("Checks to see if table with 0 count is returned empty/0-count", function()
