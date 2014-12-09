@@ -25,12 +25,60 @@ local function fmt_nil(arg)
   end
 end
 
+local type_priorities = {
+  number = 1,
+  boolean = 2,
+  string = 3,
+  table = 4,
+  ["function"] = 5,
+  userdata = 6,
+  thread = 7
+}
+
+local function is_in_array_part(key, length)
+  return type(key) == "number" and 1 <= key and key <= length and math.floor(key) == key
+end
+
+local function get_sorted_keys(t)
+  local keys = {}
+  local nkeys = 0
+
+  for key in pairs(t) do
+    nkeys = nkeys + 1
+    keys[nkeys] = key
+  end
+
+  local length = #t
+
+  local function key_comparator(key1, key2)
+    local type1, type2 = type(key1), type(key2)
+    local priority1 = is_in_array_part(key1, length) and 0 or type_priorities[type1] or 8
+    local priority2 = is_in_array_part(key2, length) and 0 or type_priorities[type2] or 8
+
+    if priority1 == priority2 then
+      if type1 == "string" or type1 == "number" then
+        return key1 < key2
+      elseif type1 == "boolean" then
+        return key1  -- put true before false
+      end
+    else
+      return priority1 < priority2
+    end
+  end
+
+  table.sort(keys, key_comparator)
+  return keys, nkeys
+end
+
 local function fmt_table(arg)
   local tmax = assert:get_parameter("TableFormatLevel")
   local ft
   ft = function(t, l)
     local result = ""
-    for k, v in pairs(t) do
+    local keys, nkeys = get_sorted_keys(t)
+    for i = 1, nkeys do
+      local k = keys[i]
+      local v = t[k]
       if type(v) == "table" then
         if l < tmax or tmax < 0 then
           result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = {\n%s }\n", tostring(k), tostring(ft(v, l + 1):sub(1,-2)))
