@@ -1,7 +1,8 @@
 
 local getoutput = function(...)
   local success, message = pcall(assert.are.equal, ...)
-  return message
+  if message == nil then return nil end
+  return tostring(message)
 end
 
 
