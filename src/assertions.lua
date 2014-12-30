@@ -79,9 +79,13 @@ local function has_error(state, arguments)
   local err_expected = arguments[2]
   assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local ok, err_actual = pcall(func)
-  arguments[1] = err_actual
-  arguments[2] = err_expected
+  arguments.nofmt = {}
   arguments.n = 2
+  arguments[1] = (ok and '(no error)' or err_actual)
+  arguments[2] = (err_expected == nil and '(error)' or err_expected)
+  arguments.nofmt[1] = ok
+  arguments.nofmt[2] = (err_expected == nil)
+
   if ok or err_expected == nil then
     return not ok
   elseif type(err_actual) == 'string' and type(err_expected) == 'string' then
