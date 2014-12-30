@@ -88,8 +88,17 @@ local function has_error(state, arguments)
 
   if ok or err_expected == nil then
     return not ok
-  elseif type(err_actual) == 'string' and type(err_expected) == 'string' then
-    return err_actual:find(err_expected, nil, true) ~= nil
+  end
+  if type(err_expected) == 'string' then
+    -- err_actual must be (convertible to) a string
+    local mt = getmetatable(err_actual)
+    if mt and mt.__tostring then
+      err_actual = tostring(err_actual)
+    end
+    if type(err_actual) == 'string' then
+      -- we expect err_expected to be a substring of err_actual
+      return err_actual:find(err_expected, nil, true) ~= nil
+    end
   end
   return same(state, {err_expected, err_actual, ["n"] = 2})
 end
