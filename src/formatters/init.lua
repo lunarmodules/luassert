@@ -71,42 +71,40 @@ local function get_sorted_keys(t)
 end
 
 local function fmt_table(arg)
+  if type(arg) ~= "table" then
+    return
+  end
+
   local tmax = assert:get_parameter("TableFormatLevel")
-  local ft
-  ft = function(t, l)
-    local result = ""
+
+  local function ft(t, l)
+    if next(t) == nil then
+      return "{ }"
+    end
+
+    if l > tmax then
+      return "{ ... more }"
+    end
+
+    local result = "{"
     local keys, nkeys = get_sorted_keys(t)
+
     for i = 1, nkeys do
       local k = keys[i]
       local v = t[k]
+
       if type(v) == "table" then
-        if l < tmax or tmax < 0 then
-          result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = {\n%s }\n", tostring(k), tostring(ft(v, l + 1):sub(1,-2)))
-        else
-          result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = { ... more }\n", tostring(k))
-        end
-      else
-        if type(v) == "string" then v = "'"..v.."'" end
-        result = result .. string.format(string.rep(" ",l * 2) .. "[%s] = %s\n", tostring(k), tostring(v))
+        v = ft(v, l + 1)
+      elseif type(v) == "string" then
+        v = "'"..v.."'"
       end
+
+      result = result .. string.format("\n" .. string.rep(" ",l * 2) .. "[%s] = %s", tostring(k), tostring(v))
     end
-    return result
+    return result .. " }"
   end
-  if type(arg) == "table" then
-    local result
-    if tmax == 0 then
-      if next(arg) then
-        result = "(table): { ... more }"
-      else
-        result = "(table): { }"
-      end
-    else
-      result = "(table): {\n" .. ft(arg, 1):sub(1,-2) .. " }\n"
-      result = result:gsub("{\n }\n", "{ }\n") -- cleanup empty tables
-      result = result:sub(1,-2)                -- remove trailing newline
-    end
-    return result
-  end
+
+  return "(table): " .. ft(arg, 1)
 end
 
 local function fmt_function(arg)
