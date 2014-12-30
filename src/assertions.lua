@@ -81,6 +81,7 @@ local function has_error(state, arguments)
   local ok, err_actual = pcall(func)
   arguments[1] = err_actual
   arguments[2] = err_expected
+  arguments.n = 2
   if ok or err_expected == nil then
     return not ok
   elseif type(err_actual) == 'string' and type(err_expected) == 'string' then
