@@ -259,7 +259,12 @@ describe("Test Assertions", function()
   end)
 
   it("Checks has_error compares error objects", function()
+    local func = function() end
     assert.has_error(function() error({ "table" }) end, { "table" })
+    assert.has_error(function() error(func) end, func)
+    assert.has_error(function() error(false) end, false)
+    assert.has_error(function() error(true) end, true)
+    assert.has_error(function() error(0) end, 0)
   end)
 
   it("Checks has_error compares error objects with strings", function()
