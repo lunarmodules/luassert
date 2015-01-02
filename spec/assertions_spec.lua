@@ -241,7 +241,7 @@ describe("Test Assertions", function()
     assert.returned_arguments(3, fn4())
   end)
 
-  it("checks has_error to accept only callable arguments", function()
+  it("Checks has_error to accept only callable arguments", function()
     local t_ok = setmetatable( {}, { __call = function() end } )
     local t_nok = setmetatable( {}, { __call = function() error("some error") end } )
     local f_ok = function() end
@@ -253,6 +253,24 @@ describe("Test Assertions", function()
     assert.has_no_error(t_ok)
   end)
 
-end)
+  it("Checks has_error compares error strings", function()
+    assert.has_error(function() error() end)
+    assert.has_error(function() error("string") end, "string")
+  end)
 
+  it("Checks has_error compares error objects", function()
+    local func = function() end
+    assert.has_error(function() error({ "table" }) end, { "table" })
+    assert.has_error(function() error(func) end, func)
+    assert.has_error(function() error(false) end, false)
+    assert.has_error(function() error(true) end, true)
+    assert.has_error(function() error(0) end, 0)
+  end)
+
+  it("Checks has_error compares error objects with strings", function()
+    local mt = { __tostring = function(t) return t[1] end }
+    assert.has_error(function() error(setmetatable({ "table" }, mt)) end, "table")
+  end)
+
+end)
 

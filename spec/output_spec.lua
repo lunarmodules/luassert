@@ -1,12 +1,11 @@
 
-local getoutput = function(...)
-  local success, message = pcall(assert.are.equal, ...)
-  if message == nil then return nil end
-  return tostring(message)
-end
-
-
 describe("Output testing using string comparison with the equal assertion", function()
+  local getoutput = function(...)
+    local success, message = pcall(assert.are.equal, ...)
+    if message == nil then return nil end
+    return tostring(message)
+  end
+
   it("Should compare strings correctly; nil-string", function()
     --assert.are.equal(nil, "string")
     local output = getoutput(nil, "string")
@@ -68,6 +67,78 @@ describe("Output testing using string comparison with the equal assertion", func
     assert(ok, "Output check 1 failed, comparing string-nil-string;\n    " .. output:gsub("\n","\n    "))
     local ok = output:find("Expected:\n%(string%) 'string'")
     assert(ok, "Output check 2 failed, comparing string-nil-string;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+end)
+
+describe("Output testing using string comparison with the has_error assertion", function()
+  local getoutput = function(...)
+    local success, message = pcall(assert.has_error, ...)
+    if message == nil then return nil end
+    return tostring(message)
+  end
+
+  it("Should report no error caught, but error expected; noerror-nil", function()
+    --assert.has_error(function() end)
+    local output = getoutput(function() end)
+    local ok = output:find("Caught:\n%(no error%)")
+    assert(ok, "Output check 1 failed, comparing noerror-nil;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(error%)")
+    assert(ok, "Output check 2 failed, comparing noerror-nil;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should report no error caught, but error string expected; noerror-string", function()
+    --assert.has_error(function() end, "string")
+    local output = getoutput(function() end, 'string')
+    local ok = output:find("Caught:\n%(no error%)")
+    assert(ok, "Output check 1 failed, comparing noerror-string;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(string%) 'string'")
+    assert(ok, "Output check 2 failed, comparing noerror-string;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare error strings correctly; nil-string", function()
+    --assert.has_error(function() error() end, "string")
+    local output = getoutput(function() error() end, "string")
+    local ok = output:find("Caught:\n%(nil%)")
+    assert(ok, "Output check 1 failed, comparing nil-string;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(string%) 'string'")
+    assert(ok, "Output check 2 failed, comparing nil-string;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare error strings correctly; string-string", function()
+    --assert.has_error(function() error("string") end, "string_")
+    local output = getoutput(function() error("string") end, "string_")
+    local ok = output:find("Caught:\n%(string%) '.*: string'")
+    assert(ok, "Output check 1 failed, comparing string-string;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(string%) 'string_'")
+    assert(ok, "Output check 2 failed, comparing string-string;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare error strings correctly; table-string", function()
+    --assert.has_error(function() error({}) end, "string")
+    local output = getoutput(function() error({}) end, "string")
+    local ok = output:find("Caught:\n%(table%): { }")
+    assert(ok, "Output check 1 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(string%) 'string'")
+    assert(ok, "Output check 2 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare error strings correctly; string-table", function()
+    --assert.has_error(function() error("string") end, {})
+    local output = getoutput(function() error("string") end, {})
+    local ok = output:find("Caught:\n%(string%) '.*: string'")
+    assert(ok, "Output check 1 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(table%): { }")
+    assert(ok, "Output check 2 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare error objects correctly; table-table", function()
+    --assert.has_error(function() error({}) end, { "table" })
+    local output = getoutput(function() error({}) end, { "table" })
+    local ok = output:find("Caught:\n%(table%): { }")
+    assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n%(table%): {\n  %[1] = 'table' }")
+    assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
 end)
