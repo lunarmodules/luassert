@@ -2,6 +2,8 @@
 # Sets up Lua and Luarocks. 
 # LUA must be "Lua 5.1", "Lua 5.2" or "LuaJIT 2.0". 
 
+set -e
+
 if [ "$LUA" == "LuaJIT 2.0" ]; then
   wget -O - http://luajit.org/download/LuaJIT-2.0.2.tar.gz | tar xz
   cd LuaJIT-2.0.2
