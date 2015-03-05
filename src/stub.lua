@@ -2,10 +2,9 @@
 local assert = require 'luassert.assert'
 local spy = require 'luassert.spy'
 local util = require 'luassert.util'
-local stubfunc = function() end
 local stub = {}
 
-function stub.new(object, key)
+function stub.new(object, key, return_value)
   if object == nil and key == nil then
     -- called without arguments, create a 'blank' stub
     object = {}
@@ -14,6 +13,9 @@ function stub.new(object, key)
   assert(type(object) == "table" and key ~= nil, "stub.new(): Can only create stub on a table key, call with 2 params; table, key")
   assert(object[key] == nil or util.callable(object[key]), "stub.new(): The element for which to create a stub must either be callable, or be nil")
   local old_elem = object[key]    -- keep existing element (might be nil!)
+  local stubfunc = function()
+    return return_value
+  end
   object[key] = stubfunc          -- set the stubfunction
   local s = spy.on(object, key)   -- create a spy on top of the stub function
   local spy_revert = s.revert     -- keep created revert function
@@ -28,10 +30,6 @@ function stub.new(object, key)
   end
   
   return s
-end
-
-function stub.is_stub(object)
-  return spy.is_spy(object) and object.callback == stubfunc
 end
 
 local function set_stub(state)

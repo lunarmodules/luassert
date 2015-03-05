@@ -92,4 +92,10 @@ describe("Tests dealing with stubs", function()
      assert.is_nil(s)
   end)
 
+  it("returns a given return value", function()
+    stub(test, "key", "foo")
+
+    assert.is.equal("foo", test.key())
+  end)
+
 end)
