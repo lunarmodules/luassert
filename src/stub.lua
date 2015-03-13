@@ -11,12 +11,13 @@ function stub.new(object, key, ...)
     object = {}
     key = ""
   end
+  local return_values_count = select("#", ...)
   local return_values = {...}
   assert(type(object) == "table" and key ~= nil, "stub.new(): Can only create stub on a table key, call with 2 params; table, key")
   assert(object[key] == nil or util.callable(object[key]), "stub.new(): The element for which to create a stub must either be callable, or be nil")
   local old_elem = object[key]    -- keep existing element (might be nil!)
   local stubfunc = function()
-    return unpack(return_values)
+    return unpack(return_values, 1, return_values_count)
   end
   object[key] = stubfunc          -- set the stubfunction
   local s = spy.on(object, key)   -- create a spy on top of the stub function
