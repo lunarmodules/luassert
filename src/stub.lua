@@ -3,6 +3,7 @@ local assert = require 'luassert.assert'
 local spy = require 'luassert.spy'
 local util = require 'luassert.util'
 local stub = {}
+local unpack = require 'luassert.compatiblity'.unpack
 
 function stub.new(object, key, ...)
   if object == nil and key == nil then
