@@ -98,4 +98,14 @@ describe("Tests dealing with stubs", function()
     assert.is.equal("foo", test.key())
   end)
 
+  it("returns multiple given values", function()
+    stub(test, "key", "foo", nil, "bar")
+
+    arg1, arg2, arg3 = test.key()
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
 end)
