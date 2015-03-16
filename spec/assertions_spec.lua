@@ -265,6 +265,7 @@ describe("Test Assertions", function()
     assert.has_error(function() error(false) end, false)
     assert.has_error(function() error(true) end, true)
     assert.has_error(function() error(0) end, 0)
+    assert.has_no_error(function() error(true) end, 0)
   end)
 
   it("Checks has_error compares error objects with strings", function()

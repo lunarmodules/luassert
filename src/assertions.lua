@@ -100,8 +100,10 @@ local function has_error(state, arguments)
       return err_actual:find(err_expected, nil, true) ~= nil
     end
   elseif type(err_expected) == 'number' then
+    if type(err_actual) == 'string' then
       -- we expect err_expected to be at the end of err_actual
       return err_actual:match('.*%s+' .. err_expected .. '$') ~= nil
+    end
   end
   return same(state, {err_expected, err_actual, ["n"] = 2})
 end
