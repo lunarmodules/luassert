@@ -102,7 +102,8 @@ local function has_error(state, arguments)
   elseif type(err_expected) == 'number' then
     if type(err_actual) == 'string' then
       -- we expect err_expected to be at the end of err_actual
-      return err_actual:match('.*%s+' .. err_expected .. '$') ~= nil
+      local err_expected_pattern = tostring(err_expected):gsub("[%.%+%-]", "%%%1")
+      return err_actual:match('.*%s+' .. err_expected_pattern .. '$') ~= nil
     end
   end
   return same(state, {err_expected, err_actual, ["n"] = 2})
