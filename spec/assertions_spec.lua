@@ -212,6 +212,31 @@ describe("Test Assertions", function()
     assert.has_error(function() assert.is_not_false(false) end)
   end)
 
+  it("Checks '.' chaining of modifiers and assertions", function()
+    assert.is.string("abc")
+    assert.is.True(true)
+    assert.is.Not.string(123)
+    assert.is.Nil(nil)
+    assert.is.Not.Nil({})
+    assert.is.Not.True(false)
+    assert.is.Not.False(true)
+    assert.equals.Not(true, false)
+    assert.equals.Not.Not(true, true)
+    assert.Not.equals.Not(true, true)
+
+    -- verify that failing assertions actually fail
+    assert.has.error(function() assert.is.string(1) end)
+    assert.has.error(function() assert.is.True(false) end)
+    assert.has.error(function() assert.is.Not.string('string!') end)
+    assert.has.error(function() assert.is.Nil({}) end)
+    assert.has.error(function() assert.is.Not.Nil(nil) end)
+    assert.has.error(function() assert.is.Not.True(true) end)
+    assert.has.error(function() assert.is.Not.False(false) end)
+    assert.has.error(function() assert.equals.Not(true, true) end)
+    assert.has.error(function() assert.equals.Not.Not(true, false) end)
+    assert.has.error(function() assert.Not.equals.Not(true, false) end)
+  end)
+
   it("Checks number of returned arguments", function()
     local fn = function()
     end
@@ -275,6 +300,35 @@ describe("Test Assertions", function()
   it("Checks has_error compares error objects with strings", function()
     local mt = { __tostring = function(t) return t[1] end }
     assert.has_error(function() error(setmetatable({ "table" }, mt)) end, "table")
+  end)
+
+  it("Checks register creates custom assertions", function()
+    local say = require("say")
+
+    local function has_property(state, arguments)
+      local property = arguments[1]
+      local table = arguments[2]
+      for key, value in pairs(table) do
+        if key == property then
+          return true
+        end
+      end
+      return false
+    end
+
+    say:set_namespace("en")
+    say:set("assertion.has_property.positive", "Expected property %s in:\n%s")
+    say:set("assertion.has_property.negative", "Expected property %s to not be in:\n%s")
+    assert:register("assertion", "has_property", has_property, "assertion.has_property.positive", "assertion.has_property.negative")
+
+    assert.has_property("name", { name = "jack" })
+    assert.has.property("name", { name = "jack" })
+    assert.not_has_property("surname", { name = "jack" })
+    assert.Not.has.property("surname", { name = "jack" })
+    assert.has_error(function() assert.has_property("surname", { name = "jack" }) end)
+    assert.has_error(function() assert.has.property("surname", { name = "jack" }) end)
+    assert.has_error(function() assert.no_has_property("name", { name = "jack" }) end)
+    assert.has_error(function() assert.no.has.property("name", { name = "jack" }) end)
   end)
 
 end)
