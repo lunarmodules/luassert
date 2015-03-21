@@ -37,6 +37,14 @@ describe("Test Formatters", function()
     assert.is.same(assert:format({ f, ["n"] = 1 })[1]:sub(1, #expected), expected)
   end)
 
+  it("Checks to see if numbers are serialized correctly", function()
+    assert.is.same(assert:format({ 1.0, ["n"] = 1 })[1], "(number) "..tostring(1.0))
+    assert.is.same(assert:format({ 23456789012E66, ["n"] = 1 })[1], "(number) 2.3456789012000000698e+76")
+    assert.is.same(assert:format({ 0/0, ["n"] = 1 })[1], "(number) NaN")
+    assert.is.same(assert:format({ 1/0, ["n"] = 1 })[1], "(number) Inf")
+    assert.is.same(assert:format({ -1/0, ["n"] = 1 })[1], "(number) -Inf")
+  end)
+
   it("Checks to see if tables are recursively serialized", function()
     assert.is.same(assert:format({ {}, ["n"] = 1 })[1], "(table): { }")
     assert.is.same(assert:format({ { 2, 3, 4, [-5] = 7}, ["n"] = 1 })[1], [[(table): {
