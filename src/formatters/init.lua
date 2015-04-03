@@ -7,9 +7,34 @@ local function fmt_string(arg)
   end
 end
 
+-- A version of tostring which formats numbers more precisely.
+local function tostr(arg)
+  if type(arg) ~= "number" then
+    return tostring(arg)
+  end
+
+  if arg ~= arg then
+    return "NaN"
+  elseif arg == 1/0 then
+    return "Inf"
+  elseif arg == -1/0 then
+    return "-Inf"
+  end
+
+  local str = string.format("%.20g", arg)
+
+  if math.type and math.type(arg) == "float" and not str:find("[%.,]") then
+    -- Number is a float but looks like an integer.
+    -- Insert ".0" after first run of digits.
+    str = str:gsub("%d+", "%0.0", 1)
+  end
+
+  return str
+end
+
 local function fmt_number(arg)
   if type(arg) == "number" then
-    return string.format("(number) %s", tostring(arg))
+    return string.format("(number) %s", tostr(arg))
   end
 end
 
@@ -99,7 +124,7 @@ local function fmt_table(arg)
         v = "'"..v.."'"
       end
 
-      result = result .. string.format("\n" .. string.rep(" ",l * 2) .. "[%s] = %s", tostring(k), tostring(v))
+      result = result .. string.format("\n" .. string.rep(" ",l * 2) .. "[%s] = %s", tostr(k), tostr(v))
     end
     return result .. " }"
   end
