@@ -16,7 +16,8 @@ function stub.new(object, key, ...)
   assert(type(object) == "table" and key ~= nil, "stub.new(): Can only create stub on a table key, call with 2 params; table, key")
   assert(object[key] == nil or util.callable(object[key]), "stub.new(): The element for which to create a stub must either be callable, or be nil")
   local old_elem = object[key]    -- keep existing element (might be nil!)
-  local stubfunc = function()
+  local fn = (return_values_count == 1 and util.callable(return_values[1]) and return_values[1])
+  local stubfunc = fn or function()
     return unpack(return_values, 1, return_values_count)
   end
   object[key] = stubfunc          -- set the stubfunction

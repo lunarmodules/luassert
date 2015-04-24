@@ -101,9 +101,45 @@ describe("Tests dealing with stubs", function()
   it("returns multiple given values", function()
     stub(test, "key", "foo", nil, "bar")
 
-    arg1, arg2, arg3 = test.key()
+    local arg1, arg2, arg3 = test.key()
 
     assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
+  it("calls specified stub function", function()
+    stub(test, "key", function(a, b, c)
+      return c, b, a
+    end)
+
+    local arg1, arg2, arg3 = test.key("bar", nil, "foo")
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
+  it("calls specified stub callable object", function()
+    local callable = setmetatable({}, { __call = function(self, a, b, c)
+      return c, b, a
+    end})
+    stub(test, "key", callable)
+
+    local arg1, arg2, arg3 = test.key("bar", nil, "foo")
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
+  it("returning multiple given values overrides stub function", function()
+    local function foo() end
+    stub(test, "key", foo, nil, "bar")
+
+    local arg1, arg2, arg3 = test.key()
+
+    assert.is.equal(foo, arg1)
     assert.is.equal(nil, arg2)
     assert.is.equal("bar", arg3)
   end)
