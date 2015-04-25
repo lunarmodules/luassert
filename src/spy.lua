@@ -129,4 +129,8 @@ assert:register("assertion", "called_at_most", called_at_most, "assertion.called
 assert:register("assertion", "called_more_than", called_more_than, "assertion.called_more_than.positive", "assertion.called_more_than.negative")
 assert:register("assertion", "called_less_than", called_less_than, "assertion.called_less_than.positive", "assertion.called_less_than.negative")
 
-return spy
+return setmetatable(spy, {
+  __call = function(self, ...)
+    return spy.new(...)
+  end
+})
