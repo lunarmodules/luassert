@@ -41,6 +41,50 @@ describe("Tests dealing with spies", function()
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 
+  it("checks called_at_least() assertions", function()
+    local s = spy.new(function() end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy(s).was.called.at_least(1)
+    assert.spy(s).was.called.at_least(2)
+    assert.spy(s).was_not.called.at_least(3)
+    assert.has_error(function() assert.spy(s).was.called.at_least() end)
+  end)
+
+  it("checks called_at_most() assertions", function()
+    local s = spy.new(function() end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy(s).was.called.at_most(3)
+    assert.spy(s).was.called.at_most(2)
+    assert.spy(s).was_not.called.at_most(1)
+    assert.has_error(function() assert.spy(s).was.called.at_most() end)
+  end)
+
+  it("checks called_more_than() assertions", function()
+    local s = spy.new(function() end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy(s).was.called.more_than(0)
+    assert.spy(s).was.called.more_than(1)
+    assert.spy(s).was_not.called.more_than(2)
+    assert.has_error(function() assert.spy(s).was.called.more_than() end)
+  end)
+
+  it("checks called_less_than() assertions", function()
+    local s = spy.new(function() end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy(s).was.called.less_than(4)
+    assert.spy(s).was.called.less_than(3)
+    assert.spy(s).was_not.called.less_than(2)
+    assert.has_error(function() assert.spy(s).was.called.less_than() end)
+  end)
+
   it("checks spies to fail when spying on non-callable elements", function()
     local s
     local testfunc = function()

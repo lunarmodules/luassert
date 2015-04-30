@@ -35,9 +35,10 @@ spy = {
         return self.callback
       end,
       
-      called = function(self, times)
-        if times then
-          return (#self.calls == times), #self.calls
+      called = function(self, times, compare)
+        if times or compare then
+          local compare = compare or function(count, expected) return count == expected end
+          return compare(#self.calls, times), #self.calls
         end
 
         return (#self.calls > 0), #self.calls
@@ -82,10 +83,10 @@ local function called_with(state, arguments)
   end
 end
 
-local function called(state, arguments)
+local function called(state, arguments, compare)
   local num_times = arguments[1]
   if state.payload and type(state.payload) == "table" and state.payload.called then
-    local result, count = state.payload:called(num_times)
+    local result, count = state.payload:called(num_times, compare)
     arguments[1] = tostring(arguments[1])
     table.insert(arguments, 2, tostring(count))
     arguments.n = arguments.n + 1
@@ -96,12 +97,32 @@ local function called(state, arguments)
   elseif state.payload and type(state.payload) == "function" then
     error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
   else
-    error("'called_with' must be chained after 'spy(aspy)'")
+    error("'called' must be chained after 'spy(aspy)'")
   end
+end
+
+local function called_at_least(state, arguments)
+  return called(state, arguments, function(count, expected) return count >= expected end)
+end
+
+local function called_at_most(state, arguments)
+  return called(state, arguments, function(count, expected) return count <= expected end)
+end
+
+local function called_more_than(state, arguments)
+  return called(state, arguments, function(count, expected) return count > expected end)
+end
+
+local function called_less_than(state, arguments)
+  return called(state, arguments, function(count, expected) return count < expected end)
 end
 
 assert:register("modifier", "spy", set_spy)
 assert:register("assertion", "called_with", called_with, "assertion.called_with.positive", "assertion.called_with.negative")
 assert:register("assertion", "called", called, "assertion.called.positive", "assertion.called.negative")
+assert:register("assertion", "called_at_least", called_at_least, "assertion.called_at_least.positive", "assertion.called_at_least.negative")
+assert:register("assertion", "called_at_most", called_at_most, "assertion.called_at_most.positive", "assertion.called_at_most.negative")
+assert:register("assertion", "called_more_than", called_more_than, "assertion.called_more_than.positive", "assertion.called_more_than.negative")
+assert:register("assertion", "called_less_than", called_less_than, "assertion.called_less_than.positive", "assertion.called_less_than.negative")
 
 return spy
