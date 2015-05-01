@@ -96,11 +96,10 @@ end
 
 assert:register("modifier", "stub", set_stub)
 
-return setmetatable( stub, {
-    __call = function(self, ...)
-      -- stub originally was a function only. Now that it is a module table
-      -- the __call method is required for backward compatibility
-      -- NOTE: this deviates from spy, which has no __call method
-      return stub.new(...)
-    end })
-
+return setmetatable(stub, {
+  __call = function(self, ...)
+    -- stub originally was a function only. Now that it is a module table
+    -- the __call method is required for backward compatibility
+    return stub.new(...)
+  end
+})
