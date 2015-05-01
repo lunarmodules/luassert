@@ -21,10 +21,10 @@ spy = {
     {
       calls = {},
       callback = callback,
-      
+
       target_table = nil, -- these will be set when using 'spy.on'
       target_key = nil,
-      
+
       revert = function(self)
         if not self.reverted then
           if self.target_table and self.target_key then
@@ -34,7 +34,7 @@ spy = {
         end
         return self.callback
       end,
-      
+
       called = function(self, times, compare)
         if times or compare then
           local compare = compare or function(count, expected) return count == expected end
@@ -60,14 +60,14 @@ spy = {
   is_spy = function(object)
     return type(object) == "table" and getmetatable(object) == spy_mt
   end,
-    
+
   on = function(target_table, target_key)
     local s = spy.new(target_table[target_key])
     target_table[target_key] = s
-    -- store original data 
+    -- store original data
     s.target_table = target_table
     s.target_key = target_key
-    
+
     return s
   end
 }

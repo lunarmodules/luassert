@@ -144,4 +144,54 @@ describe("Tests dealing with stubs", function()
     assert.is.equal("bar", arg3)
   end)
 
+  it("returns default stub arguments", function()
+    stub(test, "key").returns(nil, "foo", "bar")
+
+    local arg1, arg2, arg3 = test.key("bar", nil, "foo")
+
+    assert.is.equal(nil, arg1)
+    assert.is.equal("foo", arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
+  it("invokes default stub function", function()
+    stub(test, "key").invokes(function(a, b, c)
+      return c, b, a
+    end)
+
+    local arg1, arg2, arg3 = test.key("bar", nil, "foo")
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+  end)
+
+  it("on_call_with returns specified arguments", function()
+    stub(test, "key").returns("foo bar")
+    test.key.on_call_with("bar").returns("foo", nil, "bar")
+
+    local arg1, arg2, arg3 = test.key("bar")
+    local foobar = test.key()
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+    assert.is.equal("foo bar", foobar)
+  end)
+
+  it("on_call_with invokes stub function", function()
+    stub(test, "key").returns("foo foo")
+    test.key.on_call_with("foo").invokes(function(a, b, c)
+      return "bar", nil, "bar"
+    end)
+
+    local arg1, arg2, arg3 = test.key("foo")
+    local foo = test.key()
+
+    assert.is.equal("bar", arg1)
+    assert.is.equal(nil, arg2)
+    assert.is.equal("bar", arg3)
+    assert.is.equal("foo foo", foo)
+  end)
+
 end)
