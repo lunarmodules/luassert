@@ -85,9 +85,13 @@ end
 
 local function called(state, arguments, compare)
   local num_times = arguments[1]
+  if not num_times and not state.mod then
+    state.mod = true
+    num_times = 0
+  end
   if state.payload and type(state.payload) == "table" and state.payload.called then
     local result, count = state.payload:called(num_times, compare)
-    arguments[1] = tostring(arguments[1])
+    arguments[1] = tostring(num_times or ">0")
     table.insert(arguments, 2, tostring(count))
     arguments.n = arguments.n + 1
     arguments.nofmt = arguments.nofmt or {}
