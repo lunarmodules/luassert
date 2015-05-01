@@ -8,6 +8,9 @@ s:set("assertion.same.negative", "Expected objects to not be the same.\nPassed i
 s:set("assertion.equals.positive", "Expected objects to be equal.\nPassed in:\n%s\nExpected:\n%s")
 s:set("assertion.equals.negative", "Expected objects to not be equal.\nPassed in:\n%s\nDid not expect:\n%s")
 
+s:set("assertion.near.positive", "Expected values to be near.\nPassed in:\n%s\nExpected:\n%s +/- %s")
+s:set("assertion.near.negative", "Expected values to not be near.\nPassed in:\n%s\nDid not expect:\n%s +/- %s")
+
 s:set("assertion.unique.positive", "Expected object to be unique:\n%s")
 s:set("assertion.unique.negative", "Expected object to not be unique:\n%s")
 
