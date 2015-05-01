@@ -51,6 +51,18 @@ describe("Test Assertions", function()
     assert.is_not.unique(tablenotunique)
   end)
 
+  it("Checks near() assertion handles tolerances", function()
+    assert.is.error(function() assert.near(0) end)  -- minimum 3 arguments
+    assert.is.error(function() assert.near(0, 0) end)  -- minimum 3 arguments
+    assert.is.error(function() assert.near('a', 0, 0) end)  -- arg1 must be convertable to number
+    assert.is.error(function() assert.near(0, 'a', 0) end)  -- arg2 must be convertable to number
+    assert.is.error(function() assert.near(0, 0, 'a') end)  -- arg3 must be convertable to number
+    assert.is.near(1.5, 2.0, 0.5)
+    assert.is.near('1.5', '2.0', '0.5')
+    assert.is_not.near(1.5, 2.0, 0.499)
+    assert.is_not.near('1.5', '2.0', '0.499')
+  end)
+
   it("Ensures the is operator doesn't change the behavior of equals", function()
     assert.is.equals(true, true)
   end)

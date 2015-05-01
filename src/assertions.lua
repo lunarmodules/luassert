@@ -6,8 +6,13 @@
 -- returns; boolean; whether assertion passed
 
 local assert = require('luassert.assert')
+local astate = require ('luassert.state')
 local util = require ('luassert.util')
 local s = require('say')
+
+local function format(val)
+  return astate.format_argument(val) or tostring(val)
+end
 
 local function unique(state, arguments)
   local list = arguments[1]
@@ -26,6 +31,25 @@ local function unique(state, arguments)
     end
   end
   return true
+end
+
+local function near(state, arguments)
+  local argcnt = arguments.n
+  assert(argcnt > 2, s("assertion.internal.argtolittle", { "near", 3, tostring(argcnt) }))
+  local expected = tonumber(arguments[1])
+  local actual = tonumber(arguments[2])
+  local tolerance = tonumber(arguments[3])
+  local numbertype = "number or object convertible to a number"
+  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }))
+  assert(actual, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
+  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[3]) }))
+  -- switch arguments for proper output message
+  util.tinsert(arguments, 1, arguments[2])
+  util.tremove(arguments, 3)
+  arguments[3] = tolerance
+  arguments.nofmt = arguments.nofmt or {}
+  arguments.nofmt[3] = true
+  return (actual >= expected - tolerance and actual <= expected + tolerance)
 end
 
 local function equals(state, arguments)
@@ -161,6 +185,7 @@ assert:register("assertion", "thread", is_thread, "assertion.same.positive", "as
 assert:register("assertion", "returned_arguments", returned_arguments, "assertion.returned_arguments.positive", "assertion.returned_arguments.negative")
 
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "near", near, "assertion.near.positive", "assertion.near.negative")
 assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
 assert:register("assertion", "equal", equals, "assertion.equals.positive", "assertion.equals.negative")
 assert:register("assertion", "unique", unique, "assertion.unique.positive", "assertion.unique.negative")
