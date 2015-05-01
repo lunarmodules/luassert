@@ -61,6 +61,11 @@ function stub.new(object, key, ...)
     return s
   end
 
+  s.by_default = {
+    returns = s.returns,
+    invokes = s.invokes,
+  }
+
   s.on_call_with = function(...)
     local match_args = {...}
     return {

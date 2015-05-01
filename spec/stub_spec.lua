@@ -166,6 +166,26 @@ describe("Tests dealing with stubs", function()
     assert.is.equal("bar", arg3)
   end)
 
+  it("returns stub arguments by default", function()
+    stub(test, "key").by_default.returns("foo", "bar")
+
+    local arg1, arg2 = test.key()
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal("bar", arg2)
+  end)
+
+  it("invokes stub function by default", function()
+    stub(test, "key").by_default.invokes(function(a, b)
+      return b, a
+    end)
+
+    local arg1, arg2 = test.key("bar", "foo")
+
+    assert.is.equal("foo", arg1)
+    assert.is.equal("bar", arg2)
+  end)
+
   it("on_call_with returns specified arguments", function()
     stub(test, "key").returns("foo bar")
     test.key.on_call_with("bar").returns("foo", nil, "bar")
