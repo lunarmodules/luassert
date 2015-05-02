@@ -52,6 +52,28 @@ local function near(state, arguments)
   return (actual >= expected - tolerance and actual <= expected + tolerance)
 end
 
+local function matches(state, arguments)
+  local argcnt = arguments.n
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
+  local pattern = arguments[1]
+  local actualtype = type(arguments[2])
+  local actual = nil
+  if actualtype == "string" or actualtype == "number" or
+     actualtype == "table" and (getmetatable(arguments[2]) or {}).__tostring then
+    actual = tostring(arguments[2])
+  end
+  local init = arguments[3]
+  local plain = arguments[4]
+  local stringtype = "string or object convertible to a string"
+  assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }))
+  assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(arguments[2]) }))
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }))
+  -- switch arguments for proper output message
+  util.tinsert(arguments, 1, actual)
+  util.tremove(arguments, 3)
+  return (actual:find(pattern, init, plain) ~= nil)
+end
+
 local function equals(state, arguments)
   local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
@@ -186,6 +208,8 @@ assert:register("assertion", "thread", is_thread, "assertion.same.positive", "as
 assert:register("assertion", "returned_arguments", returned_arguments, "assertion.returned_arguments.positive", "assertion.returned_arguments.negative")
 
 assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
+assert:register("assertion", "matches", matches, "assertion.matches.positive", "assertion.matches.negative")
+assert:register("assertion", "match", matches, "assertion.matches.positive", "assertion.matches.negative")
 assert:register("assertion", "near", near, "assertion.near.positive", "assertion.near.negative")
 assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
 assert:register("assertion", "equal", equals, "assertion.equals.positive", "assertion.equals.negative")
