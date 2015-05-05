@@ -6,14 +6,13 @@ describe("Tests dealing with spies", function()
       return "derp"
     end}
   end)
---[[
+
   it("checks if a spy actually executes the internal function", function()
     spy.on(test, "key")
     assert(test.key() == "derp")
   end)
-]]
-  it("checks to see if spy keeps track of arguments", function()
 
+  it("checks to see if spy keeps track of arguments", function()
     spy.on(test, "key")
 
     test.key("derp")
