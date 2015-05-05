@@ -1,5 +1,6 @@
 local s = require 'say'
 local astate = require 'luassert.state'
+local util = require 'luassert.util'
 local obj   -- the returned module table
 
 -- list of namespaces
@@ -40,6 +41,14 @@ local function extract_keys(tokens)
   return keys
 end
 
+local function geterror(assertion_message, failure_message, args)
+  local message = s(assertion_message, obj:format(args))
+  if message and failure_message then
+    message = failure_message .. "\n" .. message
+  end
+  return message or failure_message
+end
+
 local __state_meta = {
 
   __call = function(self, ...)
@@ -63,8 +72,12 @@ local __state_meta = {
       local val = assertion.callback(self, arguments)
 
       if not val == self.mod then
-        local message = self.mod and assertion.positive_message or assertion.negative_message
-        error(s(message, obj:format(arguments)) or "assertion failed!", errorlevel())
+        local message = assertion.positive_message
+        if not self.mod then
+          message = assertion.negative_message
+        end
+        local err = geterror(message, rawget(self,"failure_message"), arguments)
+        error(err or "assertion failed!", errorlevel())
       end
     else
       self.payload = ...
