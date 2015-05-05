@@ -90,7 +90,8 @@ local function set_spy(state)
 end
 
 local function called_with(state, arguments)
-  if rawget(state, "payload") and rawget(state, "payload").called_with then
+  local payload = rawget(state, "payload")
+  if payload and payload.called_with then
     return state.payload:called_with(arguments)
   else
     error("'called_with' must be chained after 'spy(aspy)'")
@@ -103,16 +104,17 @@ local function called(state, arguments, compare)
     state.mod = true
     num_times = 0
   end
-  if state.payload and type(state.payload) == "table" and state.payload.called then
+  local payload = rawget(state, "payload")
+  if payload and type(payload) == "table" and payload.called then
     local result, count = state.payload:called(num_times, compare)
     arguments[1] = tostring(num_times or ">0")
-    table.insert(arguments, 2, tostring(count))
+    util.tinsert(arguments, 2, tostring(count))
     arguments.n = arguments.n + 1
     arguments.nofmt = arguments.nofmt or {}
     arguments.nofmt[1] = true
     arguments.nofmt[2] = true
     return result
-  elseif state.payload and type(state.payload) == "function" then
+  elseif payload and type(payload) == "function" then
     error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
   else
     error("'called' must be chained after 'spy(aspy)'")
