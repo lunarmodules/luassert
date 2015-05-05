@@ -44,8 +44,7 @@ local function near(state, arguments)
   assert(actual, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
   assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[3]) }))
   -- switch arguments for proper output message
-  util.tinsert(arguments, 1, arguments[2])
-  util.tremove(arguments, 3)
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
   arguments[3] = tolerance
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[3] = true
@@ -69,8 +68,7 @@ local function matches(state, arguments)
   assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(arguments[2]) }))
   assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }))
   -- switch arguments for proper output message
-  util.tinsert(arguments, 1, actual)
-  util.tremove(arguments, 3)
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
   return (actual:find(pattern, init, plain) ~= nil)
 end
 
@@ -80,8 +78,7 @@ local function equals(state, arguments)
   for i = 2,argcnt  do
     if arguments[1] ~= arguments[i] then
       -- switch arguments for proper output message
-      util.tinsert(arguments, 1, arguments[i])
-      util.tremove(arguments, i + 1)
+      util.tinsert(arguments, 1, util.tremove(arguments, i))
       return false
     end
   end
@@ -97,8 +94,7 @@ local function same(state, arguments)
       local issame, crumbs = util.deepcompare(arguments[1], arguments[i], true)
       if not issame then
         -- switch arguments for proper output message
-        util.tinsert(arguments, 1, arguments[i])
-        util.tremove(arguments, i + 1)
+        util.tinsert(arguments, 1, util.tremove(arguments, i))
         arguments.fmtargs = arguments.fmtargs or {}
         arguments.fmtargs[1] = { crumbs = crumbs }
         arguments.fmtargs[2] = { crumbs = crumbs }
@@ -107,8 +103,7 @@ local function same(state, arguments)
     else
       if arguments[1] ~= arguments[i] then
         -- switch arguments for proper output message
-        util.tinsert(arguments, 1, arguments[i])
-        util.tremove(arguments, i + 1)
+        util.tinsert(arguments, 1, util.tremove(arguments, i))
         return false
       end
     end
@@ -162,13 +157,11 @@ end
 
 local function is_true(state, arguments)
   util.tinsert(arguments, 2, true)
-  arguments.n = arguments.n + 1
   return arguments[1] == arguments[2]
 end
 
 local function is_false(state, arguments)
   util.tinsert(arguments, 2, false)
-  arguments.n = arguments.n + 1
   return arguments[1] == arguments[2]
 end
 
@@ -176,7 +169,6 @@ local function is_type(state, arguments, etype)
   util.tinsert(arguments, 2, "type " .. etype)
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[2] = true
-  arguments.n = arguments.n + 1
   return arguments.n > 1 and type(arguments[1]) == etype
 end
 

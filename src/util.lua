@@ -133,10 +133,12 @@ function util.tremove(t, pos)
   if not pos then
     pos = t.n
   elseif pos > t.n then
+    local removed = t[pos]
     -- out of our range
     t[pos] = nil
-    return
+    return removed
   end
+  local removed = t[pos]
   -- shift everything up 1 pos
   for i = pos, t.n do
     t[i]=t[i+1]
@@ -144,6 +146,7 @@ function util.tremove(t, pos)
   -- set size, clean last
   t[t.n] = nil
   t.n = t.n - 1
+  return removed
 end
 
 -----------------------------------------------

@@ -118,7 +118,6 @@ local function called(state, arguments, compare)
     local result, count = state.payload:called(num_times, compare)
     arguments[1] = tostring(num_times or ">0")
     util.tinsert(arguments, 2, tostring(count))
-    arguments.n = arguments.n + 1
     arguments.nofmt = arguments.nofmt or {}
     arguments.nofmt[1] = true
     arguments.nofmt[2] = true
