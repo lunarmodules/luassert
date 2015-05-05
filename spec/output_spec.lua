@@ -236,3 +236,82 @@ describe("Output testing using custom failure message", function()
   end)
 
 end)
+
+for _,ss in ipairs({"spy", "stub"}) do
+  describe("Output testing " .. ss .. " using custom failure message", function()
+    local test = {key = function() return "derp" end}
+
+    local geterror = function(key, args, ...)
+      local err = select('#', ...) == 0 and key .. " failed" or ...
+      local success, message = pcall(assert[ss](test.key, err)[key], unpack(args))
+      if message == nil then return nil end
+      message = tostring(message):gsub("\n.*", "")
+      return message
+    end
+
+    before_each(function()
+      if ss == "spy" then
+        spy.on(test, "key")
+      else
+        stub(test, "key").returns("derp")
+      end
+    end)
+
+    after_each(function()
+      test.key:revert()
+    end)
+
+    it("Should use standard failure message if none provided for called", function()
+      local err = geterror("was_called", {}, nil)
+      local ok = err:find("^Expected")
+      assert(ok, "Output check for called failed\n    " .. err:gsub("\n","\n    "))
+    end)
+
+    it("Should use failure message for " .. ss .. " called assertion", function()
+      assert.is_equal("was_called failed", geterror("was_called", {}))
+      assert.is_equal("was_not_called failed", geterror("was_not_called", {0}))
+    end)
+
+    it("Should use failure message for " .. ss .. " called_at_least assertion", function()
+      assert.is_equal("was_called_at_least failed", geterror("was_called_at_least", {1}))
+      assert.is_equal("was_not_called_at_least failed", geterror("was_not_called_at_least", {0}))
+    end)
+
+    it("Should use failure message for " .. ss .. " called_at_most assertion", function()
+      test.key()
+      assert.is_equal("was_called_at_most failed", geterror("was_called_at_most", {0}))
+      assert.is_equal("was_not_called_at_most failed", geterror("was_not_called_at_most", {1}))
+    end)
+
+    it("Should use failure message for " .. ss .. " called_more_than assertion", function()
+      test.key()
+      assert.is_equal("was_called_more_than failed", geterror("was_called_more_than", {1}))
+      assert.is_equal("was_not_called_more_than failed", geterror("was_not_called_more_than", {0}))
+    end)
+
+    it("Should use failure message for " .. ss .. " called_less_than assertion", function()
+      test.key()
+      assert.is_equal("was_called_less_than failed", geterror("was_called_less_than", {1}))
+      assert.is_equal("was_not_called_less_than failed", geterror("was_not_called_less_than", {2}))
+    end)
+
+    it("Should use standard failure message if none provided for called_with", function()
+      local err = geterror("was_called_with", {}, nil)
+      local ok = err:find("^Function")
+      assert(ok, "Output check for called_with failed\n    " .. err:gsub("\n","\n    "))
+    end)
+
+    it("Should use failure message for " .. ss .. " called_with assertion", function()
+      test.key()
+      assert.is_equal("was_called_with failed", geterror("was_called_with", {1}))
+      assert.is_equal("was_not_called_with failed", geterror("was_not_called_with", {}))
+    end)
+
+    it("Should use failure message for " .. ss .. " returned_with assertion", function()
+      test.key()
+      assert.is_equal("was_returned_with failed", geterror("was_returned_with", {1}))
+      assert.is_equal("was_not_returned_with failed", geterror("was_not_returned_with", {"derp"}))
+    end)
+
+  end)
+end

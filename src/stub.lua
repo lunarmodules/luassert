@@ -96,7 +96,9 @@ function stub.new(object, key, ...)
   return s
 end
 
-local function set_stub(state)
+local function set_stub(state, arguments)
+  state.payload = arguments[1]
+  state.failure_message = arguments[2]
 end
 
 assert:register("modifier", "stub", set_stub)

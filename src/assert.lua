@@ -53,6 +53,7 @@ local __state_meta = {
 
   __call = function(self, ...)
     local keys = extract_keys(self.tokens)
+    self.tokens = {}
 
     local assertion
 
@@ -80,7 +81,14 @@ local __state_meta = {
         error(err or "assertion failed!", errorlevel())
       end
     else
-      self.payload = ...
+      local arguments = {...}
+      arguments.n = select('#', ...)
+
+      for _, key in ipairs(keys) do
+        if namespace.modifier[key] then
+          namespace.modifier[key].callback(self, arguments)
+        end
+      end
     end
 
     return self

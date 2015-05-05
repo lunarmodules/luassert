@@ -86,7 +86,9 @@ spy = {
   end
 }
 
-local function set_spy(state)
+local function set_spy(state, arguments)
+  state.payload = arguments[1]
+  state.failure_message = arguments[2]
 end
 
 local function returned_with(state, arguments)
