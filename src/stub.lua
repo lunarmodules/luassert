@@ -5,6 +5,8 @@ local util = require 'luassert.util'
 local stub = {}
 local unpack = require 'luassert.compatibility'.unpack
 
+stub._ = spy._
+
 function stub.new(object, key, ...)
   if object == nil and key == nil then
     -- called without arguments, create a 'blank' stub

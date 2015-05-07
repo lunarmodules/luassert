@@ -13,6 +13,8 @@ local spy_mt = {
 
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
+  _ = {"don't care"},
+
   new = function(callback)
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
@@ -45,8 +47,20 @@ spy = {
       end,
 
       called_with = function(self, args)
+        local function deepcompare(t1, t2)
+          for k1,v1 in pairs(t1) do
+            local v2 = t2[k1]
+            if v2 == nil or v2 ~= spy._ and not util.deepcompare(v1,v2) then
+              return false
+            end
+          end
+          for k2,_ in pairs(t2) do
+            if t1[k2] == nil then return false end
+          end
+          return true
+        end
         for _,v in ipairs(self.calls) do
-          if util.deepcompare(v, args) then
+          if deepcompare(v, args) then
             return true
           end
         end
