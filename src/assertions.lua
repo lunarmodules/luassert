@@ -103,6 +103,10 @@ local function has_error(state, arguments)
   local err_expected = arguments[2]
   assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local ok, err_actual = pcall(func)
+  if type(err_actual) == 'string' then
+    -- remove 'path/to/file:line: ' from string
+    err_actual = err_actual:gsub('^.-:%d+: ', '', 1)
+  end
   arguments.nofmt = {}
   arguments.n = 2
   arguments[1] = (ok and '(no error)' or err_actual)
@@ -120,14 +124,11 @@ local function has_error(state, arguments)
       err_actual = tostring(err_actual)
     end
     if type(err_actual) == 'string' then
-      -- we expect err_expected to be a substring of err_actual
-      return err_actual:find(err_expected, nil, true) ~= nil
+      return err_expected == err_actual
     end
   elseif type(err_expected) == 'number' then
     if type(err_actual) == 'string' then
-      -- we expect err_expected to be at the end of err_actual
-      local err_expected_pattern = tostring(err_expected):gsub("[%.%+%-]", "%%%1")
-      return err_actual:match('.*%s+' .. err_expected_pattern .. '$') ~= nil
+      return tostring(err_expected) == tostring(tonumber(err_actual))
     end
   end
   return same(state, {err_expected, err_actual, ["n"] = 2})
