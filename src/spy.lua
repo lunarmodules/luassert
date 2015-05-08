@@ -88,7 +88,9 @@ spy = {
 
 local function set_spy(state, arguments)
   state.payload = arguments[1]
-  state.failure_message = arguments[2]
+  if arguments[2] ~= nil then
+    state.failure_message = arguments[2]
+  end
 end
 
 local function returned_with(state, arguments)
