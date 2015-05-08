@@ -6,14 +6,13 @@ describe("Tests dealing with spies", function()
       return "derp"
     end}
   end)
---[[
+
   it("checks if a spy actually executes the internal function", function()
     spy.on(test, "key")
     assert(test.key() == "derp")
   end)
-]]
-  it("checks to see if spy keeps track of arguments", function()
 
+  it("checks to see if spy keeps track of arguments", function()
     spy.on(test, "key")
 
     test.key("derp")
@@ -30,6 +29,7 @@ describe("Tests dealing with spies", function()
 
   it("checks called() and called_with() assertions", function()
     local s = spy.new(function() end)
+    local _ = spy._
 
     s(1, 2, 3)
     s("a", "b", "c")
@@ -38,6 +38,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.called(3)
     assert.spy(s).was_not.called_with({1, 2, 3}) -- mind the accolades
     assert.spy(s).was.called_with(1, 2, 3)
+    assert.spy(s).was.called_with(_, 2, 3) -- matches don't care
+    assert.spy(s).was.called_with(_, _, _) -- matches multiple don't cares
+    assert.spy(s).was_not.called_with(_, _, _, _) -- does not match if too many args
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 

@@ -13,6 +13,8 @@ local spy_mt = {
 
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
+  _ = {"don't care"},
+
   new = function(callback)
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
@@ -45,8 +47,20 @@ spy = {
       end,
 
       called_with = function(self, args)
+        local function deepcompare(t1, t2)
+          for k1,v1 in pairs(t1) do
+            local v2 = t2[k1]
+            if v2 == nil or v2 ~= spy._ and not util.deepcompare(v1,v2) then
+              return false
+            end
+          end
+          for k2,_ in pairs(t2) do
+            if t1[k2] == nil then return false end
+          end
+          return true
+        end
         for _,v in ipairs(self.calls) do
-          if util.deepcompare(v, args) then
+          if deepcompare(v, args) then
             return true
           end
         end
@@ -76,7 +90,8 @@ local function set_spy(state)
 end
 
 local function called_with(state, arguments)
-  if rawget(state, "payload") and rawget(state, "payload").called_with then
+  local payload = rawget(state, "payload")
+  if payload and payload.called_with then
     return state.payload:called_with(arguments)
   else
     error("'called_with' must be chained after 'spy(aspy)'")
@@ -89,16 +104,17 @@ local function called(state, arguments, compare)
     state.mod = true
     num_times = 0
   end
-  if state.payload and type(state.payload) == "table" and state.payload.called then
+  local payload = rawget(state, "payload")
+  if payload and type(payload) == "table" and payload.called then
     local result, count = state.payload:called(num_times, compare)
     arguments[1] = tostring(num_times or ">0")
-    table.insert(arguments, 2, tostring(count))
+    util.tinsert(arguments, 2, tostring(count))
     arguments.n = arguments.n + 1
     arguments.nofmt = arguments.nofmt or {}
     arguments.nofmt[1] = true
     arguments.nofmt[2] = true
     return result
-  elseif state.payload and type(state.payload) == "function" then
+  elseif payload and type(payload) == "function" then
     error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
   else
     error("'called' must be chained after 'spy(aspy)'")
