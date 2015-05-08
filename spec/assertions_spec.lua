@@ -63,6 +63,20 @@ describe("Test Assertions", function()
     assert.is_not.near('1.5', '2.0', '0.499')
   end)
 
+  it("Checks matches() assertion does string matching", function()
+    assert.is.error(function() assert.matches('.*') end)  -- minimum 2 arguments
+    assert.is.error(function() assert.matches(nil, 's') end)  -- arg1 must be a string
+    assert.is.error(function() assert.matches('s', {}) end)  -- arg2 must be convertable to string
+    assert.is.error(function() assert.matches('s', 's', 's') end)  -- arg3 must be a number or nil
+    assert.matches("%w+", "test")
+    assert.has.match("%w+", "test")
+    assert.has_no.match("%d+", "derp")
+    assert.has.match("test", "test", nil, true)
+    assert.has_no.match("%w+", "test", nil, true)
+    assert.has.match("^test", "123 test", 5)
+    assert.has_no.match("%d+", "123 test", '4')
+  end)
+
   it("Ensures the is operator doesn't change the behavior of equals", function()
     assert.is.equals(true, true)
   end)

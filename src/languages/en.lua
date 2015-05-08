@@ -11,6 +11,9 @@ s:set("assertion.equals.negative", "Expected objects to not be equal.\nPassed in
 s:set("assertion.near.positive", "Expected values to be near.\nPassed in:\n%s\nExpected:\n%s +/- %s")
 s:set("assertion.near.negative", "Expected values to not be near.\nPassed in:\n%s\nDid not expect:\n%s +/- %s")
 
+s:set("assertion.matches.positive", "Expected strings to match.\nPassed in:\n%s\nExpected:\n%s")
+s:set("assertion.matches.negative", "Expected strings not to match.\nPassed in:\n%s\nDid not expect:\n%s")
+
 s:set("assertion.unique.positive", "Expected object to be unique:\n%s")
 s:set("assertion.unique.negative", "Expected object to not be unique:\n%s")
 
