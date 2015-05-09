@@ -133,7 +133,7 @@ local function fmt_table(arg, fmtargs)
     return result .. " }"
   end
 
-  return "(table): " .. ft(arg, 1)
+  return "(table) " .. ft(arg, 1)
 end
 
 local function fmt_function(arg)
