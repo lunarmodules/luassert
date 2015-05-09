@@ -14,6 +14,16 @@ describe("Test Assertions", function()
     local table1 = { derp = false}
     local table2 = { derp = false}
     assert.same(table1, table2)
+
+    if type(jit) == "table" then
+      loadstring([[
+        local assert = require 'luassert'
+        assert.same(0ULL, 0)
+        assert.same(0, 0ULL)
+        assert.same({0ULL}, {0})
+        assert.same({0}, {0ULL})
+      ]])()
+    end
   end)
   
   it("Checks the same() assertion for tables with protected metatables", function()

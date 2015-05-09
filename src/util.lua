@@ -2,9 +2,8 @@ local util = {}
 function util.deepcompare(t1,t2,ignore_mt)
   local ty1 = type(t1)
   local ty2 = type(t2)
-  if ty1 ~= ty2 then return false end
   -- non-table types can be directly compared
-  if ty1 ~= 'table' then return t1 == t2 end
+  if ty1 ~= 'table' or ty2 ~= 'table' then return t1 == t2 end
   local mt1 = debug.getmetatable(t1)
   local mt2 = debug.getmetatable(t2)
   -- would equality be determined by metatable __eq?
