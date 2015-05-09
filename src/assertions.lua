@@ -14,18 +14,24 @@ local function format(val)
   return astate.format_argument(val) or tostring(val)
 end
 
+local function set_failure_message(state, message)
+  if message ~= nil then
+    state.failure_message = message
+  end
+end
+
 local function unique(state, arguments)
   local list = arguments[1]
   local deep
   local argcnt = arguments.n
   if type(arguments[2]) == "boolean" or (arguments[2] == nil and argcnt > 2) then
     deep = arguments[2]
-    state.failure_message = arguments[3] or rawget(state, "failure_message")
+    set_failure_message(state, arguments[3])
   else
     if type(arguments[3]) == "boolean" then
       deep = arguments[3]
     end
-    state.failure_message = arguments[2] or rawget(state, "failure_message")
+    set_failure_message(state, arguments[2])
   end
   for k,v in pairs(list) do
     for k2, v2 in pairs(list) do
@@ -58,7 +64,7 @@ local function near(state, arguments)
   arguments[3] = tolerance
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[3] = true
-  state.failure_message = arguments[4] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[4])
   return (actual >= expected - tolerance and actual <= expected + tolerance)
 end
 
@@ -72,7 +78,7 @@ local function matches(state, arguments)
   end
   local err_message
   for i=3,argcnt,1 do
-    if util.hastostring(arguments[i]) and not tonumber(arguments[i]) then
+    if arguments[i] and type(arguments[i]) ~= "boolean" and not tonumber(arguments[i]) then
       err_message = util.tremove(arguments, i)
       break
     end
@@ -85,7 +91,7 @@ local function matches(state, arguments)
   assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }))
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
-  state.failure_message = err_message or rawget(state, "failure_message")
+  set_failure_message(state, err_message)
   return (actual:find(pattern, init, plain) ~= nil)
 end
 
@@ -95,7 +101,7 @@ local function equals(state, arguments)
   local result =  arguments[1] == arguments[2]
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
-  state.failure_message = arguments[3] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[3])
   return result
 end
 
@@ -109,18 +115,18 @@ local function same(state, arguments)
     arguments.fmtargs = arguments.fmtargs or {}
     arguments.fmtargs[1] = { crumbs = crumbs }
     arguments.fmtargs[2] = { crumbs = crumbs }
-    state.failure_message = arguments[3] or rawget(state, "failure_message")
+    set_failure_message(state, arguments[3])
     return result
   end
   local result = arguments[1] == arguments[2]
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
-  state.failure_message = arguments[3] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[3])
   return result
 end
 
 local function truthy(state, arguments)
-  state.failure_message = arguments[2] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[2])
   return arguments[1] ~= false and arguments[1] ~= nil
 end
 
@@ -144,7 +150,7 @@ local function has_error(state, arguments)
   arguments[2] = (err_expected == nil and '(error)' or err_expected)
   arguments.nofmt[1] = ok
   arguments.nofmt[2] = (err_expected == nil)
-  state.failure_message = failure_message or rawget(state, "failure_message")
+  set_failure_message(state, failure_message)
 
   if ok or err_expected == nil then
     return not ok
@@ -167,13 +173,13 @@ end
 
 local function is_true(state, arguments)
   util.tinsert(arguments, 2, true)
-  state.failure_message = arguments[3] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
 local function is_false(state, arguments)
   util.tinsert(arguments, 2, false)
-  state.failure_message = arguments[3] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
@@ -181,7 +187,7 @@ local function is_type(state, arguments, etype)
   util.tinsert(arguments, 2, "type " .. etype)
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[2] = true
-  state.failure_message = arguments[3] or rawget(state, "failure_message")
+  set_failure_message(state, arguments[3])
   return arguments.n > 1 and type(arguments[1]) == etype
 end
 

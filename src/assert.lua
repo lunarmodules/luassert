@@ -42,6 +42,11 @@ local function extract_keys(tokens)
 end
 
 local function geterror(assertion_message, failure_message, args)
+  if util.hastostring(failure_message) then
+    failure_message = tostring(failure_message)
+  elseif failure_message ~= nil then
+    failure_message = astate.format_argument(failure_message)
+  end
   local message = s(assertion_message, obj:format(args))
   if message and failure_message then
     message = failure_message .. "\n" .. message

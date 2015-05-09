@@ -291,6 +291,21 @@ describe("Output testing using custom failure message", function()
     assert.is_equal("not_returned_arguments fails", geterror2("not_returned_arguments", 4, 1, 2, 3, 4))
   end)
 
+  it("Should convert objects to string", function()
+    local t = setmetatable({},{__tostring=function(t) return "empty table" end})
+    assert.is_equal("(table) { }", geterror("is_true", false, {}))
+    assert.is_equal("(number) 999", geterror("is_true", false, 999))
+    assert.is_equal("(boolean) true", geterror("is_true", false, true))
+    assert.is_equal("(boolean) false", geterror("is_true", false, false))
+    assert.is_equal("empty table", geterror("is_true", false, t))
+
+    assert.is_equal("(table) { }", geterror2("is_true", false, {}))
+    assert.is_equal("(number) 999", geterror2("is_true", false, 999))
+    assert.is_equal("(boolean) true", geterror2("is_true", false, true))
+    assert.is_equal("(boolean) false", geterror2("is_true", false, false))
+    assert.is_equal("empty table", geterror2("is_true", false, t))
+  end)
+
 end)
 
 for _,ss in ipairs({"spy", "stub"}) do
@@ -395,6 +410,21 @@ for _,ss in ipairs({"spy", "stub"}) do
       assert.is_equal("was_returned_with failed", geterror2("was_returned_with", {1}))
       assert.is_equal("was_not_returned_with failed", geterror("was_not_returned_with", {"derp"}))
       assert.is_equal("was_not_returned_with failed", geterror2("was_not_returned_with", {"derp"}))
+    end)
+
+    it("Should convert objects to string", function()
+      local t = setmetatable({},{__tostring=function(t) return "empty table" end})
+      assert.is_equal("(table) { }", geterror("was_called", {}, {}))
+      assert.is_equal("(number) 999", geterror("was_called", {}, 999))
+      assert.is_equal("(boolean) true", geterror("was_called", {}, true))
+      assert.is_equal("(boolean) false", geterror("was_called", {}, false))
+      assert.is_equal("empty table", geterror("was_called", {}, t))
+
+      assert.is_equal("(table) { }", geterror2("was_called", {}, {}))
+      assert.is_equal("(number) 999", geterror2("was_called", {}, 999))
+      assert.is_equal("(boolean) true", geterror2("was_called", {}, true))
+      assert.is_equal("(boolean) false", geterror2("was_called", {}, false))
+      assert.is_equal("empty table", geterror2("was_called", {}, t))
     end)
 
   end)
