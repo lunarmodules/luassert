@@ -44,6 +44,9 @@ s:set("assertion.called_less_than.negative", "Expected not to be called less tha
 s:set("assertion.called_with.positive", "Function was not called with the arguments")
 s:set("assertion.called_with.negative", "Function was called with the arguments")
 
+s:set("assertion.returned_with.positive", "Function was not returned with the arguments")
+s:set("assertion.returned_with.negative", "Function was returned with the arguments")
+
 s:set("assertion.returned_arguments.positive", "Expected to be called with %s argument(s), but was called with %s")
 s:set("assertion.returned_arguments.negative", "Expected not to be called with %s argument(s), but was called with %s")
 

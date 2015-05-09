@@ -8,8 +8,15 @@ local spy_mt = {
     local arguments = {...}
     arguments.n = select('#',...)  -- add argument count for trailing nils
     table.insert(self.calls, arguments)
-    return self.callback(...)
-  end }
+    local function get_returns(...)
+      local returnvals = {...}
+      returnvals.n = select('#',...)  -- add argument count for trailing nils
+      table.insert(self.returnvals, returnvals)
+      return ...
+    end
+    return get_returns(self.callback(...))
+  end
+}
 
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
@@ -19,9 +26,9 @@ spy = {
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
     end
-    local s = setmetatable(
-    {
+    local s = setmetatable({
       calls = {},
+      returnvals = {},
       callback = callback,
 
       target_table = nil, -- these will be set when using 'spy.on'
@@ -47,24 +54,11 @@ spy = {
       end,
 
       called_with = function(self, args)
-        local function deepcompare(t1, t2)
-          for k1,v1 in pairs(t1) do
-            local v2 = t2[k1]
-            if v2 == nil or v2 ~= spy._ and not util.deepcompare(v1,v2) then
-              return false
-            end
-          end
-          for k2,_ in pairs(t2) do
-            if t1[k2] == nil then return false end
-          end
-          return true
-        end
-        for _,v in ipairs(self.calls) do
-          if deepcompare(v, args) then
-            return true
-          end
-        end
-        return false
+        return util.matchargs(self.calls, args, spy._) ~= nil
+      end,
+
+      returned_with = function(self, args)
+        return util.matchargs(self.returnvals, args, spy._) ~= nil
       end
     }, spy_mt)
     assert:add_spy(s)  -- register with the current state
@@ -87,6 +81,15 @@ spy = {
 }
 
 local function set_spy(state)
+end
+
+local function returned_with(state, arguments)
+  local payload = rawget(state, "payload")
+  if payload and payload.returned_with then
+    return state.payload:returned_with(arguments)
+  else
+    error("'returned_with' must be chained after 'spy(aspy)'")
+  end
 end
 
 local function called_with(state, arguments)
@@ -138,6 +141,7 @@ local function called_less_than(state, arguments)
 end
 
 assert:register("modifier", "spy", set_spy)
+assert:register("assertion", "returned_with", returned_with, "assertion.returned_with.positive", "assertion.returned_with.negative")
 assert:register("assertion", "called_with", called_with, "assertion.called_with.positive", "assertion.called_with.negative")
 assert:register("assertion", "called", called, "assertion.called.positive", "assertion.called.negative")
 assert:register("assertion", "called_at_least", called_at_least, "assertion.called_at_least.positive", "assertion.called_at_least.negative")
