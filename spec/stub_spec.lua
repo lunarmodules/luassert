@@ -8,9 +8,7 @@ describe("Tests dealing with stubs", function()
   end)
   
   it("checks to see if stub keeps track of arguments", function()
-
     stub(test, "key")
-
     test.key("derp")
     assert.stub(test.key).was.called_with("derp")
     assert.errors(function() assert.stub(test.key).was.called_with("herp") end)
@@ -90,6 +88,12 @@ describe("Tests dealing with stubs", function()
      local old_s = s
      s = s:revert()
      assert.is_nil(s)
+  end)
+
+  it("returns nil by default", function()
+    stub(test, "key")
+
+    assert.is_nil(test.key())
   end)
 
   it("returns a given return value", function()
@@ -189,14 +193,21 @@ describe("Tests dealing with stubs", function()
   it("on_call_with returns specified arguments", function()
     stub(test, "key").returns("foo bar")
     test.key.on_call_with("bar").returns("foo", nil, "bar")
+    test.key.on_call_with(stub._, "foo").returns("foofoo")
 
     local arg1, arg2, arg3 = test.key("bar")
+    local foofoo1 = test.key(1, "foo")
+    local foofoo2 = test.key(2, "foo")
+    local foofoo3 = test.key(nil, "foo")
     local foobar = test.key()
 
     assert.is.equal("foo", arg1)
     assert.is.equal(nil, arg2)
     assert.is.equal("bar", arg3)
     assert.is.equal("foo bar", foobar)
+    assert.is.equal("foofoo", foofoo1)
+    assert.is.equal("foofoo", foofoo2)
+    assert.is.equal("foofoo", foofoo3)
   end)
 
   it("on_call_with invokes stub function", function()
