@@ -95,12 +95,13 @@ local function get_sorted_keys(t)
   return keys, nkeys
 end
 
-local function fmt_table(arg)
+local function fmt_table(arg, fmtargs)
   if type(arg) ~= "table" then
     return
   end
 
   local tmax = assert:get_parameter("TableFormatLevel")
+  local crumbs = fmtargs and fmtargs.crumbs or {}
 
   local function ft(t, l)
     if next(t) == nil then
@@ -124,7 +125,10 @@ local function fmt_table(arg)
         v = "'"..v.."'"
       end
 
-      result = result .. string.format("\n" .. string.rep(" ",l * 2) .. "[%s] = %s", tostr(k), tostr(v))
+      local crumb = crumbs[#crumbs - l + 1]
+      local ch = (crumb == k and "*" or " ")
+      local indent = string.rep(" ",l * 2 - 1)
+      result = result .. string.format("\n%s%s[%s] = %s", indent, ch, tostr(k), tostr(v))
     end
     return result .. " }"
   end

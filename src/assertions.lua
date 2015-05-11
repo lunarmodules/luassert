@@ -94,10 +94,14 @@ local function same(state, arguments)
   local prev = nil
   for i = 2,argcnt  do
     if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
-      if not util.deepcompare(arguments[1], arguments[i], true) then
+      local issame, crumbs = util.deepcompare(arguments[1], arguments[i], true)
+      if not issame then
         -- switch arguments for proper output message
         util.tinsert(arguments, 1, arguments[i])
         util.tremove(arguments, i + 1)
+        arguments.fmtargs = arguments.fmtargs or {}
+        arguments.fmtargs[1] = { crumbs = crumbs }
+        arguments.fmtargs[2] = { crumbs = crumbs }
         return false
       end
     else

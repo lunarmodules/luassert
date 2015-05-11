@@ -114,10 +114,11 @@ obj = {
   format = function(self, args)
     -- args.n specifies the number of arguments in case of 'trailing nil' arguments which get lost
     local nofmt = args.nofmt or {}  -- arguments in this list should not be formatted
+    local fmtargs = args.fmtargs or {} -- additional arguments to be passed to formatter
     for i = 1, (args.n or #args) do -- cannot use pairs because table might have nils
       if not nofmt[i] then
         local val = args[i]
-        local valfmt = astate.format_argument(val)
+        local valfmt = astate.format_argument(val, nil, fmtargs[i])
         if valfmt == nil then valfmt = tostring(val) end -- no formatter found
         args[i] = valfmt
       end
