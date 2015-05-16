@@ -2,6 +2,17 @@
 local spy = require 'luassert.spy'
 local stub = require 'luassert.stub'
 
+local function mock_apply(object, action)
+  if type(object) ~= "table" then return end
+  if spy.is_spy(object) then
+    return object[action](object)
+  end
+  for k,v in pairs(object) do
+    mock_apply(v, action)
+  end
+  return object
+end
+
 local mock
 mock = {
   new = function(object, dostub, func, self, key)
@@ -26,16 +37,12 @@ mock = {
     return object
   end,
 
+  clear = function(object)
+    return mock_apply(object, "clear")
+  end,
+
   revert = function(object)
-    if type(object) ~= "table" then return end
-    if spy.is_spy(object) then
-      object:revert()
-      return
-    end
-    for k,v in pairs(object) do
-      mock.revert(v)
-    end
-    return object
+    return mock_apply(object, "revert")
   end
 }
 
