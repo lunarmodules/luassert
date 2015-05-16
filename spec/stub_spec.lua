@@ -225,4 +225,30 @@ describe("Tests dealing with stubs", function()
     assert.is.equal("foo foo", foo)
   end)
 
+  it("on_call_with matches arguments for returns", function()
+    local t = { foo = { bar = { "test" } } }
+    stub(test, "key").returns("foo foo")
+    test.key.on_call_with(t).returns("bar")
+    t.foo.bar = "value"
+
+    local bar = test.key({ foo = { bar = { "test" } } })
+    local foofoo = test.key(t)
+
+    assert.is.equal("bar", bar)
+    assert.is.equal("foo foo", foofoo)
+  end)
+
+  it("on_call_with matches arguments for invokes", function()
+    local t = { foo = { bar = { "test" } } }
+    stub(test, "key").returns("foo foo")
+    test.key.on_call_with(t).invokes(function() return "bar bar" end)
+    t.foo.bar = "value"
+
+    local bar = test.key({ foo = { bar = { "test" } } })
+    local foofoo = test.key(t)
+
+    assert.is.equal("bar bar", bar)
+    assert.is.equal("foo foo", foofoo)
+  end)
+
 end)

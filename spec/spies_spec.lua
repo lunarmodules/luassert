@@ -37,32 +37,44 @@ describe("Tests dealing with spies", function()
 
   it("checks returned_with() assertions", function()
     local s = spy.new(function(...) return ... end)
+    local t = { foo = { bar = { "test" } } }
     local _ = spy._
 
     s(1, 2, 3)
     s("a", "b", "c")
+    s(t)
+    t.foo.bar = "value"
+
     assert.spy(s).was.returned_with(1, 2, 3)
     assert.spy(s).was_not.returned_with({1, 2, 3}) -- mind the accolades
     assert.spy(s).was.returned_with(_, 2, 3) -- matches don't care
     assert.spy(s).was.returned_with(_, _, _) -- matches multiple don't cares
     assert.spy(s).was_not.returned_with(_, _, _, _) -- does not match if too many args
+    assert.spy(s).was.returned_with({ foo = { bar = { "test" } } }) -- matches original table
+    assert.spy(s).was_not.returned_with(t) -- does not match modified table
     assert.has_error(function() assert.spy(s).was.returned_with(5, 6) end)
   end)
 
   it("checks called() and called_with() assertions", function()
     local s = spy.new(function() end)
+    local t = { foo = { bar = { "test" } } }
     local _ = spy._
 
     s(1, 2, 3)
     s("a", "b", "c")
+    s(t)
+    t.foo.bar = "value"
+
     assert.spy(s).was.called()
-    assert.spy(s).was.called(2) -- twice!
-    assert.spy(s).was_not.called(3)
+    assert.spy(s).was.called(3) -- 3 times!
+    assert.spy(s).was_not.called(4)
     assert.spy(s).was_not.called_with({1, 2, 3}) -- mind the accolades
     assert.spy(s).was.called_with(1, 2, 3)
     assert.spy(s).was.called_with(_, 2, 3) -- matches don't care
     assert.spy(s).was.called_with(_, _, _) -- matches multiple don't cares
     assert.spy(s).was_not.called_with(_, _, _, _) -- does not match if too many args
+    assert.spy(s).was.called_with({ foo = { bar = { "test" } } }) -- matches original table
+    assert.spy(s).was_not.called_with(t) -- does not match modified table
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 

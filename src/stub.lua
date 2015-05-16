@@ -71,7 +71,7 @@ function stub.new(object, key, ...)
   }
 
   s.on_call_with = function(...)
-    local match_args = {...}
+    local match_args = util.copyargs({...}, stub._)
     match_args.n = select('#', ...)
     return {
       returns = function(...)
