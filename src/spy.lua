@@ -44,6 +44,12 @@ spy = {
         return self.callback
       end,
 
+      clear = function(self)
+        self.calls = {}
+        self.returnvals = {}
+        return self
+      end,
+
       called = function(self, times, compare)
         if times or compare then
           local compare = compare or function(count, expected) return count == expected end
