@@ -15,13 +15,19 @@ describe("Test Assertions", function()
     local table2 = { derp = false}
     assert.same(table1, table2)
   end)
-  
+
+  it("Checks to see if tables 1 and 2 are not the same", function()
+    local table1 = { derp = false}
+    local table2 = { derp = true}
+    assert.is_not.same(table1, table2)
+  end)
+
   it("Checks the same() assertion for tables with protected metatables", function()
     local troubleSomeTable = {}
     setmetatable(troubleSomeTable, {__metatable = 0})
     assert.are.same(troubleSomeTable, troubleSomeTable)
   end)
-  
+
   it("Checks same() assertion to handle nils properly", function()
     assert.is.error(function() assert.same(nil) end)  -- minimum 2 arguments
     assert.same(nil, nil)

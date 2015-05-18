@@ -83,15 +83,15 @@ state.remove_formatter = function(callback, s)
   end
 end
 
-state.format_argument = function(val, s)
+state.format_argument = function(val, s, fmtargs)
   s = s or current
   for _, fmt in ipairs(s.formatters) do
-    local valfmt = fmt(val)
+    local valfmt = fmt(val, fmtargs)
     if valfmt ~= nil then return valfmt end
   end
   -- nothing found, check snapshot 1 up in list
   if s.previous then
-    return state.format_argument(val, s.previous)
+    return state.format_argument(val, s.previous, fmtargs)
   end
   return nil -- end of list, couldn't format
 end

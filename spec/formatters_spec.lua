@@ -46,33 +46,33 @@ describe("Test Formatters", function()
   end)
 
   it("Checks to see if tables are recursively serialized", function()
-    assert.is.same(assert:format({ {}, ["n"] = 1 })[1], "(table): { }")
-    assert.is.same(assert:format({ { 2, 3, 4, [-5] = 7}, ["n"] = 1 })[1], [[(table): {
+    assert.is.same(assert:format({ {}, ["n"] = 1 })[1], "(table) { }")
+    assert.is.same(assert:format({ { 2, 3, 4, [-5] = 7}, ["n"] = 1 })[1], [[(table) {
   [1] = 2
   [2] = 3
   [3] = 4
   [-5] = 7 }]])
-    assert.is.same(assert:format({ { 1, ["k1"] = "v1", ["k2"] = "v2"}, ["n"] = 1 })[1], [[(table): {
+    assert.is.same(assert:format({ { 1, ["k1"] = "v1", ["k2"] = "v2"}, ["n"] = 1 })[1], [[(table) {
   [1] = 1
   [k1] = 'v1'
   [k2] = 'v2' }]])
-    assert.is.same(assert:format({ { "{\n }\n" }, ["n"] = 1 })[1], [[(table): {
+    assert.is.same(assert:format({ { "{\n }\n" }, ["n"] = 1 })[1], [[(table) {
   [1] = '{
  }
 ' }]])
   end)
 
   it("Checks to see if TableFormatLevel parameter limits table formatting depth", function()
-    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table): {
+    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table) {
   [1] = {
     [1] = {
       [1] = { ... more } } } }]])
-    assert.is.same(assert:format({ { { { } } }, ["n"] = 1 })[1], [[(table): {
+    assert.is.same(assert:format({ { { { } } }, ["n"] = 1 })[1], [[(table) {
   [1] = {
     [1] = { } } }]])
     assert:set_parameter("TableFormatLevel", 0)
-    assert.is.same(assert:format({ { }, ["n"] = 1 })[1], "(table): { }")
-    assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table): { ... more }")
+    assert.is.same(assert:format({ { }, ["n"] = 1 })[1], "(table) { }")
+    assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table) { ... more }")
   end)
 
   it("Checks to see if table with 0 count is returned empty/0-count", function()

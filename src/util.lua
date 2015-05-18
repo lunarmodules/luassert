@@ -16,12 +16,20 @@ function util.deepcompare(t1,t2,ignore_mt)
   end
   for k1,v1 in pairs(t1) do
     local v2 = t2[k1]
-    if v2 == nil or not util.deepcompare(v1,v2) then return false end
+    if v2 == nil then
+      return false, {k1}
+    end
+    local same, crumbs = util.deepcompare(v1,v2)
+    if not same then
+      crumbs = crumbs or {}
+      table.insert(crumbs, k1)
+      return false, crumbs
+    end
   end
   for k2,_ in pairs(t2) do
     -- only check wether each element has a t1 counterpart, actual comparison
     -- has been done in first loop above
-    if t1[k2] == nil then return false end
+    if t1[k2] == nil then return false, {k2} end
   end
   return true
 end

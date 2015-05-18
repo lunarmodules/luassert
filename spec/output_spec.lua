@@ -117,7 +117,7 @@ describe("Output testing using string comparison with the has_error assertion", 
   it("Should compare error strings correctly; table-string", function()
     --assert.has_error(function() error({}) end, "string")
     local output = getoutput(function() error({}) end, "string")
-    local ok = output:find("Caught:\n%(table%): { }")
+    local ok = output:find("Caught:\n%(table%) { }")
     assert(ok, "Output check 1 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
     local ok = output:find("Expected:\n%(string%) 'string'")
     assert(ok, "Output check 2 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
@@ -128,16 +128,45 @@ describe("Output testing using string comparison with the has_error assertion", 
     local output = getoutput(function() error("string") end, {})
     local ok = output:find("Caught:\n%(string%) 'string'")
     assert(ok, "Output check 1 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
-    local ok = output:find("Expected:\n%(table%): { }")
+    local ok = output:find("Expected:\n%(table%) { }")
     assert(ok, "Output check 2 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
   it("Should compare error objects correctly; table-table", function()
     --assert.has_error(function() error({}) end, { "table" })
     local output = getoutput(function() error({}) end, { "table" })
-    local ok = output:find("Caught:\n%(table%): { }")
+    local ok = output:find("Caught:\n%(table%) { }")
     assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
-    local ok = output:find("Expected:\n%(table%): {\n  %[1] = 'table' }")
+    local ok = output:find("Expected:\n%(table%) {\n  %[1] = 'table' }")
+    assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+end)
+
+describe("Output testing using string comparison with the same assertion", function()
+  local getoutput = function(...)
+    local success, message = pcall(assert.are.same, ...)
+    if message == nil then return nil end
+    return tostring(message)
+  end
+
+  it("Should compare tables correctly", function()
+    -- assert.are.same({1}, {2})
+    local output = getoutput({1}, {2})
+    local ok = output:find("Passed in:\n(table) {\n *[1] = 2 }", nil, true)
+    assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n(table) {\n *[1] = 1 }", nil, true)
+    assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
+  end)
+
+  it("Should compare tables correctly and highlight differences", function()
+    -- assert.are.same(t1, t2)
+    local t1 = {1, {"a", "b", {"foo", "bar"} }, "c"}
+    local t2 = {1, {"a", "b", {"bar", "bar"} }, "c"}
+    local output = getoutput(t1, t2)
+    local ok = output:find("Passed in:\n.*%*%[2].*%*%[3].*%*%[1] = 'bar'\n")
+    assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
+    local ok = output:find("Expected:\n.*%*%[2].*%*%[3].*%*%[1] = 'foo'\n")
     assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
