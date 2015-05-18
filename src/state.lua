@@ -2,9 +2,10 @@
 -- records; formatters, parameters, spies and stubs
 
 local state_mt = {
-      __call = function(self)
-        self:revert()
-      end }
+  __call = function(self)
+    self:revert()
+  end
+}
 
 local nilvalue = {} -- unique ID to refer to nil values for parameters
 
@@ -36,9 +37,9 @@ state.revert = function(self)
   -- revert parameters in 'last'
   self.parameters = {}
   -- revert spies/stubs in 'last'
-  while self.spies[1] do
-    self.spies[1]:revert()
-    table.remove(self.spies, 1)
+  while #self.spies > 0 do
+    local s = table.remove(self.spies)
+    s:revert()
   end
   setmetatable(self, nil) -- invalidate as a snapshot
   current = self.previous
@@ -117,7 +118,7 @@ end
 
 --  SPIES / STUBS
 state.add_spy = function(spy)
-  table.insert(current.spies, 1, spy)
+  table.insert(current.spies, spy)
 end
 
 state.snapshot()  -- create initial state
