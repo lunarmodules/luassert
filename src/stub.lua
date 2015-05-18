@@ -2,10 +2,11 @@
 local assert = require 'luassert.assert'
 local spy = require 'luassert.spy'
 local util = require 'luassert.util'
-local stub = {}
 local unpack = require 'luassert.compatibility'.unpack
 
-stub._ = spy._
+local stub = {
+  _ = spy._
+}
 
 function stub.new(object, key, ...)
   if object == nil and key == nil then
@@ -23,13 +24,14 @@ function stub.new(object, key, ...)
   local defaultfunc = fn or function()
     return unpack(return_values, 1, return_values_count)
   end
-  local stub_call_args = {}
-  local stub_callers = {}
+  local oncalls = {}
+  local callbacks = {}
   local stubfunc = function(...)
-    for _, args in ipairs(stub_call_args) do
-      if util.deepcompare(args, {...}) then
-        return stub_callers[args](...)
-      end
+    local args = {...}
+    args.n = select('#', ...)
+    local match = util.matchargs(oncalls, args, stub._)
+    if match then
+      return callbacks[match](...)
     end
     return defaultfunc(...)
   end
@@ -69,20 +71,21 @@ function stub.new(object, key, ...)
   }
 
   s.on_call_with = function(...)
-    local match_args = {...}
+    local match_args = util.copyargs({...}, stub._)
+    match_args.n = select('#', ...)
     return {
       returns = function(...)
         local return_args = {...}
         local n = select('#', ...)
-        table.insert(stub_call_args, match_args)
-        stub_callers[match_args] = function()
+        table.insert(oncalls, match_args)
+        callbacks[match_args] = function()
           return unpack(return_args, 1, n)
         end
         return s
       end,
       invokes = function(func)
-        table.insert(stub_call_args, match_args)
-        stub_callers[match_args] = function(...)
+        table.insert(oncalls, match_args)
+        callbacks[match_args] = function(...)
           return func(...)
         end
         return s

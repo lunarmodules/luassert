@@ -26,6 +26,58 @@ function util.deepcompare(t1,t2,ignore_mt)
   return true
 end
 
+function util.deepcopy(t)
+  if type(t) ~= "table" then return t end
+  local copy = {}
+  for k,v in pairs(t) do
+    copy[k] = util.deepcopy(v)
+  end
+  return copy
+end
+
+-----------------------------------------------
+-- Copies arguments in a of arguments
+-- @param args the arguments of which to copy
+-- @param dontcare value representing don't care which matches against everything
+-- @return the copy of the arguments
+function util.copyargs(args, dontcare)
+  local _ = (dontcare == nil and {} or dontcare)
+  local copy = {}
+  for k,v in pairs(args) do
+    copy[k] = (v == dontcare and v or util.deepcopy(v))
+  end
+  return copy
+end
+
+-----------------------------------------------
+-- Finds matching arguments in a saved list of arguments
+-- @param argslist list of arguments from which to search
+-- @param args the arguments of which to find a match
+-- @param dontcare value representing don't care which matches against everything
+-- @return the matching arguments if a match is found, otherwise nil
+function util.matchargs(argslist, args, dontcare)
+  local _ = (dontcare == nil and {} or dontcare)
+  local function matches(t1, t2)
+    for k1,v1 in pairs(t1) do
+      local v2 = t2[k1]
+      if v1 ~= _ and v2 ~= _ and (v2 == nil or not util.deepcompare(v1,v2)) then
+        return false
+      end
+    end
+    for k2,v2 in pairs(t2) do
+      local v1 = t1[k2]
+      if v1 ~= _ and v2 ~= _ and v1 == nil then return false end
+    end
+    return true
+  end
+  for k,v in ipairs(argslist) do
+    if matches(v, args) then
+      return v
+    end
+  end
+  return nil
+end
+
 -----------------------------------------------
 -- table.insert() replacement that respects nil values.
 -- The function will use table field 'n' as indicator of the

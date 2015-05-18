@@ -20,6 +20,14 @@ describe("Tests dealing with spies", function()
     assert.errors(function() assert.spy(test.key).was.called_with("herp") end)
   end)
 
+  it("checks to see if spy keeps track of returned arguments", function()
+    spy.on(test, "key")
+
+    test.key()
+    assert.spy(test.key).was.returned_with("derp")
+    assert.errors(function() assert.spy(test.key).was.returned_with("herp") end)
+  end)
+
   it("checks to see if spy keeps track of number of calls", function()
      spy.on(test, "key")
      test.key()
@@ -27,20 +35,46 @@ describe("Tests dealing with spies", function()
      assert.spy(test.key).was.called(2)
   end)
 
-  it("checks called() and called_with() assertions", function()
-    local s = spy.new(function() end)
+  it("checks returned_with() assertions", function()
+    local s = spy.new(function(...) return ... end)
+    local t = { foo = { bar = { "test" } } }
     local _ = spy._
 
     s(1, 2, 3)
     s("a", "b", "c")
+    s(t)
+    t.foo.bar = "value"
+
+    assert.spy(s).was.returned_with(1, 2, 3)
+    assert.spy(s).was_not.returned_with({1, 2, 3}) -- mind the accolades
+    assert.spy(s).was.returned_with(_, 2, 3) -- matches don't care
+    assert.spy(s).was.returned_with(_, _, _) -- matches multiple don't cares
+    assert.spy(s).was_not.returned_with(_, _, _, _) -- does not match if too many args
+    assert.spy(s).was.returned_with({ foo = { bar = { "test" } } }) -- matches original table
+    assert.spy(s).was_not.returned_with(t) -- does not match modified table
+    assert.has_error(function() assert.spy(s).was.returned_with(5, 6) end)
+  end)
+
+  it("checks called() and called_with() assertions", function()
+    local s = spy.new(function() end)
+    local t = { foo = { bar = { "test" } } }
+    local _ = spy._
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    s(t)
+    t.foo.bar = "value"
+
     assert.spy(s).was.called()
-    assert.spy(s).was.called(2) -- twice!
-    assert.spy(s).was_not.called(3)
+    assert.spy(s).was.called(3) -- 3 times!
+    assert.spy(s).was_not.called(4)
     assert.spy(s).was_not.called_with({1, 2, 3}) -- mind the accolades
     assert.spy(s).was.called_with(1, 2, 3)
     assert.spy(s).was.called_with(_, 2, 3) -- matches don't care
     assert.spy(s).was.called_with(_, _, _) -- matches multiple don't cares
     assert.spy(s).was_not.called_with(_, _, _, _) -- does not match if too many args
+    assert.spy(s).was.called_with({ foo = { bar = { "test" } } }) -- matches original table
+    assert.spy(s).was_not.called_with(t) -- does not match modified table
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 
@@ -86,6 +120,16 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.less_than(3)
     assert.spy(s).was_not.called.less_than(2)
     assert.has_error(function() assert.spy(s).was.called.less_than() end)
+  end)
+
+  it("checkis if called()/called_with assertions fail on non-spies ", function()
+    assert.has_error(assert.was.called)
+    assert.has_error(assert.was.called_at_least)
+    assert.has_error(assert.was.called_at_most)
+    assert.has_error(assert.was.called_more_than)
+    assert.has_error(assert.was.called_less_than)
+    assert.has_error(assert.was.called_with)
+    assert.has_error(assert.was.returned_with)
   end)
 
   it("checks spies to fail when spying on non-callable elements", function()
