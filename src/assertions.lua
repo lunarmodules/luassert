@@ -54,7 +54,7 @@ end
 
 local function matches(state, arguments)
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "matches", 2, tostring(argcnt) }))
   local pattern = arguments[1]
   local actualtype = type(arguments[2])
   local actual = nil
