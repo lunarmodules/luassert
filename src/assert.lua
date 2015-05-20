@@ -6,41 +6,6 @@ local obj   -- the returned module table
 -- list of namespaces
 local namespace = require 'luassert.namespaces'
 
-local errorlevel = function()
-  -- find the first level, not defined in the same file as this
-  -- code file to properly report the error
-  local level = 1
-  local info = debug.getinfo(level)
-  local thisfile = (info or {}).source
-  while thisfile and thisfile == (info or {}).source do
-    level = level + 1
-    info = debug.getinfo(level)
-  end
-  if level > 1 then level = level - 1 end -- deduct call to errorlevel() itself
-  return level
-end
-
-local function extract_keys(tokens)
-  -- find valid keys by coalescing tokens as needed, starting from the end
-  local keys = {}
-  local key = nil
-  for i = #tokens, 1, -1 do
-    local token = tokens[i]
-    key = key and (token .. '_' .. key) or token
-    if namespace.modifier[key] or namespace.assertion[key] then
-      table.insert(keys, 1, key)
-      key = nil
-    end
-  end
-
-  -- if there's anything left we didn't recognize it
-  if key then
-    error("luassert: unknown modifier/assertion: '" .. key .."'", errorlevel())
-  end
-
-  return keys
-end
-
 local function geterror(assertion_message, failure_message, args)
   if util.hastostring(failure_message) then
     failure_message = tostring(failure_message)
@@ -57,7 +22,7 @@ end
 local __state_meta = {
 
   __call = function(self, ...)
-    local keys = extract_keys(self.tokens)
+    local keys = util.extract_keys("assertion", self.tokens)
     self.tokens = {}
 
     local assertion
@@ -83,7 +48,7 @@ local __state_meta = {
           message = assertion.negative_message
         end
         local err = geterror(message, rawget(self,"failure_message"), arguments)
-        error(err or "assertion failed!", errorlevel())
+        error(err or "assertion failed!", util.errorlevel())
       end
     else
       local arguments = {...}
