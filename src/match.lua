@@ -83,6 +83,7 @@ local state_mt = {
 }
 
 local match = {
+  _ = function() return true end,
   state = function() return setmetatable({mod=true, tokens={}}, state_mt) end,
 }
 

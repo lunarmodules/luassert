@@ -3,6 +3,16 @@ local match = require 'luassert.match'
 assert(type(match) == "table")
 
 describe("Test Matchers", function()
+  it("Checks wildcard() matcher", function()
+    assert.is_true(match._(nil))
+    assert.is_true(match._(true))
+    assert.is_true(match._(false))
+    assert.is_true(match._(123))
+    assert.is_true(match._(""))
+    assert.is_true(match._({}))
+    assert.is_true(match._(function() end))
+  end)
+
   it("Checks truthy() matcher", function()
     assert.is_false(match.truthy()(nil))
     assert.is_true(match.truthy()(true))

@@ -4,7 +4,7 @@
 -- 1) state
 -- 2) arguments list. The list has a member 'n' with the argument count to check for trailing nils
 
--- matchers return a function that, given an argument, returns a boolean
+-- matchers return a function (or callable object) that, given an argument, returns a boolean
 
 local assert = require('luassert.assert')
 local astate = require ('luassert.state')
