@@ -6,6 +6,8 @@ local obj   -- the returned module table
 -- list of namespaces
 local namespace = {}
 
+namespace.matcher = require 'luassert.match'
+
 local errorlevel = function()
   -- find the first level, not defined in the same file as this
   -- code file to properly report the error
