@@ -1,3 +1,5 @@
+local match = require 'luassert.match'
+
 describe("Tests dealing with spies", function()
   local test = {}
 
@@ -38,7 +40,7 @@ describe("Tests dealing with spies", function()
   it("checks returned_with() assertions", function()
     local s = spy.new(function(...) return ... end)
     local t = { foo = { bar = { "test" } } }
-    local _ = spy._
+    local _ = match._
 
     s(1, 2, 3)
     s("a", "b", "c")
@@ -58,7 +60,7 @@ describe("Tests dealing with spies", function()
   it("checks called() and called_with() assertions", function()
     local s = spy.new(function() end)
     local t = { foo = { bar = { "test" } } }
-    local _ = spy._
+    local _ = match._
 
     s(1, 2, 3)
     s("a", "b", "c")

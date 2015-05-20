@@ -1,3 +1,5 @@
+local match = require 'luassert.match'
+
 describe("Tests dealing with stubs", function()
   local test = {}
 
@@ -207,7 +209,7 @@ describe("Tests dealing with stubs", function()
   it("on_call_with returns specified arguments", function()
     stub(test, "key").returns("foo bar")
     test.key.on_call_with("bar").returns("foo", nil, "bar")
-    test.key.on_call_with(stub._, "foo").returns("foofoo")
+    test.key.on_call_with(match._, "foo").returns("foofoo")
 
     local arg1, arg2, arg3 = test.key("bar")
     local foofoo1 = test.key(1, "foo")

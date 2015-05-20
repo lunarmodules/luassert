@@ -20,8 +20,6 @@ local spy_mt = {
 
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
-  _ = {"don't care"},
-
   new = function(callback)
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
@@ -60,11 +58,11 @@ spy = {
       end,
 
       called_with = function(self, args)
-        return util.matchargs(self.calls, args, spy._) ~= nil
+        return util.matchargs(self.calls, args) ~= nil
       end,
 
       returned_with = function(self, args)
-        return util.matchargs(self.returnvals, args, spy._) ~= nil
+        return util.matchargs(self.returnvals, args) ~= nil
       end
     }, spy_mt)
     assert:add_spy(s)  -- register with the current state

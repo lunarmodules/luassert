@@ -4,9 +4,7 @@ local spy = require 'luassert.spy'
 local util = require 'luassert.util'
 local unpack = require 'luassert.compatibility'.unpack
 
-local stub = {
-  _ = spy._
-}
+local stub = {}
 
 function stub.new(object, key, ...)
   if object == nil and key == nil then
@@ -29,7 +27,7 @@ function stub.new(object, key, ...)
   local stubfunc = function(...)
     local args = {...}
     args.n = select('#', ...)
-    local match = util.matchargs(oncalls, args, stub._)
+    local match = util.matchargs(oncalls, args)
     if match then
       return callbacks[match](...)
     end
@@ -71,7 +69,7 @@ function stub.new(object, key, ...)
   }
 
   s.on_call_with = function(...)
-    local match_args = util.copyargs({...}, stub._)
+    local match_args = util.copyargs({...})
     match_args.n = select('#', ...)
     return {
       returns = function(...)

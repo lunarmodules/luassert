@@ -35,6 +35,12 @@ local function extract_keys(tokens)
   return keys
 end
 
+local matcher_mt = {
+  __call = function(self, value)
+    return self.callback(value) == self.mod
+  end,
+}
+
 local state_mt = {
   __call = function(self, ...)
     local keys = extract_keys(self.tokens)
@@ -56,9 +62,10 @@ local state_mt = {
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
       local matches = matcher.callback(self, arguments)
-      return function(value)
-        return matches(value) == self.mod
-      end
+      return setmetatable({
+        mod = self.mod,
+        callback = matches,
+      }, matcher_mt)
     else
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
@@ -83,8 +90,13 @@ local state_mt = {
 }
 
 local match = {
-  _ = function() return true end,
+  _ = setmetatable({mod=true, callback=function() return true end}, matcher_mt),
+
   state = function() return setmetatable({mod=true, tokens={}}, state_mt) end,
+
+  is_matcher = function(object)
+    return type(object) == "table" and getmetatable(object) == matcher_mt
+  end,
 }
 
 local mt = {
