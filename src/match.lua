@@ -55,9 +55,9 @@ local state_mt = {
 
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
+      local matches = matcher.callback(self, arguments)
       return function(value)
-        local result = matcher.callback(value, arguments)
-        return result == self.mod
+        return matches(value) == self.mod
       end
     else
       local arguments = {...}

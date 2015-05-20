@@ -135,7 +135,7 @@ describe("Test Matchers", function()
   end)
 
   it("Checks equals() matcher to handle nils properly", function()
-    assert.is.error(function() match.is_equals()() end)  -- minimum 1 argument
+    assert.is.error(function() match.is_equals() end)  -- minimum 1 argument
     assert.is_true(match.is_equal(nil)(nil))
     assert.is_false(match.is_equal("a string")(nil))
     assert.is_false(match.is_equal(nil)("a string"))
@@ -155,9 +155,9 @@ describe("Test Matchers", function()
   end)
 
   it("Checks matches() matcher does string matching", function()
-    assert.is.error(function() match.matches()() end)  -- minimum 1 arguments
-    assert.is.error(function() match.matches({})() end)  -- arg1 must be a string
-    assert.is.error(function() match.matches('s', 's')() end)  -- arg2 must be a number or nil
+    assert.is.error(function() match.matches() end)  -- minimum 1 arguments
+    assert.is.error(function() match.matches({}) end)  -- arg1 must be a string
+    assert.is.error(function() match.matches('s', 's') end)  -- arg2 must be a number or nil
     assert.is_true(match.matches("%w+")("test"))
     assert.is_true(match.has.match("%w+")("test"))
     assert.is_false(match.matches("%d+")("derp"))
@@ -168,9 +168,9 @@ describe("Test Matchers", function()
   end)
 
   it("Checks near() matcher handles tolerances", function()
-    assert.is.error(function() match.near(0)(0) end)  -- minimum 2 arguments
-    assert.is.error(function() match.near('a', 0)(0) end)  -- arg1 must be convertable to number
-    assert.is.error(function() match.near(0, 'a')(0) end)  -- arg2 must be convertable to number
+    assert.is.error(function() match.near(0) end)  -- minimum 2 arguments
+    assert.is.error(function() match.near('a', 0) end)  -- arg1 must be convertable to number
+    assert.is.error(function() match.near(0, 'a') end)  -- arg2 must be convertable to number
     assert.is_true(match.is.near(1.5, 0.5)(2.0))
     assert.is_true(match.is.near('1.5', '0.5')('2.0'))
     assert.is_true(match.is_not.near(1.5, 0.499)(2.0))
