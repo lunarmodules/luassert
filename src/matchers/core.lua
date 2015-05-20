@@ -13,6 +13,38 @@ local function format(val)
   return astate.format_argument(val) or tostring(val)
 end
 
+local function unique(value, arguments)
+  local list = value
+  local deep = arguments[1]
+  for k,v in pairs(list) do
+    for k2, v2 in pairs(list) do
+      if k ~= k2 then
+        if deep and util.deepcompare(v, v2, true) then
+          return false
+        else
+          if v == v2 then
+            return false
+          end
+        end
+      end
+    end
+  end
+  return true
+end
+
+local function near(value, arguments)
+  local argcnt = arguments.n
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "near", 2, tostring(argcnt) }))
+  local expected = tonumber(arguments[1])
+  local tolerance = tonumber(arguments[2])
+  local actual = tonumber(value)
+  local numbertype = "number or object convertible to a number"
+  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }))
+  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
+  if not actual then return false end
+  return (actual >= expected - tolerance and actual <= expected + tolerance)
+end
+
 local function matches(value, arguments)
   local argcnt = arguments.n
   assert(argcnt > 0, s("assertion.internal.argtolittle", { "matches", 1, tostring(argcnt) }))
@@ -27,8 +59,8 @@ local function matches(value, arguments)
   local plain = arguments[3]
   local stringtype = "string or object convertible to a string"
   assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }))
-  assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(value) }))
   assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[2]) }))
+  if not actual then return false end
   return (actual:find(pattern, init, plain) ~= nil)
 end
 
@@ -55,12 +87,12 @@ local function is_false(value, arguments)
   return value == false
 end
 
-local function is_truthy(value, arguments)
+local function truthy(value, arguments)
   return value ~= false and value ~= nil
 end
 
-local function is_falsy(value, arguments)
-  return not is_truthy(value, arguments)
+local function falsy(value, arguments)
+  return not truthy(value, arguments)
 end
 
 local function is_type(value, arguments, etype)
@@ -84,22 +116,24 @@ local function is_boolean(value, agruments)
   return type(value) == "boolean"
 end
 
-assert:register("matcher", "is_true", is_true)
-assert:register("matcher", "is_false", is_false)
-assert:register("matcher", "is_truthy", is_truthy)
-assert:register("matcher", "is_falsy", is_falsy)
+assert:register("matcher", "true", is_true)
+assert:register("matcher", "false", is_false)
 
-assert:register("matcher", "is_nil", is_nil)
-assert:register("matcher", "is_boolean", is_boolean)
-assert:register("matcher", "is_number", is_number)
-assert:register("matcher", "is_string", is_string)
-assert:register("matcher", "is_table", is_table)
-assert:register("matcher", "is_function", is_function)
-assert:register("matcher", "is_userdata", is_userdata)
-assert:register("matcher", "is_thread", is_thread)
+assert:register("matcher", "nil", is_nil)
+assert:register("matcher", "boolean", is_boolean)
+assert:register("matcher", "number", is_number)
+assert:register("matcher", "string", is_string)
+assert:register("matcher", "table", is_table)
+assert:register("matcher", "function", is_function)
+assert:register("matcher", "userdata", is_userdata)
+assert:register("matcher", "thread", is_thread)
 
-assert:register("matcher", "is_equals", equals)
-assert:register("matcher", "is_equal", equals)
-assert:register("matcher", "is_same", same)
+assert:register("matcher", "same", same)
 assert:register("matcher", "matches", matches)
-assert:register("matcher", "has_match", matches)
+assert:register("matcher", "match", matches)
+assert:register("matcher", "near", near)
+assert:register("matcher", "equals", equals)
+assert:register("matcher", "equal", equals)
+assert:register("matcher", "unique", unique)
+assert:register("matcher", "truthy", truthy)
+assert:register("matcher", "falsy", falsy)
