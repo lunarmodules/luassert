@@ -34,6 +34,7 @@ build = {
     ["luassert.init"] = "src/init.lua",
     ["luassert.matchers.init"] = "src/matchers/init.lua",
     ["luassert.matchers.core"] = "src/matchers/core.lua",
+    ["luassert.matchers.composite"] = "src/matchers/composite.lua",
     ["luassert.formatters.init"] = "src/formatters/init.lua",
     ["luassert.formatters.binarystring"] = "src/formatters/binarystring.lua",
     ["luassert.languages.en"] = "src/languages/en.lua",

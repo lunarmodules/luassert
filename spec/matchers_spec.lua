@@ -297,4 +297,41 @@ describe("Test Matchers", function()
     assert.spy(s).was.returned_with(match.is_not_function())
   end)
 
+  it("Checks none() composite matcher", function()
+    assert.has.error(function() match.none_of() end)  -- minimum 1 arguments
+    assert.has.error(function() match.none_of('') end)  -- arg must be a matcher
+    assert.has.error(function() match.none_of('', 0) end)  -- all args must be a match
+
+    assert.is_false(match.none_of(match.is_string())(''))
+    assert.is_true(match.none_of(match.is_number())(''))
+    assert.is_true(match.none_of(match.is_number(), match.is_function())(''))
+    assert.is_false(match.none_of(match.is_number(), match.is_not_function())(''))
+    assert.is_false(match.not_none_of(match.is_number(), match.is_function())(''))
+  end)
+
+  it("Checks any() composite matcher", function()
+    assert.has.error(function() match.any_of() end)  -- minimum 1 arguments
+    assert.has.error(function() match.any_of('') end)  -- arg must be a matcher
+    assert.has.error(function() match.any_of('', 0) end)  -- all args must be a match
+
+    assert.is_true(match.any_of(match.is_string())(''))
+    assert.is_false(match.any_of(match.is_number())(''))
+    assert.is_false(match.any_of(match.is_number(), match.is_function())(''))
+    assert.is_true(match.any_of(match.is_number(), match.is_not_function())(''))
+    assert.is_true(match.not_any_of(match.is_number(), match.is_function())(''))
+  end)
+
+  it("Checks all() composite matcher", function()
+    assert.has.error(function() match.all_of() end)  -- minimum 1 arguments
+    assert.has.error(function() match.all_of('') end)  -- arg must be a matcher
+    assert.has.error(function() match.all_of('', 0) end)  -- all args must be a match
+
+    assert.is_true(match.all_of(match.is_string())(''))
+    assert.is_false(match.all_of(match.is_number())(''))
+    assert.is_false(match.all_of(match.is_number(), match.is_function())(''))
+    assert.is_false(match.all_of(match.is_number(), match.is_not_function())(''))
+    assert.is_true(match.not_all_of(match.is_number(), match.is_function())(''))
+    assert.is_true(match.all_of(match.is_not_number(), match.is_not_function())(''))
+  end)
+
 end)
