@@ -92,24 +92,27 @@ local function set_spy(state, arguments, level)
 end
 
 local function returned_with(state, arguments, level)
+  local level = (level or 1) + 1
   local payload = rawget(state, "payload")
   if payload and payload.returned_with then
     return state.payload:returned_with(arguments)
   else
-    error("'returned_with' must be chained after 'spy(aspy)'")
+    error("'returned_with' must be chained after 'spy(aspy)'", level)
   end
 end
 
 local function called_with(state, arguments, level)
+  local level = (level or 1) + 1
   local payload = rawget(state, "payload")
   if payload and payload.called_with then
     return state.payload:called_with(arguments)
   else
-    error("'called_with' must be chained after 'spy(aspy)'")
+    error("'called_with' must be chained after 'spy(aspy)'", level)
   end
 end
 
 local function called(state, arguments, level, compare)
+  local level = (level or 1) + 1
   local num_times = arguments[1]
   if not num_times and not state.mod then
     state.mod = true
@@ -125,9 +128,9 @@ local function called(state, arguments, level, compare)
     arguments.nofmt[2] = true
     return result
   elseif payload and type(payload) == "function" then
-    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
+    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original", level)
   else
-    error("'called' must be chained after 'spy(aspy)'")
+    error("'called' must be chained after 'spy(aspy)'", level)
   end
 end
 
