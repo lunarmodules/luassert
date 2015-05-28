@@ -30,16 +30,9 @@ s:set("assertion.called.positive", "Expected to be called %s time(s), but was ca
 s:set("assertion.called.negative", "Expected not to be called exactly %s time(s), but it was.")
 
 s:set("assertion.called_at_least.positive", "Expected to be called at least %s time(s), but was called %s time(s)")
-s:set("assertion.called_at_least.negative", "Expected not to be called at least %s time(s), but it was.")
-
 s:set("assertion.called_at_most.positive", "Expected to be called at most %s time(s), but was called %s time(s)")
-s:set("assertion.called_at_most.negative", "Expected not to be called at most %s time(s), but it was.")
-
 s:set("assertion.called_more_than.positive", "Expected to be called more than %s time(s), but was called %s time(s)")
-s:set("assertion.called_more_than.negative", "Expected not to be called more than %s time(s), but it was.")
-
 s:set("assertion.called_less_than.positive", "Expected to be called less than %s time(s), but was called %s time(s)")
-s:set("assertion.called_less_than.negative", "Expected not to be called less than %s time(s), but it was.")
 
 s:set("assertion.called_with.positive", "Function was not called with the arguments")
 s:set("assertion.called_with.negative", "Function was called with the arguments")
