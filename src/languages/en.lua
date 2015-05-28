@@ -45,4 +45,4 @@ s:set("assertion.returned_arguments.negative", "Expected not to be called with %
 
 -- errors
 s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got: %s")
-s:set("assertion.internal.badargtype", "the '%s' function requires a %s as an argument, got: %s")
+s:set("assertion.internal.badargtype", "bad argument #%s to '%s' (%s expected, got %s")

@@ -58,9 +58,9 @@ local function near(state, arguments, level)
   local actual = tonumber(arguments[2])
   local tolerance = tonumber(arguments[3])
   local numbertype = "number or object convertible to a number"
-  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }), level)
-  assert(actual, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }), level)
-  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[3]) }), level)
+  assert(expected, s("assertion.internal.badargtype", { 1, "near", numbertype, format(arguments[1]) }), level)
+  assert(actual, s("assertion.internal.badargtype", { 2, "near", numbertype, format(arguments[2]) }), level)
+  assert(tolerance, s("assertion.internal.badargtype", { 3, "near", numbertype, format(arguments[3]) }), level)
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   arguments[3] = tolerance
@@ -80,8 +80,10 @@ local function matches(state, arguments, level)
     actual = tostring(arguments[2])
   end
   local err_message
+  local init_arg_num = 3
   for i=3,argcnt,1 do
     if arguments[i] and type(arguments[i]) ~= "boolean" and not tonumber(arguments[i]) then
+      if i == 3 then init_arg_num = init_arg_num + 1 end
       err_message = util.tremove(arguments, i)
       break
     end
@@ -89,9 +91,9 @@ local function matches(state, arguments, level)
   local init = arguments[3]
   local plain = arguments[4]
   local stringtype = "string or object convertible to a string"
-  assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }), level)
-  assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(arguments[2]) }), level)
-  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }), level)
+  assert(type(pattern) == "string", s("assertion.internal.badargtype", { 1, "matches", "string", type(arguments[1]) }), level)
+  assert(actual, s("assertion.internal.badargtype", { 2, "matches", stringtype, format(arguments[2]) }), level)
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { init_arg_num, "matches", "number", type(arguments[3]) }), level)
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   set_failure_message(state, err_message)
@@ -144,7 +146,7 @@ local function has_error(state, arguments, level)
   local func = arguments[1]
   local err_expected = arguments[2]
   local failure_message = arguments[3]
-  assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }), level)
+  assert(util.callable(func), s("assertion.internal.badargtype", { 1, "error", "function or callable object", type(func) }), level)
   local ok, err_actual = pcall(func)
   if type(err_actual) == 'string' then
     -- remove 'path/to/file:line: ' from string

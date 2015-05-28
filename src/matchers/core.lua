@@ -43,8 +43,8 @@ local function near(state, arguments, level)
   local expected = tonumber(arguments[1])
   local tolerance = tonumber(arguments[2])
   local numbertype = "number or object convertible to a number"
-  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }), level)
-  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }), level)
+  assert(expected, s("assertion.internal.badargtype", { 1, "near", numbertype, format(arguments[1]) }), level)
+  assert(tolerance, s("assertion.internal.badargtype", { 2, "near", numbertype, format(arguments[2]) }), level)
 
   return function(value)
     local actual = tonumber(value)
@@ -61,8 +61,8 @@ local function matches(state, arguments, level)
   local init = arguments[2]
   local plain = arguments[3]
   local stringtype = "string or object convertible to a string"
-  assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }), level)
-  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[2]) }), level)
+  assert(type(pattern) == "string", s("assertion.internal.badargtype", { 1, "matches", "string", type(arguments[1]) }), level)
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { 2, "matches", "number", type(arguments[2]) }), level)
 
   return function(value)
     local actualtype = type(value)
