@@ -33,11 +33,16 @@ function util.deepcompare(t1,t2,ignore_mt)
   return true
 end
 
-function util.deepcopy(t)
+function util.deepcopy(t, deepmt)
   if type(t) ~= "table" then return t end
   local copy = {}
-  for k,v in pairs(t) do
+  for k,v in next, t, nil do
     copy[k] = util.deepcopy(v)
+  end
+  if deepmt then
+    debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t)))
+  else
+    debug.setmetatable(copy, debug.getmetatable(t))
   end
   return copy
 end
