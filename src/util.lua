@@ -189,10 +189,12 @@ end
 function util.errorlevel(level)
   local level = (level or 1) + 1 -- add one to get level of the caller
   local info = debug.getinfo(level)
-  local file = (info or {}).source
-  while file and file == (info or {}).source do
+  local source = (info or {}).source
+  local file = source
+  while file and (file == source or source == "=(tail call)") do
     level = level + 1
     info = debug.getinfo(level)
+    source = (info or {}).source
   end
   if level > 1 then level = level - 1 end -- deduct call to errorlevel() itself
   return level

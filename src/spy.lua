@@ -22,7 +22,7 @@ local spy   -- must make local before defining table, because table contents ref
 spy = {
   new = function(callback)
     if not util.callable(callback) then
-      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
+      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", util.errorlevel())
     end
     local s = setmetatable({
       calls = {},

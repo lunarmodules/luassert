@@ -135,14 +135,14 @@ describe("Output testing using custom failure message", function()
     args[argcnt+1] = key .. " fails"
     local success, message = pcall(assert[key], unpack(args, 1, argcnt+1))
     if message == nil then return nil end
-    message = tostring(message):gsub("\n.*", "")
+    message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
     return message
   end
 
   local geterror2 = function(key, ...)
     local success, message = pcall(assert.message(key .. " fails")[key], ...)
     if message == nil then return nil end
-    message = tostring(message):gsub("\n.*", "")
+    message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
     return message
   end
 
@@ -316,7 +316,7 @@ for _,ss in ipairs({"spy", "stub"}) do
       local err = select('#', ...) == 0 and key .. " failed" or ...
       local success, message = pcall(assert[ss](test.key, err)[key], unpack(args))
       if message == nil then return nil end
-      message = tostring(message):gsub("\n.*", "")
+      message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
       return message
     end
 
@@ -324,7 +324,7 @@ for _,ss in ipairs({"spy", "stub"}) do
       local err = select('#', ...) == 0 and key .. " failed" or ...
       local success, message = pcall(assert.message(err).spy(test.key)[key], unpack(args))
       if message == nil then return nil end
-      message = tostring(message):gsub("\n.*", "")
+      message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
       return message
     end
 
