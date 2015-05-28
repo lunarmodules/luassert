@@ -84,14 +84,14 @@ spy = {
   end
 }
 
-local function set_spy(state, arguments)
+local function set_spy(state, arguments, level)
   state.payload = arguments[1]
   if arguments[2] ~= nil then
     state.failure_message = arguments[2]
   end
 end
 
-local function returned_with(state, arguments)
+local function returned_with(state, arguments, level)
   local payload = rawget(state, "payload")
   if payload and payload.returned_with then
     return state.payload:returned_with(arguments)
@@ -100,7 +100,7 @@ local function returned_with(state, arguments)
   end
 end
 
-local function called_with(state, arguments)
+local function called_with(state, arguments, level)
   local payload = rawget(state, "payload")
   if payload and payload.called_with then
     return state.payload:called_with(arguments)
@@ -109,7 +109,7 @@ local function called_with(state, arguments)
   end
 end
 
-local function called(state, arguments, compare)
+local function called(state, arguments, level, compare)
   local num_times = arguments[1]
   if not num_times and not state.mod then
     state.mod = true
@@ -131,20 +131,24 @@ local function called(state, arguments, compare)
   end
 end
 
-local function called_at_least(state, arguments)
-  return called(state, arguments, function(count, expected) return count >= expected end)
+local function called_at_least(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count >= expected end)
 end
 
-local function called_at_most(state, arguments)
-  return called(state, arguments, function(count, expected) return count <= expected end)
+local function called_at_most(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count <= expected end)
 end
 
-local function called_more_than(state, arguments)
-  return called(state, arguments, function(count, expected) return count > expected end)
+local function called_more_than(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count > expected end)
 end
 
-local function called_less_than(state, arguments)
-  return called(state, arguments, function(count, expected) return count < expected end)
+local function called_less_than(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count < expected end)
 end
 
 assert:register("modifier", "spy", set_spy)

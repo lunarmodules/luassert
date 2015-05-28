@@ -40,7 +40,7 @@ local __state_meta = {
 
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
-      local val = assertion.callback(self, arguments)
+      local val = assertion.callback(self, arguments, util.errorlevel())
 
       if not val == self.mod then
         local message = assertion.positive_message
@@ -56,7 +56,7 @@ local __state_meta = {
 
       for _, key in ipairs(keys) do
         if namespace.modifier[key] then
-          namespace.modifier[key].callback(self, arguments)
+          namespace.modifier[key].callback(self, arguments, util.errorlevel())
         end
       end
     end
@@ -136,11 +136,12 @@ obj = {
 
 local __meta = {
 
-  __call = function(self, bool, message, ...)
+  __call = function(self, bool, message, level, ...)
     if not bool then
-      error(message or "assertion failed!", 2)
+      local level = (level or 1) + 1
+      error(message or "assertion failed!", level)
     end
-    return bool , message , ...
+    return bool , message , level , ...
   end,
 
   __index = function(self, key)
