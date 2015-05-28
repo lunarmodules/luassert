@@ -83,7 +83,7 @@ describe("Test Assertions", function()
     assert.is.error(function() assert.matches('.*') end)  -- minimum 2 arguments
     assert.is.error(function() assert.matches(nil, 's') end)  -- arg1 must be a string
     assert.is.error(function() assert.matches('s', {}) end)  -- arg2 must be convertable to string
-    assert.is.error(function() assert.matches('s', 's', 's') end)  -- arg3 must be a number or nil
+    assert.is.error(function() assert.matches('s', 's', 's', 's') end)  -- arg3 or arg4 must be a number or nil
     assert.matches("%w+", "test")
     assert.has.match("%w+", "test")
     assert.has_no.match("%d+", "derp")
@@ -125,20 +125,6 @@ describe("Test Assertions", function()
     assert.is_not.falsy(function() end)
     assert.is_not.falsy("")
     assert.is.falsy(false)
-  end)
-
-  it("tests the error outputted for same() with multiple arguments, to report the failing value", function()
-    local old_assertformat = assert.format
-    local arg1, arg2
-    assert.format = function(self, args)
-      args = old_assertformat(self, args)
-      arg1 = args[1]
-      arg2 = args[2]
-      return args
-    end
-    pcall(assert.are.same,"ok", "ok","not ok")
-    assert.format = old_assertformat
-    assert.are_not.equal(arg1, arg2)
   end)
 
   it("Ensures the Not operator does change the behavior of equals", function()

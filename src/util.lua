@@ -133,10 +133,12 @@ function util.tremove(t, pos)
   if not pos then
     pos = t.n
   elseif pos > t.n then
+    local removed = t[pos]
     -- out of our range
     t[pos] = nil
-    return
+    return removed
   end
+  local removed = t[pos]
   -- shift everything up 1 pos
   for i = pos, t.n do
     t[i]=t[i+1]
@@ -144,6 +146,7 @@ function util.tremove(t, pos)
   -- set size, clean last
   t[t.n] = nil
   t.n = t.n - 1
+  return removed
 end
 
 -----------------------------------------------
@@ -154,6 +157,16 @@ end
 -- @return boolean, true if the object is callable
 function util.callable(object)
   return type(object) == "function" or type((debug.getmetatable(object) or {}).__call) == "function"
+end
+
+-----------------------------------------------
+-- Checks an element has tostring.
+-- The type must either be a string or have a metatable
+-- containing an '__tostring' function.
+-- @param object element to inspect on having tostring or not
+-- @return boolean, true if the object has tostring
+function util.hastostring(object)
+  return type(object) == "string" or type((debug.getmetatable(object) or {}).__tostring) == "function"
 end
 
 return util

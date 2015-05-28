@@ -86,7 +86,11 @@ spy = {
   end
 }
 
-local function set_spy(state)
+local function set_spy(state, arguments)
+  state.payload = arguments[1]
+  if arguments[2] ~= nil then
+    state.failure_message = arguments[2]
+  end
 end
 
 local function returned_with(state, arguments)
@@ -118,7 +122,6 @@ local function called(state, arguments, compare)
     local result, count = state.payload:called(num_times, compare)
     arguments[1] = tostring(num_times or ">0")
     util.tinsert(arguments, 2, tostring(count))
-    arguments.n = arguments.n + 1
     arguments.nofmt = arguments.nofmt or {}
     arguments.nofmt[1] = true
     arguments.nofmt[2] = true

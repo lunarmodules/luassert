@@ -14,9 +14,25 @@ local function format(val)
   return astate.format_argument(val) or tostring(val)
 end
 
+local function set_failure_message(state, message)
+  if message ~= nil then
+    state.failure_message = message
+  end
+end
+
 local function unique(state, arguments)
   local list = arguments[1]
-  local deep = arguments[2]
+  local deep
+  local argcnt = arguments.n
+  if type(arguments[2]) == "boolean" or (arguments[2] == nil and argcnt > 2) then
+    deep = arguments[2]
+    set_failure_message(state, arguments[3])
+  else
+    if type(arguments[3]) == "boolean" then
+      deep = arguments[3]
+    end
+    set_failure_message(state, arguments[2])
+  end
   for k,v in pairs(list) do
     for k2, v2 in pairs(list) do
       if k ~= k2 then
@@ -44,11 +60,11 @@ local function near(state, arguments)
   assert(actual, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
   assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[3]) }))
   -- switch arguments for proper output message
-  util.tinsert(arguments, 1, arguments[2])
-  util.tremove(arguments, 3)
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
   arguments[3] = tolerance
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[3] = true
+  set_failure_message(state, arguments[4])
   return (actual >= expected - tolerance and actual <= expected + tolerance)
 end
 
@@ -56,11 +72,16 @@ local function matches(state, arguments)
   local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "matches", 2, tostring(argcnt) }))
   local pattern = arguments[1]
-  local actualtype = type(arguments[2])
   local actual = nil
-  if actualtype == "string" or actualtype == "number" or
-     actualtype == "table" and (getmetatable(arguments[2]) or {}).__tostring then
+  if util.hastostring(arguments[2]) or type(arguments[2]) == "number" then
     actual = tostring(arguments[2])
+  end
+  local err_message
+  for i=3,argcnt,1 do
+    if arguments[i] and type(arguments[i]) ~= "boolean" and not tonumber(arguments[i]) then
+      err_message = util.tremove(arguments, i)
+      break
+    end
   end
   local init = arguments[3]
   local plain = arguments[4]
@@ -69,54 +90,43 @@ local function matches(state, arguments)
   assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(arguments[2]) }))
   assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }))
   -- switch arguments for proper output message
-  util.tinsert(arguments, 1, actual)
-  util.tremove(arguments, 3)
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
+  set_failure_message(state, err_message)
   return (actual:find(pattern, init, plain) ~= nil)
 end
 
 local function equals(state, arguments)
   local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
-  for i = 2,argcnt  do
-    if arguments[1] ~= arguments[i] then
-      -- switch arguments for proper output message
-      util.tinsert(arguments, 1, arguments[i])
-      util.tremove(arguments, i + 1)
-      return false
-    end
-  end
-  return true
+  local result =  arguments[1] == arguments[2]
+  -- switch arguments for proper output message
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
+  set_failure_message(state, arguments[3])
+  return result
 end
 
 local function same(state, arguments)
   local argcnt = arguments.n
   assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
-  local prev = nil
-  for i = 2,argcnt  do
-    if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
-      local issame, crumbs = util.deepcompare(arguments[1], arguments[i], true)
-      if not issame then
-        -- switch arguments for proper output message
-        util.tinsert(arguments, 1, arguments[i])
-        util.tremove(arguments, i + 1)
-        arguments.fmtargs = arguments.fmtargs or {}
-        arguments.fmtargs[1] = { crumbs = crumbs }
-        arguments.fmtargs[2] = { crumbs = crumbs }
-        return false
-      end
-    else
-      if arguments[1] ~= arguments[i] then
-        -- switch arguments for proper output message
-        util.tinsert(arguments, 1, arguments[i])
-        util.tremove(arguments, i + 1)
-        return false
-      end
-    end
+  if type(arguments[1]) == 'table' and type(arguments[2]) == 'table' then
+    local result, crumbs = util.deepcompare(arguments[1], arguments[2], true)
+    -- switch arguments for proper output message
+    util.tinsert(arguments, 1, util.tremove(arguments, 2))
+    arguments.fmtargs = arguments.fmtargs or {}
+    arguments.fmtargs[1] = { crumbs = crumbs }
+    arguments.fmtargs[2] = { crumbs = crumbs }
+    set_failure_message(state, arguments[3])
+    return result
   end
-  return true
+  local result = arguments[1] == arguments[2]
+  -- switch arguments for proper output message
+  util.tinsert(arguments, 1, util.tremove(arguments, 2))
+  set_failure_message(state, arguments[3])
+  return result
 end
 
 local function truthy(state, arguments)
+  set_failure_message(state, arguments[2])
   return arguments[1] ~= false and arguments[1] ~= nil
 end
 
@@ -127,6 +137,7 @@ end
 local function has_error(state, arguments)
   local func = arguments[1]
   local err_expected = arguments[2]
+  local failure_message = arguments[3]
   assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local ok, err_actual = pcall(func)
   if type(err_actual) == 'string' then
@@ -139,14 +150,14 @@ local function has_error(state, arguments)
   arguments[2] = (err_expected == nil and '(error)' or err_expected)
   arguments.nofmt[1] = ok
   arguments.nofmt[2] = (err_expected == nil)
+  set_failure_message(state, failure_message)
 
   if ok or err_expected == nil then
     return not ok
   end
   if type(err_expected) == 'string' then
     -- err_actual must be (convertible to) a string
-    local mt = getmetatable(err_actual)
-    if mt and mt.__tostring then
+    if util.hastostring(err_actual) then
       err_actual = tostring(err_actual)
     end
     if type(err_actual) == 'string' then
@@ -162,13 +173,13 @@ end
 
 local function is_true(state, arguments)
   util.tinsert(arguments, 2, true)
-  arguments.n = arguments.n + 1
+  set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
 local function is_false(state, arguments)
   util.tinsert(arguments, 2, false)
-  arguments.n = arguments.n + 1
+  set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
@@ -176,7 +187,7 @@ local function is_type(state, arguments, etype)
   util.tinsert(arguments, 2, "type " .. etype)
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[2] = true
-  arguments.n = arguments.n + 1
+  set_failure_message(state, arguments[3])
   return arguments.n > 1 and type(arguments[1]) == etype
 end
 
@@ -190,6 +201,10 @@ local function returned_arguments(state, arguments)
   return arguments[1] == arguments[2]
 end
 
+local function set_message(state, arguments)
+  state.failure_message = arguments[1]
+end
+
 local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
 local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
 local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
@@ -199,6 +214,7 @@ local function is_userdata(state, arguments) return is_type(state, arguments, "u
 local function is_function(state, arguments) return is_type(state, arguments, "function") end
 local function is_thread(state, arguments)   return is_type(state, arguments, "thread")   end
 
+assert:register("modifier", "message", set_message)
 assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "false", is_false, "assertion.same.positive", "assertion.same.negative")
 assert:register("assertion", "boolean", is_boolean, "assertion.same.positive", "assertion.same.negative")
