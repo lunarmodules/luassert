@@ -27,7 +27,7 @@ local state_mt = {
 
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
-      local matches = matcher.callback(self, arguments)
+      local matches = matcher.callback(self, arguments, util.errorlevel())
       return setmetatable({
         mod = self.mod,
         callback = matches,
@@ -38,7 +38,7 @@ local state_mt = {
 
       for _, key in ipairs(keys) do
         if namespace.modifier[key] then
-          namespace.modifier[key].callback(self, arguments)
+          namespace.modifier[key].callback(self, arguments, util.errorlevel())
         end
       end
     end
