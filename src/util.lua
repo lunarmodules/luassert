@@ -50,13 +50,12 @@ end
 -----------------------------------------------
 -- Copies arguments in a of arguments
 -- @param args the arguments of which to copy
--- @param dontcare value representing don't care which matches against everything
 -- @return the copy of the arguments
-function util.copyargs(args, dontcare)
-  local _ = (dontcare == nil and {} or dontcare)
+function util.copyargs(args)
   local copy = {}
+  local match = require 'luassert.match'
   for k,v in pairs(args) do
-    copy[k] = (v == dontcare and v or util.deepcopy(v))
+    copy[k] = (match.is_matcher(v) and v or util.deepcopy(v))
   end
   return copy
 end
@@ -65,20 +64,29 @@ end
 -- Finds matching arguments in a saved list of arguments
 -- @param argslist list of arguments from which to search
 -- @param args the arguments of which to find a match
--- @param dontcare value representing don't care which matches against everything
 -- @return the matching arguments if a match is found, otherwise nil
-function util.matchargs(argslist, args, dontcare)
-  local _ = (dontcare == nil and {} or dontcare)
+function util.matchargs(argslist, args)
   local function matches(t1, t2)
+    local match = require 'luassert.match'
     for k1,v1 in pairs(t1) do
       local v2 = t2[k1]
-      if v1 ~= _ and v2 ~= _ and (v2 == nil or not util.deepcompare(v1,v2)) then
+      if match.is_matcher(v1) then
+        if not v1(v2) then return false end
+      elseif match.is_matcher(v2) then
+        if not v2(v1) then return false end
+      elseif (v2 == nil or not util.deepcompare(v1,v2)) then
         return false
       end
     end
     for k2,v2 in pairs(t2) do
       local v1 = t1[k2]
-      if v1 ~= _ and v2 ~= _ and v1 == nil then return false end
+      if match.is_matcher(v1) then
+        if not v1(v2) then return false end
+      elseif match.is_matcher(v2) then
+        if not v2(v1) then return false end
+      elseif v1 == nil then
+        return false
+      end
     end
     return true
   end
@@ -163,7 +171,6 @@ end
 function util.callable(object)
   return type(object) == "function" or type((debug.getmetatable(object) or {}).__call) == "function"
 end
-
 -----------------------------------------------
 -- Checks an element has tostring.
 -- The type must either be a string or have a metatable
@@ -172,6 +179,52 @@ end
 -- @return boolean, true if the object has tostring
 function util.hastostring(object)
   return type(object) == "string" or type((debug.getmetatable(object) or {}).__tostring) == "function"
+end
+
+-----------------------------------------------
+-- Find the first level, not defined in the same file as the caller's
+-- code file to properly report an error.
+-- @param level the level to use as the caller's source file
+-- @return number, the level of which to report an error
+function util.errorlevel(level)
+  local level = (level or 1) + 1 -- add one to get level of the caller
+  local info = debug.getinfo(level)
+  local file = (info or {}).source
+  while file and file == (info or {}).source do
+    level = level + 1
+    info = debug.getinfo(level)
+  end
+  if level > 1 then level = level - 1 end -- deduct call to errorlevel() itself
+  return level
+end
+
+-----------------------------------------------
+-- Extract modifier and namespace keys from list of tokens.
+-- @param nspace the namespace from which to match tokens
+-- @param tokens list of tokens to search for keys
+-- @return table, list of keys that were extracted
+function util.extract_keys(nspace, tokens)
+  local namespace = require 'luassert.namespaces'
+  local level = (level or 1) + 1
+
+  -- find valid keys by coalescing tokens as needed, starting from the end
+  local keys = {}
+  local key = nil
+  for i = #tokens, 1, -1 do
+    local token = tokens[i]
+    key = key and (token .. '_' .. key) or token
+    if namespace.modifier[key] or namespace[nspace][key] then
+      table.insert(keys, 1, key)
+      key = nil
+    end
+  end
+
+  -- if there's anything left we didn't recognize it
+  if key then
+    error("luassert: unknown modifier/" .. nspace .. ": '" .. key .."'", util.errorlevel(2))
+  end
+
+  return keys
 end
 
 return util
