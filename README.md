@@ -49,7 +49,67 @@ assert.has_property("name", { name = "jack" })
 ##Implementation notes:
 
 * assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
-* assertions `same` and `equal` will compare all arguments provided, the other assertions will only take 1 or 2 parameters and ignore all additional arguments
+* Most assertions will only take 1 or 2 parameters and an optional failure message, except for the `returned_arguments` assertion, which does not take a failure message
+ * To specify a custom failure message for the `returned_arguments` assertion, use the `message` modifier
+```lua
+local f = function() end
+assert.message("the function 'f' did not return 2 arguments").returned_arguments(2, f())
+```
+
+##Matchers
+Argument matching can be performed on spies/stubs with the ability to create your own. This provides flexible argument matching for `called_with` and `returned_with` assertions. Like assertions, you can modify chains of matchers with `not`. Furthermore, matchers can be combined using composite matchers.
+```lua
+local assert = require 'luassert'
+local match = require 'luassert.match'
+local spy = require 'luassert.spy'
+
+local s = spy.new(function() end)
+s('foo')
+s(1)
+s({}, 'foo')
+assert.spy(s).was.called_with(match._) -- arg1 is anything
+assert.spy(s).was.called_with(match.is_string()) -- arg1 is a string
+assert.spy(s).was.called_with(match.is_number()) -- arg1 is a number
+assert.spy(s).was.called_with(match.is_not_true()) -- arg1 is not true
+assert.spy(s).was.called_with(match.is_table(), match.is_string()) -- arg1 is a table, arg2 is a string
+assert.spy(s).was.called_with(match.has_match('.oo')) -- arg1 contains pattern ".oo"
+assert.spy(s).was.called_with({}, 'foo') -- you can still match without using matchers
+```
+Extend your own:
+```lua
+local function is_even(state, arguments)
+  return function(value)
+    return (value % 2) == 0
+  end
+end
+
+local function is_gt(state, arguments)
+  local expected = arguments[1]
+  return function(value)
+    return value > expected
+  end
+end
+
+assert:register("matcher", "even", is_even)
+assert:register("matcher", "gt", is_gt)
+```
+```lua
+local assert = require 'luassert'
+local match = require 'luassert.match'
+local spy = require 'luassert.spy'
+
+local s = spy.new(function() end)
+s(7)
+assert.spy(s).was.called_with(match.is_number()) -- arg1 was a number
+assert.spy(s).was.called_with(match.is_not_even()) -- arg1 was not even
+assert.spy(s).was.called_with(match.is_gt(5)) -- arg1 was greater than 5
+```
+Composite matchers have the form:
+```lua
+match.all_of(m1, m2, ...) -- argument matches all of the matchers m1 to mn
+match.any_of(m1, m2, ...) -- argument matches at least one of the matchers m1 to mn
+match.none_of(m1, m2, ...) -- argument does not match any of the matchers m1 to mn
+```
 
 ##Snapshots
 To be able to revert changes created by tests, inserting spies and stubs for example, luassert supports 'snapshots'. A snapshot includes the following;
@@ -62,20 +122,20 @@ Example:
 ```lua
 describe("Showing use of snapshots", function()
   local snapshot
-  
+
   before_each(function()
     snapshot = assert:snapshot()
   end)
-  
+
   after_each(function()
     snapshot:revert()
   end)
-  
+
   it("does some test", function()
     -- spies or stubs registered here, parameters changed, or formatters added
     -- will be undone in the after_each() handler.
   end)
-  
+
 end)
 ```
 
@@ -95,7 +155,7 @@ assert.are.equal(1, assert:get_parameter("my_param_name"))
 luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own. Customizing them is especially useful for limiting table depth and for userdata types.
 
 ###Configuring table depth display
-The default table formatter allows you to customize the levels displayed by setting the `TableFormatLevel` parameter (setting it to -1 displays all levels). 
+The default table formatter allows you to customize the levels displayed by setting the `TableFormatLevel` parameter (setting it to -1 displays all levels).
 
 Example:
 ```lua
@@ -112,7 +172,7 @@ describe("Tests different levels of table display", function()
           tropical = { "banana", "orange", "mango" },
         },
     }
-    
+
   it("tests display of 0 levels", function()
     assert:set_parameter("TableFormatLevel", 0)
     assert.are.same(testtable, {})
@@ -122,7 +182,7 @@ describe("Tests different levels of table display", function()
     assert:set_parameter("TableFormatLevel", 2)
     assert.are.same(testtable, {})
   end)
-  
+
 end)
 ```
 
@@ -160,7 +220,7 @@ Example using the included binary string formatter:
 local binstring = require("luassert.formatters.binarystring")
 
 describe("Tests using a binary string formatter", function()
-    
+
   setup(function()
     assert:add_formatter(binstring)
   end)
@@ -168,7 +228,7 @@ describe("Tests using a binary string formatter", function()
   teardown(function()
     assert:remove_formatter(binstring)
   end)
-  
+
   it("tests a string comparison with binary formatting", function()
     local s1, s2 = "", ""
     for n = 65,88 do
@@ -176,9 +236,9 @@ describe("Tests using a binary string formatter", function()
       s2 = string.char(n) .. s2
     end
     assert.are.same(s1, s2)
-    
+
   end)
-     
+
 end)
 ```
 
