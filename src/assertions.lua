@@ -3,6 +3,7 @@
 -- assertions take 2 parameters;
 -- 1) state
 -- 2) arguments list. The list has a member 'n' with the argument count to check for trailing nils
+-- 3) level The level of the error position relative to the called function
 -- returns; boolean; whether assertion passed
 
 local assert = require('luassert.assert')
@@ -20,7 +21,7 @@ local function set_failure_message(state, message)
   end
 end
 
-local function unique(state, arguments)
+local function unique(state, arguments, level)
   local list = arguments[1]
   local deep
   local argcnt = arguments.n
@@ -49,16 +50,17 @@ local function unique(state, arguments)
   return true
 end
 
-local function near(state, arguments)
+local function near(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 2, s("assertion.internal.argtolittle", { "near", 3, tostring(argcnt) }))
+  assert(argcnt > 2, s("assertion.internal.argtolittle", { "near", 3, tostring(argcnt) }), level)
   local expected = tonumber(arguments[1])
   local actual = tonumber(arguments[2])
   local tolerance = tonumber(arguments[3])
   local numbertype = "number or object convertible to a number"
-  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }))
-  assert(actual, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
-  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[3]) }))
+  assert(expected, s("assertion.internal.badargtype", { 1, "near", numbertype, format(arguments[1]) }), level)
+  assert(actual, s("assertion.internal.badargtype", { 2, "near", numbertype, format(arguments[2]) }), level)
+  assert(tolerance, s("assertion.internal.badargtype", { 3, "near", numbertype, format(arguments[3]) }), level)
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   arguments[3] = tolerance
@@ -68,17 +70,20 @@ local function near(state, arguments)
   return (actual >= expected - tolerance and actual <= expected + tolerance)
 end
 
-local function matches(state, arguments)
+local function matches(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "matches", 2, tostring(argcnt) }))
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "matches", 2, tostring(argcnt) }), level)
   local pattern = arguments[1]
   local actual = nil
   if util.hastostring(arguments[2]) or type(arguments[2]) == "number" then
     actual = tostring(arguments[2])
   end
   local err_message
+  local init_arg_num = 3
   for i=3,argcnt,1 do
     if arguments[i] and type(arguments[i]) ~= "boolean" and not tonumber(arguments[i]) then
+      if i == 3 then init_arg_num = init_arg_num + 1 end
       err_message = util.tremove(arguments, i)
       break
     end
@@ -86,18 +91,19 @@ local function matches(state, arguments)
   local init = arguments[3]
   local plain = arguments[4]
   local stringtype = "string or object convertible to a string"
-  assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }))
-  assert(actual, s("assertion.internal.badargtype", { "matches", stringtype, format(arguments[2]) }))
-  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[3]) }))
+  assert(type(pattern) == "string", s("assertion.internal.badargtype", { 1, "matches", "string", type(arguments[1]) }), level)
+  assert(actual, s("assertion.internal.badargtype", { 2, "matches", stringtype, format(arguments[2]) }), level)
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { init_arg_num, "matches", "number", type(arguments[3]) }), level)
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   set_failure_message(state, err_message)
   return (actual:find(pattern, init, plain) ~= nil)
 end
 
-local function equals(state, arguments)
+local function equals(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }), level)
   local result =  arguments[1] == arguments[2]
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
@@ -105,9 +111,10 @@ local function equals(state, arguments)
   return result
 end
 
-local function same(state, arguments)
+local function same(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }), level)
   if type(arguments[1]) == 'table' and type(arguments[2]) == 'table' then
     local result, crumbs = util.deepcompare(arguments[1], arguments[2], true)
     -- switch arguments for proper output message
@@ -125,20 +132,21 @@ local function same(state, arguments)
   return result
 end
 
-local function truthy(state, arguments)
+local function truthy(state, arguments, level)
   set_failure_message(state, arguments[2])
   return arguments[1] ~= false and arguments[1] ~= nil
 end
 
-local function falsy(state, arguments)
-  return not truthy(state, arguments)
+local function falsy(state, arguments, level)
+  return not truthy(state, arguments, level)
 end
 
-local function has_error(state, arguments)
+local function has_error(state, arguments, level)
+  local level = (level or 1) + 1
   local func = arguments[1]
   local err_expected = arguments[2]
   local failure_message = arguments[3]
-  assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
+  assert(util.callable(func), s("assertion.internal.badargtype", { 1, "error", "function or callable object", type(func) }), level)
   local ok, err_actual = pcall(func)
   if type(err_actual) == 'string' then
     -- remove 'path/to/file:line: ' from string
@@ -171,19 +179,19 @@ local function has_error(state, arguments)
   return same(state, {err_expected, err_actual, ["n"] = 2})
 end
 
-local function is_true(state, arguments)
+local function is_true(state, arguments, level)
   util.tinsert(arguments, 2, true)
   set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
-local function is_false(state, arguments)
+local function is_false(state, arguments, level)
   util.tinsert(arguments, 2, false)
   set_failure_message(state, arguments[3])
   return arguments[1] == arguments[2]
 end
 
-local function is_type(state, arguments, etype)
+local function is_type(state, arguments, level, etype)
   util.tinsert(arguments, 2, "type " .. etype)
   arguments.nofmt = arguments.nofmt or {}
   arguments.nofmt[2] = true
@@ -191,7 +199,7 @@ local function is_type(state, arguments, etype)
   return arguments.n > 1 and type(arguments[1]) == etype
 end
 
-local function returned_arguments(state, arguments)
+local function returned_arguments(state, arguments, level)
   arguments[1] = tostring(arguments[1])
   arguments[2] = tostring(arguments.n - 1)
   arguments.nofmt = arguments.nofmt or {}
@@ -201,18 +209,18 @@ local function returned_arguments(state, arguments)
   return arguments[1] == arguments[2]
 end
 
-local function set_message(state, arguments)
+local function set_message(state, arguments, level)
   state.failure_message = arguments[1]
 end
 
-local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
-local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
-local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
-local function is_table(state, arguments)    return is_type(state, arguments, "table")    end
-local function is_nil(state, arguments)      return is_type(state, arguments, "nil")      end
-local function is_userdata(state, arguments) return is_type(state, arguments, "userdata") end
-local function is_function(state, arguments) return is_type(state, arguments, "function") end
-local function is_thread(state, arguments)   return is_type(state, arguments, "thread")   end
+local function is_boolean(state, arguments, level)  return is_type(state, arguments, level, "boolean")  end
+local function is_number(state, arguments, level)   return is_type(state, arguments, level, "number")   end
+local function is_string(state, arguments, level)   return is_type(state, arguments, level, "string")   end
+local function is_table(state, arguments, level)    return is_type(state, arguments, level, "table")    end
+local function is_nil(state, arguments, level)      return is_type(state, arguments, level, "nil")      end
+local function is_userdata(state, arguments, level) return is_type(state, arguments, level, "userdata") end
+local function is_function(state, arguments, level) return is_type(state, arguments, level, "function") end
+local function is_thread(state, arguments, level)   return is_type(state, arguments, level, "thread")   end
 
 assert:register("modifier", "message", set_message)
 assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")

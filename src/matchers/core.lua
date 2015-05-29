@@ -3,8 +3,8 @@
 -- matchers take 1 parameters;
 -- 1) state
 -- 2) arguments list. The list has a member 'n' with the argument count to check for trailing nils
-
--- matchers return a function (or callable object) that, given an argument, returns a boolean
+-- 3) level The level of the error position relative to the called function
+-- returns; function (or callable object); a function that, given an argument, returns a boolean
 
 local assert = require('luassert.assert')
 local astate = require ('luassert.state')
@@ -15,7 +15,7 @@ local function format(val)
   return astate.format_argument(val) or tostring(val)
 end
 
-local function unique(state, arguments)
+local function unique(state, arguments, level)
   local deep = arguments[1]
   return function(value)
     local list = value
@@ -36,14 +36,15 @@ local function unique(state, arguments)
   end
 end
 
-local function near(state, arguments)
+local function near(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "near", 2, tostring(argcnt) }))
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "near", 2, tostring(argcnt) }), level)
   local expected = tonumber(arguments[1])
   local tolerance = tonumber(arguments[2])
   local numbertype = "number or object convertible to a number"
-  assert(expected, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[1]) }))
-  assert(tolerance, s("assertion.internal.badargtype", { "near", numbertype, format(arguments[2]) }))
+  assert(expected, s("assertion.internal.badargtype", { 1, "near", numbertype, format(arguments[1]) }), level)
+  assert(tolerance, s("assertion.internal.badargtype", { 2, "near", numbertype, format(arguments[2]) }), level)
 
   return function(value)
     local actual = tonumber(value)
@@ -52,15 +53,16 @@ local function near(state, arguments)
   end
 end
 
-local function matches(state, arguments)
+local function matches(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 0, s("assertion.internal.argtolittle", { "matches", 1, tostring(argcnt) }))
+  assert(argcnt > 0, s("assertion.internal.argtolittle", { "matches", 1, tostring(argcnt) }), level)
   local pattern = arguments[1]
   local init = arguments[2]
   local plain = arguments[3]
   local stringtype = "string or object convertible to a string"
-  assert(type(pattern) == "string", s("assertion.internal.badargtype", { "matches", "string", type(arguments[1]) }))
-  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { "matches", "number", type(arguments[2]) }))
+  assert(type(pattern) == "string", s("assertion.internal.badargtype", { 1, "matches", "string", type(arguments[1]) }), level)
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { 2, "matches", "number", type(arguments[2]) }), level)
 
   return function(value)
     local actualtype = type(value)
@@ -74,17 +76,19 @@ local function matches(state, arguments)
   end
 end
 
-local function equals(state, arguments)
+local function equals(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 0, s("assertion.internal.argtolittle", { "equals", 1, tostring(argcnt) }))
+  assert(argcnt > 0, s("assertion.internal.argtolittle", { "equals", 1, tostring(argcnt) }), level)
   return function(value)
     return value == arguments[1]
   end
 end
 
-local function same(state, arguments)
+local function same(state, arguments, level)
+  local level = (level or 1) + 1
   local argcnt = arguments.n
-  assert(argcnt > 0, s("assertion.internal.argtolittle", { "same", 1, tostring(argcnt) }))
+  assert(argcnt > 0, s("assertion.internal.argtolittle", { "same", 1, tostring(argcnt) }), level)
   return function(value)
     if type(value) == 'table' and type(arguments[1]) == 'table' then
       local result = util.deepcompare(value, arguments[1], true)
@@ -94,45 +98,45 @@ local function same(state, arguments)
   end
 end
 
-local function is_true(state, arguments)
+local function is_true(state, arguments, level)
   return function(value)
     return value == true
   end
 end
 
-local function is_false(state, arguments)
+local function is_false(state, arguments, level)
   return function(value)
     return value == false
   end
 end
 
-local function truthy(state, arguments)
+local function truthy(state, arguments, level)
   return function(value)
     return value ~= false and value ~= nil
   end
 end
 
-local function falsy(state, arguments)
-  local is_truthy = truthy(state, arguments)
+local function falsy(state, arguments, level)
+  local is_truthy = truthy(state, arguments, level)
   return function(value)
     return not is_truthy(value)
   end
 end
 
-local function is_type(state, arguments, etype)
+local function is_type(state, arguments, level, etype)
   return function(value)
     return type(value) == etype
   end
 end
 
-local function is_nil(state, arguments)      return is_type(state, arguments, "nil")      end
-local function is_boolean(state, arguments)  return is_type(state, arguments, "boolean")  end
-local function is_number(state, arguments)   return is_type(state, arguments, "number")   end
-local function is_string(state, arguments)   return is_type(state, arguments, "string")   end
-local function is_table(state, arguments)    return is_type(state, arguments, "table")    end
-local function is_function(state, arguments) return is_type(state, arguments, "function") end
-local function is_userdata(state, arguments) return is_type(state, arguments, "userdata") end
-local function is_thread(state, arguments)   return is_type(state, arguments, "thread")   end
+local function is_nil(state, arguments, level)      return is_type(state, arguments, level, "nil")      end
+local function is_boolean(state, arguments, level)  return is_type(state, arguments, level, "boolean")  end
+local function is_number(state, arguments, level)   return is_type(state, arguments, level, "number")   end
+local function is_string(state, arguments, level)   return is_type(state, arguments, level, "string")   end
+local function is_table(state, arguments, level)    return is_type(state, arguments, level, "table")    end
+local function is_function(state, arguments, level) return is_type(state, arguments, level, "function") end
+local function is_userdata(state, arguments, level) return is_type(state, arguments, level, "userdata") end
+local function is_thread(state, arguments, level)   return is_type(state, arguments, level, "thread")   end
 
 assert:register("matcher", "true", is_true)
 assert:register("matcher", "false", is_false)

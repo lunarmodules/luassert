@@ -31,4 +31,4 @@ s:set("assertion.returned_arguments.negative", "期待されていない返り�
 
 -- errors
 s:set("assertion.internal.argtolittle", "関数には最低%s個の引数が必要ですが、実際の引数の数は: %s")
-s:set("assertion.internal.badargtype", "関数には%s個の引数が必要ですが、実際に引数の数は: %s")
+s:set("assertion.internal.badargtype", "bad argument #%s: 関数には%s個の引数が必要ですが、実際に引数の数は: %s")

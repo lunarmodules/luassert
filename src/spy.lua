@@ -22,7 +22,7 @@ local spy   -- must make local before defining table, because table contents ref
 spy = {
   new = function(callback)
     if not util.callable(callback) then
-      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", 2)
+      error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", util.errorlevel())
     end
     local s = setmetatable({
       calls = {},
@@ -84,32 +84,35 @@ spy = {
   end
 }
 
-local function set_spy(state, arguments)
+local function set_spy(state, arguments, level)
   state.payload = arguments[1]
   if arguments[2] ~= nil then
     state.failure_message = arguments[2]
   end
 end
 
-local function returned_with(state, arguments)
+local function returned_with(state, arguments, level)
+  local level = (level or 1) + 1
   local payload = rawget(state, "payload")
   if payload and payload.returned_with then
     return state.payload:returned_with(arguments)
   else
-    error("'returned_with' must be chained after 'spy(aspy)'")
+    error("'returned_with' must be chained after 'spy(aspy)'", level)
   end
 end
 
-local function called_with(state, arguments)
+local function called_with(state, arguments, level)
+  local level = (level or 1) + 1
   local payload = rawget(state, "payload")
   if payload and payload.called_with then
     return state.payload:called_with(arguments)
   else
-    error("'called_with' must be chained after 'spy(aspy)'")
+    error("'called_with' must be chained after 'spy(aspy)'", level)
   end
 end
 
-local function called(state, arguments, compare)
+local function called(state, arguments, level, compare)
+  local level = (level or 1) + 1
   local num_times = arguments[1]
   if not num_times and not state.mod then
     state.mod = true
@@ -125,26 +128,30 @@ local function called(state, arguments, compare)
     arguments.nofmt[2] = true
     return result
   elseif payload and type(payload) == "function" then
-    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original")
+    error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original", level)
   else
-    error("'called' must be chained after 'spy(aspy)'")
+    error("'called' must be chained after 'spy(aspy)'", level)
   end
 end
 
-local function called_at_least(state, arguments)
-  return called(state, arguments, function(count, expected) return count >= expected end)
+local function called_at_least(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count >= expected end)
 end
 
-local function called_at_most(state, arguments)
-  return called(state, arguments, function(count, expected) return count <= expected end)
+local function called_at_most(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count <= expected end)
 end
 
-local function called_more_than(state, arguments)
-  return called(state, arguments, function(count, expected) return count > expected end)
+local function called_more_than(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count > expected end)
 end
 
-local function called_less_than(state, arguments)
-  return called(state, arguments, function(count, expected) return count < expected end)
+local function called_less_than(state, arguments, level)
+  local level = (level or 1) + 1
+  return called(state, arguments, level, function(count, expected) return count < expected end)
 end
 
 assert:register("modifier", "spy", set_spy)

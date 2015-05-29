@@ -14,8 +14,8 @@ function stub.new(object, key, ...)
   end
   local return_values_count = select("#", ...)
   local return_values = {...}
-  assert(type(object) == "table" and key ~= nil, "stub.new(): Can only create stub on a table key, call with 2 params; table, key")
-  assert(object[key] == nil or util.callable(object[key]), "stub.new(): The element for which to create a stub must either be callable, or be nil")
+  assert(type(object) == "table" and key ~= nil, "stub.new(): Can only create stub on a table key, call with 2 params; table, key", util.errorlevel())
+  assert(object[key] == nil or util.callable(object[key]), "stub.new(): The element for which to create a stub must either be callable, or be nil", util.errorlevel())
   local old_elem = object[key]    -- keep existing element (might be nil!)
 
   local fn = (return_values_count == 1 and util.callable(return_values[1]) and return_values[1])
