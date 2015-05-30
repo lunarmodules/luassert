@@ -23,7 +23,7 @@ else
 fi
 
 cd ..
-wget -O - http://luarocks.org/releases/luarocks-2.2.1.tar.gz | tar xz
+wget -O - http://luarocks.org/releases/luarocks-2.2.1.tar.gz | tar xz || wget -O - http://keplerproject.github.io/luarocks/releases/luarocks-2.2.2.tar.gz | tar xz
 cd luarocks-2.2.1
 
 if [ "$LUA" == "LuaJIT 2.0" ]; then
