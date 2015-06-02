@@ -52,6 +52,7 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
 end
 
 function util.deepcopy(t, deepmt, cache)
+  local spy = require 'luassert.spy'
   if type(t) ~= "table" then return t end
   local copy = {}
 
@@ -61,7 +62,7 @@ function util.deepcopy(t, deepmt, cache)
   cache[t] = copy
 
   for k,v in next, t, nil do
-    copy[k] = util.deepcopy(v, deepmt, cache)
+    copy[k] = (spy.is_spy(v) and v or util.deepcopy(v, deepmt, cache))
   end
   if deepmt then
     debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t, nil, cache)))
@@ -78,8 +79,9 @@ end
 function util.copyargs(args)
   local copy = {}
   local match = require 'luassert.match'
+  local spy = require 'luassert.spy'
   for k,v in pairs(args) do
-    copy[k] = (match.is_matcher(v) and v or util.deepcopy(v))
+    copy[k] = ((match.is_matcher(v) or spy.is_spy(v)) and v or util.deepcopy(v))
   end
   return copy
 end
