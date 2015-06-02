@@ -103,7 +103,12 @@ local function fmt_table(arg, fmtargs)
   local tmax = assert:get_parameter("TableFormatLevel")
   local crumbs = fmtargs and fmtargs.crumbs or {}
 
-  local function ft(t, l)
+  local function ft(t, l, cache)
+    local cache = cache or {}
+    if cache[t] and cache[t] > 0 then
+      return "{ ... recursive }"
+    end
+
     if next(t) == nil then
       return "{ }"
     end
@@ -115,12 +120,14 @@ local function fmt_table(arg, fmtargs)
     local result = "{"
     local keys, nkeys = get_sorted_keys(t)
 
+    cache[t] = (cache[t] or 0) + 1
+
     for i = 1, nkeys do
       local k = keys[i]
       local v = t[k]
 
       if type(v) == "table" then
-        v = ft(v, l + 1)
+        v = ft(v, l + 1, cache)
       elseif type(v) == "string" then
         v = "'"..v.."'"
       end
@@ -130,6 +137,9 @@ local function fmt_table(arg, fmtargs)
       local indent = string.rep(" ",l * 2 - 1)
       result = result .. string.format("\n%s%s[%s] = %s", indent, ch, tostr(k), tostr(v))
     end
+
+    cache[t] = cache[t] - 1
+
     return result .. " }"
   end
 
