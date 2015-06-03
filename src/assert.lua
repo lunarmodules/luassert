@@ -78,7 +78,6 @@ obj = {
 
   -- registers a function in namespace
   register = function(self, nspace, name, callback, positive_message, negative_message)
-    -- register
     local lowername = name:lower()
     if not namespace[nspace] then
       namespace[nspace] = {}
@@ -89,6 +88,15 @@ obj = {
       positive_message=positive_message,
       negative_message=negative_message
     }
+  end,
+
+  -- unregisters a function in a namespace
+  unregister = function(self, nspace, name)
+    local lowername = name:lower()
+    if not namespace[nspace] then
+      namespace[nspace] = {}
+    end
+    namespace[nspace][lowername] = nil
   end,
 
   -- registers a formatter
