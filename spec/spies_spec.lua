@@ -80,6 +80,14 @@ describe("Tests dealing with spies", function()
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 
+  it("checks called_with(aspy) assertions", function()
+    local s = spy.new(function() end)
+
+    s(s)
+
+    assert.spy(s).was.called_with(s)
+  end)
+
   it("checks called_at_least() assertions", function()
     local s = spy.new(function() end)
 

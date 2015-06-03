@@ -45,6 +45,18 @@ describe("Test Assertions", function()
     assert.is_not.same(nil, "a string")
   end)
 
+  it("Checks same() assertion to handle recursive tables", function()
+    local t1 = { k1 = 1, k2 = 2, k3 = t1 }
+    local t2 = { k1 = 1, k2 = 2, k3 = t2 }
+    local t3 = { k1 = 1, k2 = 2, k3 = { k1 = 1, k2 = 2, k3 = t2 } }
+    t1.k3 = t1
+    t2.k3 = t2
+
+    assert.same(t1, t2)
+    assert.same(t1, t3)
+    assert.same(t1, t3)
+  end)
+
   it("Checks to see if tables 1 and 2 are equal", function()
     local table1 = { derp = false}
     local table2 = table1

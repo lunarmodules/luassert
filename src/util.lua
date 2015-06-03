@@ -1,5 +1,5 @@
 local util = {}
-function util.deepcompare(t1,t2,ignore_mt)
+function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
   local ty1 = type(t1)
   local ty2 = type(t2)
   -- non-table types can be directly compared
@@ -13,12 +13,26 @@ function util.deepcompare(t1,t2,ignore_mt)
   else -- we can skip the deep comparison below if t1 and t2 share identity
     if t1 == t2 then return true end
   end
+
+  -- handle recursive tables
+  local cache1 = cache1 or {}
+  local cache2 = cache2 or {}
+  cache1[t1] = (cache1[t1] or 0)
+  cache2[t2] = (cache2[t2] or 0)
+  if cache1[t1] > 0 and cache2[t2] > 0 then
+    return true
+  end
+
+  cache1[t1] = cache1[t1] + 1
+  cache2[t2] = cache2[t2] + 1
+
   for k1,v1 in pairs(t1) do
     local v2 = t2[k1]
     if v2 == nil then
       return false, {k1}
     end
-    local same, crumbs = util.deepcompare(v1,v2)
+
+    local same, crumbs = util.deepcompare(v1,v2,nil,cache1,cache2)
     if not same then
       crumbs = crumbs or {}
       table.insert(crumbs, k1)
@@ -30,17 +44,28 @@ function util.deepcompare(t1,t2,ignore_mt)
     -- has been done in first loop above
     if t1[k2] == nil then return false, {k2} end
   end
+
+  cache1[t1] = cache1[t1] - 1
+  cache2[t2] = cache2[t2] - 1
+
   return true
 end
 
-function util.deepcopy(t, deepmt)
+function util.deepcopy(t, deepmt, cache)
+  local spy = require 'luassert.spy'
   if type(t) ~= "table" then return t end
   local copy = {}
+
+  -- handle recursive tables
+  local cache = cache or {}
+  if cache[t] then return cache[t] end
+  cache[t] = copy
+
   for k,v in next, t, nil do
-    copy[k] = util.deepcopy(v)
+    copy[k] = (spy.is_spy(v) and v or util.deepcopy(v, deepmt, cache))
   end
   if deepmt then
-    debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t)))
+    debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t, nil, cache)))
   else
     debug.setmetatable(copy, debug.getmetatable(t))
   end
@@ -54,8 +79,9 @@ end
 function util.copyargs(args)
   local copy = {}
   local match = require 'luassert.match'
+  local spy = require 'luassert.spy'
   for k,v in pairs(args) do
-    copy[k] = (match.is_matcher(v) and v or util.deepcopy(v))
+    copy[k] = ((match.is_matcher(v) or spy.is_spy(v)) and v or util.deepcopy(v))
   end
   return copy
 end
