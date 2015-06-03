@@ -371,5 +371,12 @@ describe("Test Assertions", function()
     assert.has_error(function() assert.no.has.property("name", { name = "jack" }) end)
   end)
 
-end)
+  it("Checks unregister removes assertions", function()
+    assert.has_no_error(function() assert.has_property("name", { name = "jack" }) end)
 
+    assert:unregister("assertion", "has_property")
+
+    assert.has_error(function() assert.has_property("name", { name = "jack" }) end, "luassert: unknown modifier/assertion: 'has_property'")
+  end)
+
+end)
