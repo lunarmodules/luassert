@@ -75,6 +75,27 @@ describe("Test Formatters", function()
     assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table) { ... more }")
   end)
 
+  it("Checks to see if TableErrorHighlightCharacter changes error character", function()
+    assert:set_parameter("TableErrorHighlightCharacter", "**")
+    local t = {1,2,3}
+    local fmtargs = { {crumbs = {2}} }
+    local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
+    local expected = "(table) {\n  [1] = 1\n**[2] = 2\n  [3] = 3 }"
+    assert.is.equal(expected, formatted)
+  end)
+
+  it("Checks to see if TableErrorHighlightColor changes error color", function()
+    local ok, colors = pcall(require, "term.colors")
+    if not ok then pending("lua term.colors not available") end
+
+    assert:set_parameter("TableErrorHighlightColor", "red")
+    local t = {1,2,3}
+    local fmtargs = { {crumbs = {2}} }
+    local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
+    local expected = string.format("(table) {\n  [1] = 1\n %s[2] = 2\n  [3] = 3 }", colors.red("*"))
+    assert.is.equal(expected, formatted)
+  end)
+
   it("Checks to see if table with 0 count is returned empty/0-count", function()
     local t = { ["n"] = 0 }
     local formatted = assert:format(t)
