@@ -101,6 +101,7 @@ local function fmt_table(arg, fmtargs)
   end
 
   local tmax = assert:get_parameter("TableFormatLevel")
+  local errchar = assert:get_parameter("TableErrorHighlightCharacter")
   local crumbs = fmtargs and fmtargs.crumbs or {}
 
   local function ft(t, l, cache)
@@ -133,8 +134,8 @@ local function fmt_table(arg, fmtargs)
       end
 
       local crumb = crumbs[#crumbs - l + 1]
-      local ch = (crumb == k and "*" or " ")
-      local indent = string.rep(" ",l * 2 - 1)
+      local ch = (crumb == k and errchar or " ")
+      local indent = string.rep(" ",l * 2 - ch:len())
       result = result .. string.format("\n%s%s[%s] = %s", indent, ch, tostr(k), tostr(v))
     end
 
@@ -175,3 +176,4 @@ assert:add_formatter(fmt_userdata)
 assert:add_formatter(fmt_thread)
 -- Set default table display depth for table formatter
 assert:set_parameter("TableFormatLevel", 3)
+assert:set_parameter("TableErrorHighlightCharacter", "*")
