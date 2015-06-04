@@ -87,6 +87,14 @@ describe("Test Formatters", function()
     assert.is.equal(expected, formatted)
   end)
 
+  it("Checks to see if self referencing tables can be formatted", function()
+    local t = {1,2}
+    t[3] = t
+    local formatted = assert:format({t, n = 1})[1]
+    local expected = "(table) {\n  [1] = 1\n  [2] = 2\n  [3] = { ... recursive } }"
+    assert.is.equal(expected, formatted)
+  end)
+
   it("Checks to see if table with 0 count is returned empty/0-count", function()
     local t = { ["n"] = 0 }
     local formatted = assert:format(t)
