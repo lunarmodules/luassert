@@ -1,5 +1,3 @@
-local assert
-
 local function returnnils()
   -- force the return of nils in an argument array
   local a,b
@@ -8,13 +6,6 @@ end
 
 describe("Test Formatters", function()
   setup(function()
-    -- must reload luassert with _TEST defined to test private elements
-    for k,v in pairs(package.loaded) do 
-      if k:find("luassert") == 1 then package.loaded[k] = false end 
-    end    
-    assert = require("luassert")
-    require('luassert.spy')
-    require('luassert.mock')
   end)
 
   local snapshot
