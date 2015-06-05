@@ -445,4 +445,11 @@ describe("Test Assertions", function()
     assert.is_same({nil, "string"}, {assert.has_no_error(function() end, "string")})
   end)
 
+  it("Checks assert.error_matches returns thrown error on success", function()
+    assert.is_same({"err message", "err (%w+)$"}, {assert.error_matches(function() error("err message") end, "err (%w+)$")})
+    assert.is_same({"err", "err", nil, true}, {assert.error_matches(function() error(setmetatable({},{__tostring = function() return "err" end})) end, "err", nil, true)})
+    assert.is_same({nil, nil}, {assert.error_matches(function() error(nil) end, nil)})
+    assert.is_same({nil, "string"}, {assert.no_error_matches(function() end, "string")})
+  end)
+
 end)
