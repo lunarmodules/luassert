@@ -50,6 +50,8 @@ local __state_meta = {
         local err = geterror(message, rawget(self,"failure_message"), arguments)
         error(err or "assertion failed!", util.errorlevel())
       end
+
+      return ...
     else
       local arguments = {...}
       arguments.n = select('#', ...)
