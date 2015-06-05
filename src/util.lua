@@ -51,6 +51,15 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
   return true
 end
 
+function util.shallowcopy(t)
+  if type(t) ~= "table" then return t end
+  local copy = {}
+  for k,v in next, t, nil do
+    copy[k] = v
+  end
+  return copy
+end
+
 function util.deepcopy(t, deepmt, cache)
   local spy = require 'luassert.spy'
   if type(t) ~= "table" then return t end

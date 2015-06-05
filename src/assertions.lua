@@ -143,6 +143,7 @@ end
 
 local function has_error(state, arguments, level)
   local level = (level or 1) + 1
+  local retargs = util.shallowcopy(arguments)
   local func = arguments[1]
   local err_expected = arguments[2]
   local failure_message = arguments[3]
@@ -152,6 +153,7 @@ local function has_error(state, arguments, level)
     -- remove 'path/to/file:line: ' from string
     err_actual = err_actual:gsub('^.-:%d+: ', '', 1)
   end
+  retargs[1] = err_actual
   arguments.nofmt = {}
   arguments.n = 2
   arguments[1] = (ok and '(no error)' or err_actual)
@@ -161,22 +163,23 @@ local function has_error(state, arguments, level)
   set_failure_message(state, failure_message)
 
   if ok or err_expected == nil then
-    return not ok
+    return not ok, retargs
   end
   if type(err_expected) == 'string' then
     -- err_actual must be (convertible to) a string
     if util.hastostring(err_actual) then
       err_actual = tostring(err_actual)
+      retargs[1] = err_actual
     end
     if type(err_actual) == 'string' then
-      return err_expected == err_actual
+      return err_expected == err_actual, retargs
     end
   elseif type(err_expected) == 'number' then
     if type(err_actual) == 'string' then
-      return tostring(err_expected) == tostring(tonumber(err_actual))
+      return tostring(err_expected) == tostring(tonumber(err_actual)), retargs
     end
   end
-  return same(state, {err_expected, err_actual, ["n"] = 2})
+  return same(state, {err_expected, err_actual, ["n"] = 2}), retargs
 end
 
 local function error_matches(state, arguments, level)
@@ -224,7 +227,7 @@ local function error_matches(state, arguments, level)
     err_actual = tostring(err_actual)
   end
   if type(err_actual) == 'string' then
-    return err_actual:find(pattern, init, plain)
+    return (err_actual:find(pattern, init, plain) ~= nil)
   end
 
   return false
