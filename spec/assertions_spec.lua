@@ -5,8 +5,8 @@ describe("Test Assertions", function()
     local third_arg = "three"
     local fourth_arg = "four"
     one, two, three, four, five = assert(test, message, third_arg, fourth_arg)
-    assert(one == test and two == message and three == third_arg and 
-           four == fourth_arg and five == nil, 
+    assert(one == test and two == message and three == third_arg and
+           four == fourth_arg and five == nil,
            "Expected input values to be outputted as well when an assertion does not fail")
   end)
 
@@ -311,7 +311,7 @@ describe("Test Assertions", function()
     local t_nok = setmetatable( {}, { __call = function() error("some error") end } )
     local f_ok = function() end
     local f_nok = function() error("some error") end
-    
+
     assert.has_error(f_nok)
     assert.has_no_error(f_ok)
     assert.has_error(t_nok)
@@ -340,6 +340,44 @@ describe("Test Assertions", function()
   it("Checks has_error compares error objects with strings", function()
     local mt = { __tostring = function(t) return t[1] end }
     assert.has_error(function() error(setmetatable({ "table" }, mt)) end, "table")
+  end)
+
+  it("Checks error_matches to accepts at least 2 arguments", function()
+    assert.has_error(function() assert.error_matches(error) end)
+    assert.has_no_error(function() assert.error_matches(function() error("foo") end, ".*") end)
+  end)
+
+  it("Checks error_matches to accept only callable arguments", function()
+    local t_ok = setmetatable( {}, { __call = function() end } )
+    local t_nok = setmetatable( {}, { __call = function() error("some error") end } )
+    local f_ok = function() end
+    local f_nok = function() error("some error") end
+
+    assert.error_matches(f_nok, ".*")
+    assert.no_error_matches(f_ok, ".*")
+    assert.error_matches(t_nok, ".*")
+    assert.no_error_matches(t_ok, ".*")
+  end)
+
+  it("Checks error_matches compares error strings with pattern", function()
+    assert.error_matches(function() error() end, nil)
+    assert.no_error_matches(function() end, nil)
+    assert.does_error_match(function() error(123) end, "^%d+$")
+    assert.error.matches(function() error("string") end, "^%w+$")
+    assert.matches.error(function() error("string") end, "str", nil, true)
+    assert.matches_error(function() error("123string") end, "^[^0-9]+", 4)
+    assert.has_no_error.match(function() error("123string") end, "123", 4, true)
+    assert.does_not.match_error(function() error("string") end, "^%w+$", nil, true)
+  end)
+
+  it("Checks error_matches does not compare error objects", function()
+    local func = function() end
+    assert.no_error_matches(function() error({ "table" }) end, "table")
+  end)
+
+  it("Checks error_matches compares error objects that are convertible to strings", function()
+    local mt = { __tostring = function(t) return t[1] end }
+    assert.error_matches(function() error(setmetatable({ "table" }, mt)) end, "^table$")
   end)
 
   it("Checks register creates custom assertions", function()

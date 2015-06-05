@@ -179,6 +179,57 @@ local function has_error(state, arguments, level)
   return same(state, {err_expected, err_actual, ["n"] = 2})
 end
 
+local function error_matches(state, arguments, level)
+  local level = (level or 1) + 1
+  local argcnt = arguments.n
+  local func = arguments[1]
+  local pattern = arguments[2]
+  assert(argcnt > 1, s("assertion.internal.argtolittle", { "error_matches", 2, tostring(argcnt) }), level)
+  assert(util.callable(func), s("assertion.internal.badargtype", { 1, "error_matches", "function or callable object", type(func) }), level)
+  assert(pattern == nil or type(pattern) == "string", s("assertion.internal.badargtype", { 2, "error", "string", type(pattern) }), level)
+
+  local failure_message
+  local init_arg_num = 3
+  for i=3,argcnt,1 do
+    if arguments[i] and type(arguments[i]) ~= "boolean" and not tonumber(arguments[i]) then
+      if i == 3 then init_arg_num = init_arg_num + 1 end
+      failure_message = util.tremove(arguments, i)
+      break
+    end
+  end
+  local init = arguments[3]
+  local plain = arguments[4]
+  assert(init == nil or tonumber(init), s("assertion.internal.badargtype", { init_arg_num, "matches", "number", type(arguments[3]) }), level)
+
+  local ok, err_actual = pcall(func)
+  if type(err_actual) == 'string' then
+    -- remove 'path/to/file:line: ' from string
+    err_actual = err_actual:gsub('^.-:%d+: ', '', 1)
+  end
+  arguments.nofmt = {}
+  arguments.n = 2
+  arguments[1] = (ok and '(no error)' or err_actual)
+  arguments[2] = pattern
+  arguments.nofmt[1] = ok
+  arguments.nofmt[2] = false
+  set_failure_message(state, failure_message)
+
+  if ok then return not ok end
+  if err_actual == nil and pattern == nil then
+    return true
+  end
+
+  -- err_actual must be (convertible to) a string
+  if util.hastostring(err_actual) then
+    err_actual = tostring(err_actual)
+  end
+  if type(err_actual) == 'string' then
+    return err_actual:find(pattern, init, plain)
+  end
+
+  return false
+end
+
 local function is_true(state, arguments, level)
   util.tinsert(arguments, 2, true)
   set_failure_message(state, arguments[3])
@@ -244,5 +295,9 @@ assert:register("assertion", "equal", equals, "assertion.equals.positive", "asse
 assert:register("assertion", "unique", unique, "assertion.unique.positive", "assertion.unique.negative")
 assert:register("assertion", "error", has_error, "assertion.error.positive", "assertion.error.negative")
 assert:register("assertion", "errors", has_error, "assertion.error.positive", "assertion.error.negative")
+assert:register("assertion", "error_matches", error_matches, "assertion.error.positive", "assertion.error.negative")
+assert:register("assertion", "error_match", error_matches, "assertion.error.positive", "assertion.error.negative")
+assert:register("assertion", "matches_error", error_matches, "assertion.error.positive", "assertion.error.negative")
+assert:register("assertion", "match_error", error_matches, "assertion.error.positive", "assertion.error.negative")
 assert:register("assertion", "truthy", truthy, "assertion.truthy.positive", "assertion.truthy.negative")
 assert:register("assertion", "falsy", falsy, "assertion.falsy.positive", "assertion.falsy.negative")
