@@ -97,7 +97,16 @@ local function matches(state, arguments, level)
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   set_failure_message(state, err_message)
-  return (actual:find(pattern, init, plain) ~= nil)
+  local retargs
+  local ok
+  if plain then
+    ok = (actual:find(pattern, init, plain) ~= nil)
+    retargs = ok and { pattern } or {}
+  else
+    retargs = { actual:match(pattern, init) }
+    ok = (retargs[1] ~= nil)
+  end
+  return ok, retargs
 end
 
 local function equals(state, arguments, level)
