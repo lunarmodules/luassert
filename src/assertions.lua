@@ -221,7 +221,7 @@ local function error_matches(state, arguments, level)
 
   if ok then return not ok, retargs end
   if err_actual == nil and pattern == nil then
-    return true, retargs
+    return true, {}
   end
 
   -- err_actual must be (convertible to) a string
@@ -230,10 +230,20 @@ local function error_matches(state, arguments, level)
     retargs[1] = err_actual
   end
   if type(err_actual) == 'string' then
-    return (err_actual:find(pattern, init, plain) ~= nil), retargs
+    local ok
+    local retargs_ok
+    if plain then
+      retargs_ok = { pattern }
+      ok = (err_actual:find(pattern, init, plain) ~= nil)
+    else
+      retargs_ok = { err_actual:match(pattern, init) }
+      ok = (retargs_ok[1] ~= nil)
+    end
+    if ok then retargs = retargs_ok end
+    return ok, retargs
   end
 
-  return false
+  return false, retargs
 end
 
 local function is_true(state, arguments, level)
