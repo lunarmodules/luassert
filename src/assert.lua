@@ -1,6 +1,7 @@
 local s = require 'say'
 local astate = require 'luassert.state'
 local util = require 'luassert.util'
+local unpack = require 'luassert.compatibility'.unpack
 local obj   -- the returned module table
 
 -- list of namespaces
@@ -40,7 +41,7 @@ local __state_meta = {
 
       local arguments = {...}
       arguments.n = select('#', ...) -- add argument count for trailing nils
-      local val = assertion.callback(self, arguments, util.errorlevel())
+      local val, retargs = assertion.callback(self, arguments, util.errorlevel())
 
       if not val == self.mod then
         local message = assertion.positive_message
@@ -50,6 +51,11 @@ local __state_meta = {
         local err = geterror(message, rawget(self,"failure_message"), arguments)
         error(err or "assertion failed!", util.errorlevel())
       end
+
+      if retargs then
+        return unpack(retargs)
+      end
+      return ...
     else
       local arguments = {...}
       arguments.n = select('#', ...)

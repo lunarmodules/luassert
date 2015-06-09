@@ -51,6 +51,15 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
   return true
 end
 
+function util.shallowcopy(t)
+  if type(t) ~= "table" then return t end
+  local copy = {}
+  for k,v in next, t, nil do
+    copy[k] = v
+  end
+  return copy
+end
+
 function util.deepcopy(t, deepmt, cache)
   local spy = require 'luassert.spy'
   if type(t) ~= "table" then return t end
@@ -238,13 +247,25 @@ function util.extract_keys(nspace, tokens)
   -- find valid keys by coalescing tokens as needed, starting from the end
   local keys = {}
   local key = nil
-  for i = #tokens, 1, -1 do
+  local i = #tokens
+  while i > 0 do
     local token = tokens[i]
     key = key and (token .. '_' .. key) or token
+
+    -- find longest matching key in the given namespace
+    local longkey = i > 1 and (tokens[i-1] .. '_' .. key) or nil
+    while i > 1 and longkey and namespace[nspace][longkey] do
+      key = longkey
+      i = i - 1
+      token = tokens[i]
+      longkey = (token .. '_' .. key)
+    end
+
     if namespace.modifier[key] or namespace[nspace][key] then
       table.insert(keys, 1, key)
       key = nil
     end
+    i = i - 1
   end
 
   -- if there's anything left we didn't recognize it
