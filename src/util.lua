@@ -242,7 +242,6 @@ end
 -- @return table, list of keys that were extracted
 function util.extract_keys(nspace, tokens)
   local namespace = require 'luassert.namespaces'
-  local level = (level or 1) + 1
 
   -- find valid keys by coalescing tokens as needed, starting from the end
   local keys = {}
