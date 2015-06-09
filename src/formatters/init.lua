@@ -1,5 +1,21 @@
 -- module will not return anything, only register formatters with the main assert engine
 local assert = require('luassert.assert')
+local ok, term = pcall(require, 'term')
+
+local colors = setmetatable({
+  none = function(c) return c end
+},{ __index = function(self, key)
+  if not ok or not term.isatty(io.stdout) or not term.colors then
+    return function(c) return c end
+  end
+  return function(c)
+    for token in key:gmatch("[^%.]+") do
+      c = term.colors[token](c)
+    end
+    return c
+  end
+end
+})
 
 local function fmt_string(arg)
   if type(arg) == "string" then
@@ -101,6 +117,8 @@ local function fmt_table(arg, fmtargs)
   end
 
   local tmax = assert:get_parameter("TableFormatLevel")
+  local errchar = assert:get_parameter("TableErrorHighlightCharacter") or ""
+  local errcolor = assert:get_parameter("TableErrorHighlightColor") or "none"
   local crumbs = fmtargs and fmtargs.crumbs or {}
 
   local function ft(t, l, cache)
@@ -133,9 +151,10 @@ local function fmt_table(arg, fmtargs)
       end
 
       local crumb = crumbs[#crumbs - l + 1]
-      local ch = (crumb == k and "*" or " ")
-      local indent = string.rep(" ",l * 2 - 1)
-      result = result .. string.format("\n%s%s[%s] = %s", indent, ch, tostr(k), tostr(v))
+      local ch = (crumb == k and errchar or "")
+      local indent = string.rep(" ",l * 2 - ch:len())
+      local mark = (ch:len() == 0 and "" or colors[errcolor](ch))
+      result = result .. string.format("\n%s%s[%s] = %s", indent, mark, tostr(k), tostr(v))
     end
 
     cache[t] = cache[t] - 1
@@ -175,3 +194,5 @@ assert:add_formatter(fmt_userdata)
 assert:add_formatter(fmt_thread)
 -- Set default table display depth for table formatter
 assert:set_parameter("TableFormatLevel", 3)
+assert:set_parameter("TableErrorHighlightCharacter", "*")
+assert:set_parameter("TableErrorHighlightColor", "none")

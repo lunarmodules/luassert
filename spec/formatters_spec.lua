@@ -1,5 +1,3 @@
-local assert
-
 local function returnnils()
   -- force the return of nils in an argument array
   local a,b
@@ -8,13 +6,6 @@ end
 
 describe("Test Formatters", function()
   setup(function()
-    -- must reload luassert with _TEST defined to test private elements
-    for k,v in pairs(package.loaded) do 
-      if k:find("luassert") == 1 then package.loaded[k] = false end 
-    end    
-    assert = require("luassert")
-    require('luassert.spy')
-    require('luassert.mock')
   end)
 
   local snapshot
@@ -73,6 +64,35 @@ describe("Test Formatters", function()
     assert:set_parameter("TableFormatLevel", 0)
     assert.is.same(assert:format({ { }, ["n"] = 1 })[1], "(table) { }")
     assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table) { ... more }")
+  end)
+
+  it("Checks to see if TableErrorHighlightCharacter changes error character", function()
+    assert:set_parameter("TableErrorHighlightCharacter", "**")
+    local t = {1,2,3}
+    local fmtargs = { {crumbs = {2}} }
+    local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
+    local expected = "(table) {\n  [1] = 1\n**[2] = 2\n  [3] = 3 }"
+    assert.is.equal(expected, formatted)
+  end)
+
+  it("Checks to see if TableErrorHighlightColor changes error color", function()
+    local ok, colors = pcall(require, "term.colors")
+    if not ok then pending("lua term.colors not available") end
+
+    assert:set_parameter("TableErrorHighlightColor", "red")
+    local t = {1,2,3}
+    local fmtargs = { {crumbs = {2}} }
+    local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
+    local expected = string.format("(table) {\n  [1] = 1\n %s[2] = 2\n  [3] = 3 }", colors.red("*"))
+    assert.is.equal(expected, formatted)
+  end)
+
+  it("Checks to see if self referencing tables can be formatted", function()
+    local t = {1,2}
+    t[3] = t
+    local formatted = assert:format({t, n = 1})[1]
+    local expected = "(table) {\n  [1] = 1\n  [2] = 2\n  [3] = { ... recursive } }"
+    assert.is.equal(expected, formatted)
   end)
 
   it("Checks to see if table with 0 count is returned empty/0-count", function()
