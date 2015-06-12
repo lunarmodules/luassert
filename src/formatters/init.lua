@@ -117,13 +117,14 @@ local function fmt_table(arg, fmtargs)
   end
 
   local tmax = assert:get_parameter("TableFormatLevel")
+  local showrec = assert:get_parameter("TableFormatShowRecursion")
   local errchar = assert:get_parameter("TableErrorHighlightCharacter") or ""
   local errcolor = assert:get_parameter("TableErrorHighlightColor") or "none"
   local crumbs = fmtargs and fmtargs.crumbs or {}
 
   local function ft(t, l, cache)
     local cache = cache or {}
-    if cache[t] and cache[t] > 0 then
+    if showrec and cache[t] and cache[t] > 0 then
       return "{ ... recursive }"
     end
 
@@ -194,5 +195,6 @@ assert:add_formatter(fmt_userdata)
 assert:add_formatter(fmt_thread)
 -- Set default table display depth for table formatter
 assert:set_parameter("TableFormatLevel", 3)
+assert:set_parameter("TableFormatShowRecursion", false)
 assert:set_parameter("TableErrorHighlightCharacter", "*")
 assert:set_parameter("TableErrorHighlightColor", "none")
