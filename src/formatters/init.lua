@@ -132,7 +132,7 @@ local function fmt_table(arg, fmtargs)
       return "{ }"
     end
 
-    if l > tmax then
+    if l > tmax and tmax >= 0 then
       return "{ ... more }"
     end
 

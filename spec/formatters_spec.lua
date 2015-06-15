@@ -66,6 +66,15 @@ describe("Test Formatters", function()
     assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table) { ... more }")
   end)
 
+  it("Checks to see if TableFormatLevel parameter can display all levels", function()
+    assert:set_parameter("TableFormatLevel", -1)
+    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table) {
+  [1] = {
+    [1] = {
+      [1] = {
+        [1] = 1 } } } }]])
+  end)
+
   it("Checks to see if TableErrorHighlightCharacter changes error character", function()
     assert:set_parameter("TableErrorHighlightCharacter", "**")
     local t = {1,2,3}
