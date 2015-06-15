@@ -7,6 +7,8 @@ local state_mt = {
   end
 }
 
+local spies_mt = { __mode = "kv" }
+
 local nilvalue = {} -- unique ID to refer to nil values for parameters
 
 -- will hold the current state
@@ -37,8 +39,8 @@ state.revert = function(self)
   -- revert parameters in 'last'
   self.parameters = {}
   -- revert spies/stubs in 'last'
-  while #self.spies > 0 do
-    local s = table.remove(self.spies)
+  for s,_ in pairs(self.spies) do
+    self.spies[s] = nil
     s:revert()
   end
   setmetatable(self, nil) -- invalidate as a snapshot
@@ -54,7 +56,7 @@ state.snapshot = function()
   local new = setmetatable ({
     formatters = {},
     parameters = {},
-    spies = {},
+    spies = setmetatable({}, spies_mt),
     previous = current,
     revert = state.revert,
   }, state_mt)
@@ -118,7 +120,7 @@ end
 
 --  SPIES / STUBS
 state.add_spy = function(spy)
-  table.insert(current.spies, spy)
+  current.spies[spy] = true
 end
 
 state.snapshot()  -- create initial state
