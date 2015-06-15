@@ -217,7 +217,7 @@ local function error_matches(state, arguments, level)
   local ok, err_actual = pcall(func)
   if type(err_actual) == 'string' then
     -- remove 'path/to/file:line: ' from string
-    err_actual = err_actual:gsub('^.-:%d+: ', '', 1)
+    err_actual = err_actual:gsub('.-:%d+: ', '')
   end
   retargs[1] = err_actual
   arguments.nofmt = {}
