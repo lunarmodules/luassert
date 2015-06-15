@@ -46,8 +46,8 @@ describe("Test Assertions", function()
   end)
 
   it("Checks same() assertion to handle recursive tables", function()
-    local t1 = { k1 = 1, k2 = 2, k3 = t1 }
-    local t2 = { k1 = 1, k2 = 2, k3 = t2 }
+    local t1 = { k1 = 1, k2 = 2 }
+    local t2 = { k1 = 1, k2 = 2 }
     local t3 = { k1 = 1, k2 = 2, k3 = { k1 = 1, k2 = 2, k3 = t2 } }
     t1.k3 = t1
     t2.k3 = t2
@@ -55,6 +55,87 @@ describe("Test Assertions", function()
     assert.same(t1, t2)
     assert.same(t1, t3)
     assert.same(t1, t3)
+  end)
+
+  it("Checks same() assertion to handle recursive tables that don't match", function()
+    local t1 = {}
+    local t2 = {}
+    local a = {}
+    local b = {}
+    local c = {}
+    local d = {}
+    t1.k1 = a
+    t2.k1 = b
+    a.k1 = c
+    b.k1 = d
+    c.k2 = a
+    d.k2 = d
+    assert.is_table(t1.k1.k1.k2.k1)
+    assert.is_nil(t2.k1.k1.k2.k1)
+    assert.are_not_same(t1, t2)
+  end)
+
+  it("Checks same() assertion to handle recursive tables that don't match - deeper recursion", function()
+    local cycle_root = {}
+    local cycle_1 = {}
+    local cycle_2 = {}
+    cycle_root.k1 = cycle_1
+    cycle_1.k2 = cycle_2
+    cycle_2.k2 = cycle_root
+
+    local mimic_root = {}
+    local mimic_1 = {}
+    local mimic_2 = {}
+    local mimic_3 = {}
+    local self_ref = {}
+    mimic_root.k1 = mimic_1
+    mimic_1.k2 = mimic_2
+    mimic_2.k2 = mimic_3
+    mimic_3.k1 = self_ref
+    self_ref.k2 = self_ref
+
+    assert.is_table(cycle_root.k1.k2.k2.k1.k2.k2.k1)
+    assert.is_nil(mimic_root.k1.k2.k2.k1.k2.k2.k1)
+    assert.are_not_same(cycle_root, mimic_root)
+  end)
+
+  it("Checks same() assertion to handle recursive tables that don't match - multiple recursions", function()
+    local c1, c2, c3, c4 = {}, {}, {}, {}
+    local m1, m2, m3, m4, m5, m6, m7, m8, m9 = {}, {}, {}, {}, {}, {}, {}, {}, {}
+    local r1, r2, r3 = {}, {}, {}
+
+    r1[1] = r3
+    r2[1] = r2
+    r3[1] = r3
+    c2[1] = r2
+    c3[1] = r2
+    c4[1] = r2
+    m2[1] = r3
+    m3[1] = r3
+    m4[1] = r3
+    m6[1] = r3
+    m7[1] = r3
+    m8[1] = r3
+
+    c1[2] = c2
+    c2[3] = c3
+    c3[3] = c4
+    c4[3] = c1
+
+    m1[2] = m2
+    m2[3] = m3
+    m3[3] = m4
+    m4[3] = m5
+    m5[2] = m6
+    m6[3] = m7
+    m7[3] = m8
+    m8[3] = m9
+    m9[2] = r1
+    r1[3] = r1
+
+    assert.is_table(c1[2][3][3][3][2][3][3][3][2][3][3][3][2])
+    assert.is_nil(m1[2][3][3][3][2][3][3][3][2][3][3][3][2])
+    assert.are_not_same(c1, m1)
   end)
 
   it("Checks to see if tables 1 and 2 are equal", function()

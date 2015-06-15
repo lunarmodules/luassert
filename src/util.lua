@@ -1,5 +1,5 @@
 local util = {}
-function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
+function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
   local ty1 = type(t1)
   local ty2 = type(t2)
   -- non-table types can be directly compared
@@ -15,16 +15,20 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
   end
 
   -- handle recursive tables
-  local cache1 = cache1 or {}
-  local cache2 = cache2 or {}
-  cache1[t1] = (cache1[t1] or 0)
-  cache2[t2] = (cache2[t2] or 0)
-  if cache1[t1] > 0 and cache2[t2] > 0 then
+  cycles = cycles or {{},{}}
+  thresh1, thresh2 = (thresh1 or 1), (thresh2 or 1)
+  cycles[1][t1] = (cycles[1][t1] or 0)
+  cycles[2][t2] = (cycles[2][t2] or 0)
+  if cycles[1][t1] == 1 or cycles[2][t2] == 1 then
+    thresh1 = cycles[1][t1] + 1
+    thresh2 = cycles[2][t2] + 1
+  end
+  if cycles[1][t1] > thresh1 and cycles[2][t2] > thresh2 then
     return true
   end
 
-  cache1[t1] = cache1[t1] + 1
-  cache2[t2] = cache2[t2] + 1
+  cycles[1][t1] = cycles[1][t1] + 1
+  cycles[2][t2] = cycles[2][t2] + 1
 
   for k1,v1 in pairs(t1) do
     local v2 = t2[k1]
@@ -32,7 +36,7 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
       return false, {k1}
     end
 
-    local same, crumbs = util.deepcompare(v1,v2,nil,cache1,cache2)
+    local same, crumbs = util.deepcompare(v1,v2,nil,cycles,thresh1,thresh2)
     if not same then
       crumbs = crumbs or {}
       table.insert(crumbs, k1)
@@ -45,8 +49,8 @@ function util.deepcompare(t1,t2,ignore_mt,cache1,cache2)
     if t1[k2] == nil then return false, {k2} end
   end
 
-  cache1[t1] = cache1[t1] - 1
-  cache2[t2] = cache2[t2] - 1
+  cycles[1][t1] = cycles[1][t1] - 1
+  cycles[2][t2] = cycles[2][t2] - 1
 
   return true
 end
