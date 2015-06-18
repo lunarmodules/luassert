@@ -7,11 +7,11 @@ local spy_mt = {
   __call = function(self, ...)
     local arguments = {...}
     arguments.n = select('#',...)  -- add argument count for trailing nils
-    table.insert(self.calls, util.deepcopy(arguments))
+    table.insert(self.calls, util.copyargs(arguments))
     local function get_returns(...)
       local returnvals = {...}
       returnvals.n = select('#',...)  -- add argument count for trailing nils
-      table.insert(self.returnvals, util.deepcopy(returnvals))
+      table.insert(self.returnvals, util.copyargs(returnvals))
       return ...
     end
     return get_returns(self.callback(...))

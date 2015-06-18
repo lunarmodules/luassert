@@ -267,4 +267,21 @@ describe("Tests dealing with stubs", function()
     assert.is.equal("foo foo", foofoo)
   end)
 
+  it("on_call_with matches arguments using refs", function()
+    local t1 = { foo = { bar = { "test" } } }
+    local t2 = { foo = { bar = { "test" } } }
+    stub(test, "key").returns("foo foo")
+    test.key.on_call_with(match.is_ref(t1)).returns("bar")
+    t1.foo.bar = "value"
+    t2.foo.bar = "value"
+
+    local bar = test.key(t1)
+    local foo = test.key(t2)
+    local foofoo = test.key({ foo = { bar = { "test" } } })
+
+    assert.is.equal("bar", bar)
+    assert.is.equal("foo foo", foo)
+    assert.is.equal("foo foo", foofoo)
+  end)
+
 end)

@@ -164,6 +164,30 @@ describe("Test Matchers", function()
     assert.is_false(match.is_same(nil)("a string"))
   end)
 
+  it("Checks ref() matcher", function()
+    local t = {}
+    local func = function() end
+    local mythread = coroutine.create(func)
+    assert.is.error(function() match.is_ref() end)      -- minimum 1 arguments
+    assert.is.error(function() match.is_ref(0) end)     -- arg1 must be an object
+    assert.is.error(function() match.is_ref('') end)    -- arg1 must be an object
+    assert.is.error(function() match.is_ref(nil) end)   -- arg1 must be an object
+    assert.is.error(function() match.is_ref(true) end)  -- arg1 must be an object
+    assert.is.error(function() match.is_ref(false) end) -- arg1 must be an object
+    assert.is_true(match.is_ref(t)(t))
+    assert.is_true(match.is_ref(func)(func))
+    assert.is_true(match.is_ref(mythread)(mythread))
+    assert.is_false(match.is_ref(t)(func))
+    assert.is_false(match.is_ref(t)(mythread))
+    assert.is_false(match.is_ref(t)(nil))
+    assert.is_false(match.is_ref(t)(true))
+    assert.is_false(match.is_ref(t)(false))
+    assert.is_false(match.is_ref(t)(123))
+    assert.is_false(match.is_ref(t)(""))
+    assert.is_false(match.is_ref(t)({}))
+    assert.is_false(match.is_ref(t)(function() end))
+  end)
+
   it("Checks matches() matcher does string matching", function()
     assert.is.error(function() match.matches() end)  -- minimum 1 arguments
     assert.is.error(function() match.matches({}) end)  -- arg1 must be a string
