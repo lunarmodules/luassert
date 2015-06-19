@@ -119,14 +119,16 @@ function util.matchargs(argslist, args)
       end
     end
     for k2,v2 in pairs(t2) do
+      -- only check wether each element has a t1 counterpart, actual comparison
+      -- has been done in first loop above
       local v1 = t1[k2]
-      if match.is_matcher(v1) then
-        if not v1(v2) then return false end
-      elseif match.is_matcher(v2) then
-        if match.is_ref_matcher(v2) then v1 = t1refs[k2] end
-        if not v2(v1) then return false end
-      elseif v1 == nil then
-        return false
+      if v1 == nil then
+        -- no t1 counterpart, so try to compare using matcher
+        if match.is_matcher(v2) then
+          if not v2(v1) then return false end
+        else
+          return false
+        end
       end
     end
     return true
