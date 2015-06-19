@@ -80,6 +80,19 @@ describe("Tests dealing with spies", function()
     assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
   end)
 
+  it("checks called() and called_with() assertions using refs", function()
+    local s = spy.new(function() end)
+    local t1 = { foo = { bar = { "test" } } }
+    local t2 = { foo = { bar = { "test" } } }
+
+    s(t1)
+    t1.foo.bar = "value"
+
+    assert.spy(s).was.called_with(t2)
+    assert.spy(s).was_not.called_with(match.is_ref(t2))
+    assert.spy(s).was.called_with(match.is_ref(t1))
+  end)
+
   it("checks called_with(aspy) assertions", function()
     local s = spy.new(function() end)
 

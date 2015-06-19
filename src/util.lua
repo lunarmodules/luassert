@@ -86,7 +86,7 @@ function util.deepcopy(t, deepmt, cache)
 end
 
 -----------------------------------------------
--- Copies arguments in a of arguments
+-- Copies arguments as a list of arguments
 -- @param args the arguments of which to copy
 -- @return the copy of the arguments
 function util.copyargs(args)
@@ -96,7 +96,7 @@ function util.copyargs(args)
   for k,v in pairs(args) do
     copy[k] = ((match.is_matcher(v) or spy.is_spy(v)) and v or util.deepcopy(v))
   end
-  return copy
+  return { vals = copy, refs = util.shallowcopy(args) }
 end
 
 -----------------------------------------------
@@ -105,32 +105,36 @@ end
 -- @param args the arguments of which to find a match
 -- @return the matching arguments if a match is found, otherwise nil
 function util.matchargs(argslist, args)
-  local function matches(t1, t2)
+  local function matches(t1, t2, t1refs)
     local match = require 'luassert.match'
     for k1,v1 in pairs(t1) do
       local v2 = t2[k1]
       if match.is_matcher(v1) then
         if not v1(v2) then return false end
       elseif match.is_matcher(v2) then
+        if match.is_ref_matcher(v2) then v1 = t1refs[k1] end
         if not v2(v1) then return false end
       elseif (v2 == nil or not util.deepcompare(v1,v2)) then
         return false
       end
     end
     for k2,v2 in pairs(t2) do
+      -- only check wether each element has a t1 counterpart, actual comparison
+      -- has been done in first loop above
       local v1 = t1[k2]
-      if match.is_matcher(v1) then
-        if not v1(v2) then return false end
-      elseif match.is_matcher(v2) then
-        if not v2(v1) then return false end
-      elseif v1 == nil then
-        return false
+      if v1 == nil then
+        -- no t1 counterpart, so try to compare using matcher
+        if match.is_matcher(v2) then
+          if not v2(v1) then return false end
+        else
+          return false
+        end
       end
     end
     return true
   end
   for k,v in ipairs(argslist) do
-    if matches(v, args) then
+    if matches(v.vals, args, v.refs) then
       return v
     end
   end

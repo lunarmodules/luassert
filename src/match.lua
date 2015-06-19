@@ -29,6 +29,7 @@ local state_mt = {
       arguments.n = select('#', ...) -- add argument count for trailing nils
       local matches = matcher.callback(self, arguments, util.errorlevel())
       return setmetatable({
+        name = matcher.name,
         mod = self.mod,
         callback = matches,
       }, matcher_mt)
@@ -62,6 +63,11 @@ local match = {
 
   is_matcher = function(object)
     return type(object) == "table" and getmetatable(object) == matcher_mt
+  end,
+
+  is_ref_matcher = function(object)
+    local ismatcher = (type(object) == "table" and getmetatable(object) == matcher_mt)
+    return ismatcher and object.name == "ref"
   end,
 }
 

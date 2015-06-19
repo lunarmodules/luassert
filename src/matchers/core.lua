@@ -7,8 +7,8 @@
 -- returns; function (or callable object); a function that, given an argument, returns a boolean
 
 local assert = require('luassert.assert')
-local astate = require ('luassert.state')
-local util = require ('luassert.util')
+local astate = require('luassert.state')
+local util = require('luassert.util')
 local s = require('say')
 
 local function format(val)
@@ -98,6 +98,18 @@ local function same(state, arguments, level)
   end
 end
 
+local function ref(state, arguments, level)
+  local level = (level or 1) + 1
+  local argcnt = arguments.n
+  local argtype = type(arguments[1])
+  local isobject = (argtype == "table" or argtype == "function" or argtype == "thread" or argtype == "userdata")
+  assert(argcnt > 0, s("assertion.internal.argtolittle", { "ref", 1, tostring(argcnt) }), level)
+  assert(isobject, s("assertion.internal.badargtype", { 1, "ref", "object", argtype }), level)
+  return function(value)
+    return value == arguments[1]
+  end
+end
+
 local function is_true(state, arguments, level)
   return function(value)
     return value == true
@@ -150,6 +162,7 @@ assert:register("matcher", "function", is_function)
 assert:register("matcher", "userdata", is_userdata)
 assert:register("matcher", "thread", is_thread)
 
+assert:register("matcher", "ref", ref)
 assert:register("matcher", "same", same)
 assert:register("matcher", "matches", matches)
 assert:register("matcher", "match", matches)
