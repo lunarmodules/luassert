@@ -11,7 +11,7 @@ function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
     -- then use that unless asked not to
     if not ignore_mt then return t1 == t2 end
   else -- we can skip the deep comparison below if t1 and t2 share identity
-    if t1 == t2 then return true end
+    if rawequal(t1, t2) then return true end
   end
 
   -- handle recursive tables
