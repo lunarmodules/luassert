@@ -45,6 +45,13 @@ describe("Test Assertions", function()
     assert.is_not.same(nil, "a string")
   end)
 
+  it("Checks same() assertion ignores __pairs metamethod", function()
+    local t1 = setmetatable({1,2,3}, {__pairs = function(t) return nil end})
+    local t2 = {1,2,3}
+    assert.same(t1, t2)
+    assert.same(t2, t1)
+  end)
+
   it("Checks same() assertion to handle recursive tables", function()
     local t1 = { k1 = 1, k2 = 2 }
     local t2 = { k1 = 1, k2 = 2 }

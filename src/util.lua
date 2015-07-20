@@ -30,7 +30,7 @@ function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
   cycles[1][t1] = cycles[1][t1] + 1
   cycles[2][t2] = cycles[2][t2] + 1
 
-  for k1,v1 in pairs(t1) do
+  for k1,v1 in next, t1 do
     local v2 = t2[k1]
     if v2 == nil then
       return false, {k1}
@@ -43,7 +43,7 @@ function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
       return false, crumbs
     end
   end
-  for k2,_ in pairs(t2) do
+  for k2,_ in next, t2 do
     -- only check wether each element has a t1 counterpart, actual comparison
     -- has been done in first loop above
     if t1[k2] == nil then return false, {k2} end
@@ -58,7 +58,7 @@ end
 function util.shallowcopy(t)
   if type(t) ~= "table" then return t end
   local copy = {}
-  for k,v in next, t, nil do
+  for k,v in next, t do
     copy[k] = v
   end
   return copy
@@ -74,7 +74,7 @@ function util.deepcopy(t, deepmt, cache)
   if cache[t] then return cache[t] end
   cache[t] = copy
 
-  for k,v in next, t, nil do
+  for k,v in next, t do
     copy[k] = (spy.is_spy(v) and v or util.deepcopy(v, deepmt, cache))
   end
   if deepmt then
