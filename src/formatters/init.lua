@@ -5,7 +5,8 @@ local ok, term = pcall(require, 'term')
 local colors = setmetatable({
   none = function(c) return c end
 },{ __index = function(self, key)
-  if not ok or not term.isatty(io.stdout) or not term.colors then
+  local isatty = io.type(io.stdout) == 'file' and term.isatty(io.stdout)
+  if not ok or not isatty or not term.colors then
     return function(c) return c end
   end
   return function(c)
