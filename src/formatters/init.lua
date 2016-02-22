@@ -124,7 +124,7 @@ local function fmt_table(arg, fmtargs)
   local crumbs = fmtargs and fmtargs.crumbs or {}
   local cache = {}
 
-  local function ft(t, l)
+  local function ft(t, l, with_crumbs)
     if showrec and cache[t] and cache[t] > 0 then
       return "{ ... recursive }"
     end
@@ -141,19 +141,20 @@ local function fmt_table(arg, fmtargs)
     local keys, nkeys = get_sorted_keys(t)
 
     cache[t] = (cache[t] or 0) + 1
+    local crumb = crumbs[#crumbs - l + 1]
 
     for i = 1, nkeys do
       local k = keys[i]
       local v = t[k]
+      local use_crumbs = with_crumbs and k == crumb
 
       if type(v) == "table" then
-        v = ft(v, l + 1)
+        v = ft(v, l + 1, use_crumbs)
       elseif type(v) == "string" then
         v = "'"..v.."'"
       end
 
-      local crumb = crumbs[#crumbs - l + 1]
-      local ch = (crumb == k and errchar or "")
+      local ch = use_crumbs and errchar or ""
       local indent = string.rep(" ",l * 2 - ch:len())
       local mark = (ch:len() == 0 and "" or colors[errcolor](ch))
       result = result .. string.format("\n%s%s[%s] = %s", indent, mark, tostr(k), tostr(v))
@@ -164,7 +165,7 @@ local function fmt_table(arg, fmtargs)
     return result .. " }"
   end
 
-  return "(table) " .. ft(arg, 1)
+  return "(table) " .. ft(arg, 1, true)
 end
 
 local function fmt_function(arg)
