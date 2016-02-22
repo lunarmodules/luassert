@@ -122,9 +122,9 @@ local function fmt_table(arg, fmtargs)
   local errchar = assert:get_parameter("TableErrorHighlightCharacter") or ""
   local errcolor = assert:get_parameter("TableErrorHighlightColor") or "none"
   local crumbs = fmtargs and fmtargs.crumbs or {}
+  local cache = {}
 
-  local function ft(t, l, cache)
-    local cache = cache or {}
+  local function ft(t, l)
     if showrec and cache[t] and cache[t] > 0 then
       return "{ ... recursive }"
     end
@@ -147,7 +147,7 @@ local function fmt_table(arg, fmtargs)
       local v = t[k]
 
       if type(v) == "table" then
-        v = ft(v, l + 1, cache)
+        v = ft(v, l + 1)
       elseif type(v) == "string" then
         v = "'"..v.."'"
       end
