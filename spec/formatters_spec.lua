@@ -75,6 +75,15 @@ describe("Test Formatters", function()
         [1] = 1 } } } }]])
   end)
 
+
+  it("Checks to see if error character is applied only to key chain marked with crumbs", function()
+    local t = {{1,2},{3,4}}
+    local fmtargs = { {crumbs = {1,2}} }
+    local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
+    local expected = "(table) {\n  [1] = {\n    [1] = 1\n    [2] = 2 }\n *[2] = {\n   *[1] = 3\n    [2] = 4 } }"
+    assert.is.equal(expected, formatted)
+  end)
+
   it("Checks to see if TableErrorHighlightCharacter changes error character", function()
     assert:set_parameter("TableErrorHighlightCharacter", "**")
     local t = {1,2,3}
