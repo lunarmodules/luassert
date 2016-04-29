@@ -24,7 +24,6 @@ local __state_meta = {
 
   __call = function(self, ...)
     local keys = util.extract_keys("assertion", self.tokens)
-    self.tokens = {}
 
     local assertion
 
@@ -59,6 +58,7 @@ local __state_meta = {
     else
       local arguments = {...}
       arguments.n = select('#', ...)
+      self.tokens = {}
 
       for _, key in ipairs(keys) do
         if namespace.modifier[key] then
