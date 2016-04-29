@@ -1,3 +1,5 @@
+local tablex = require 'pl.tablex'
+
 describe("Test Assertions", function()
   it("Tests backward compatible assert() functionality", function()
     local test = true
@@ -8,6 +10,13 @@ describe("Test Assertions", function()
     assert(one == test and two == message and three == third_arg and
            four == fourth_arg and five == nil,
            "Expected input values to be outputted as well when an assertion does not fail")
+  end)
+
+  it("Checks asserts can be reused", function()
+    local is_same = assert.is_same
+    local orig_same = tablex.deepcopy(is_same)
+    is_same({}, {})
+    assert.is_same(orig_same, is_same)
   end)
 
   it("Checks to see if tables 1 and 2 are the same", function()
@@ -551,5 +560,4 @@ describe("Test Assertions", function()
     assert.is_same({nil, "string"}, {assert.no_error_matches(function() end, "string")})
     assert.is_same({"error", "string"}, {assert.no_error_matches(function() error("error") end, "string")})
   end)
-
 end)
