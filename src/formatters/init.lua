@@ -1,11 +1,11 @@
 -- module will not return anything, only register formatters with the main assert engine
 local assert = require('luassert.assert')
-local ok, term = pcall(require, 'term')
 
 local colors = setmetatable({
   none = function(c) return c end
 },{ __index = function(self, key)
-  local isatty = io.type(io.stdout) == 'file' and term.isatty(io.stdout)
+  local ok, term = pcall(require, 'term')
+  local isatty = io.type(io.stdout) == 'file' and ok and term.isatty(io.stdout)
   if not ok or not isatty or not term.colors then
     return function(c) return c end
   end
