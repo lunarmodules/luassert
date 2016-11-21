@@ -51,4 +51,10 @@ describe("Tests dealing with mocks", function()
     assert(test.key() == "derp")
     assert(tostring(test) == val)
   end)
+
+  it("makes sure cycles are detected", function()
+    test.foo = test
+    mock(test)
+    assert(test.foo == test)
+  end)
 end)

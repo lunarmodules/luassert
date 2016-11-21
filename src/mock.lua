@@ -16,25 +16,31 @@ end
 local mock
 mock = {
   new = function(object, dostub, func, self, key)
-    local data_type = type(object)
-    if data_type == "table" then
-      if spy.is_spy(object) then
-        -- this table is a function already wrapped as a spy, so nothing to do here
-      else
-        for k,v in pairs(object) do
-          object[k] = mock.new(v, dostub, func, object, k)
+    local visited = {}
+    local function do_mock(object, self, key)
+      local mock_handlers = {
+        ["table"] = function()
+          if spy.is_spy(object) or visited[object] then return end
+          visited[object] = true
+          for k,v in pairs(object) do
+            object[k] = do_mock(v, object, k)
+          end
+          return object
+        end,
+        ["function"] = function()
+          if dostub then
+            return stub(self, key, func)
+          elseif self==nil then
+            return spy.new(object)
+          else
+            return spy.on(self, key)
+          end
         end
-      end
-    elseif data_type == "function" then
-      if dostub then
-        return stub(self, key, func)
-      elseif self==nil then
-        return spy.new(object)
-      else
-        return spy.on(self, key)
-      end
+      }
+      local handler = mock_handlers[type(object)]
+      return handler and handler() or object
     end
-    return object
+    return do_mock(object, self, key)
   end,
 
   clear = function(object)
