@@ -150,7 +150,7 @@ obj = {
   
   level = function(self, level)
     return setmetatable({
-        level
+        level = level
       }, level_mt)
   end,
   
@@ -168,7 +168,7 @@ local __meta = {
   __call = function(self, bool, message, level, ...)
     if not bool then
       local err_level = (self:get_level(level) or 1) + 1
-      error((message or "assertion failed!")..tostring(err_level), err_level)
+      error(message or "assertion failed!", err_level)
     end
     return bool , message , level , ...
   end,
