@@ -3,6 +3,7 @@ local astate = require 'luassert.state'
 local util = require 'luassert.util'
 local unpack = require 'luassert.compatibility'.unpack
 local obj   -- the returned module table
+local level_mt = {}
 
 -- list of namespaces
 local namespace = require 'luassert.namespaces'
@@ -146,14 +147,28 @@ obj = {
   snapshot = function(self)
     return astate.snapshot()
   end,
+  
+  level = function(self, level)
+    return setmetatable({
+        level
+      }, level_mt)
+  end,
+  
+  -- returns the level if a level-value, otherwise nil
+  get_level = function(self, level)
+    if getmetatable(level) ~= level_mt then
+      return nil -- not a valid error-level
+    end
+    return level.level
+  end,
 }
 
 local __meta = {
 
   __call = function(self, bool, message, level, ...)
     if not bool then
-      local level = (level or 1) + 1
-      error(message or "assertion failed!", level)
+      local err_level = (self:get_level(level) or 1) + 1
+      error((message or "assertion failed!")..tostring(err_level), err_level)
     end
     return bool , message , level , ...
   end,
