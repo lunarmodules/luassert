@@ -11,7 +11,23 @@ describe("Test Assertions", function()
            four == fourth_arg and five == nil,
            "Expected input values to be outputted as well when an assertion does not fail")
   end)
+  
+  it("Checks assert() handles more than two return values", function()
+    local res, err = pcall(assert, false, "some error", "a string")
+    assert(not res)
 
+    err = tostring(err)
+    assert(not err:match("attempt to perform arithmetic on a string value", nil, true))
+    assert(err:match("some error", nil, true))
+  end)
+
+  it("Checks level and get_level values", function()
+    assert.equal(3, assert:get_level(assert:level(3)))
+    assert.is.Nil(assert:get_level({}))
+    assert.is.Nil(assert:get_level("hello world"))
+    assert.is.Nil(assert:get_level(nil))
+  end)
+  
   it("Checks asserts can be reused", function()
     local is_same = assert.is_same
     local orig_same = tablex.deepcopy(is_same)
