@@ -7,6 +7,7 @@ assert._VERSION     = "Luassert 1.7.9"
 -- load basic asserts
 require('luassert.assertions')
 require('luassert.modifiers')
+require('luassert.array')
 require('luassert.matchers')
 require('luassert.formatters')
 
