@@ -28,6 +28,7 @@ build = {
     ["luassert.assert"] = "src/assert.lua",
     ["luassert.modifiers"] = "src/modifiers.lua",
     ["luassert.assertions"] = "src/assertions.lua",
+    ["luassert.array"] = "src/array.lua",
     ["luassert.namespaces"] = "src/namespaces.lua",
     ["luassert.match"] = "src/match.lua",
     ["luassert.mock"] = "src/mock.lua",
