@@ -134,15 +134,15 @@ obj = {
   set_parameter = function(self, name, value)
     astate.set_parameter(name, value)
   end,
-  
+
   get_parameter = function(self, name)
     return astate.get_parameter(name)
-  end,  
-  
+  end,
+
   add_spy = function(self, spy)
     astate.add_spy(spy)
   end,
-  
+
   snapshot = function(self)
     return astate.snapshot()
   end,
@@ -152,8 +152,11 @@ local __meta = {
 
   __call = function(self, bool, message, level, ...)
     if not bool then
-      local level = (level or 1) + 1
-      error(message or "assertion failed!", level)
+      local lvl = 2
+      if type(level) == "number" then
+        lvl = level + 1
+      end
+      error(message or "assertion failed!", lvl)
     end
     return bool , message , level , ...
   end,
