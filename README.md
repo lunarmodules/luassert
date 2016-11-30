@@ -46,6 +46,18 @@ assert.has_property("name", { name = "jack" })
 
 ```
 
+When writing your own assertions you can also use modifiers to set specific objects to work against. An example 
+is the [`array` modifier](https://github.com/Olivine-Labs/luassert/blob/master/src/array.lua) with its 
+accompanying `holes` assertion.
+
+Which can be used as;
+```lua
+local arr = { "one", "two", "three" }
+
+assert.array(arr).has.no.holes()   -- checks the array to not contain holes --> passes
+assert.array(arr).has.no.holes(4)  -- sets explicit length to 4 --> fails
+```
+
 ##Implementation notes:
 
 * assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
