@@ -58,7 +58,7 @@ assert.array(arr).has.no.holes()   -- checks the array to not contain holes --> 
 assert.array(arr).has.no.holes(4)  -- sets explicit length to 4 --> fails
 ```
 
-##Implementation notes:
+## Implementation notes:
 
 * assertion/modifiers that are Lua keywords (`true`, `false`, `nil`, `function`, and `not`) cannot be used using '.' chaining because that results in compilation errors. Instead chain using '_' (underscore) or use one or more capitals in the reserved word (see code examples above), whatever your coding style prefers
 * Most assertions will only take 1 or 2 parameters and an optional failure message, except for the `returned_arguments` assertion, which does not take a failure message
@@ -68,7 +68,7 @@ local f = function() end
 assert.message("the function 'f' did not return 2 arguments").returned_arguments(2, f())
 ```
 
-##Matchers
+## Matchers
 Argument matching can be performed on spies/stubs with the ability to create your own. This provides flexible argument matching for `called_with` and `returned_with` assertions. Like assertions, you can modify chains of matchers with `not`. Furthermore, matchers can be combined using composite matchers.
 ```lua
 local assert = require 'luassert'
@@ -123,7 +123,7 @@ match.any_of(m1, m2, ...) -- argument matches at least one of the matchers m1 to
 match.none_of(m1, m2, ...) -- argument does not match any of the matchers m1 to mn
 ```
 
-##Snapshots
+## Snapshots
 To be able to revert changes created by tests, inserting spies and stubs for example, luassert supports 'snapshots'. A snapshot includes the following;
 
 1. spies and stubs
@@ -151,7 +151,7 @@ describe("Showing use of snapshots", function()
 end)
 ```
 
-##Parameters
+## Parameters
 To register state information 'parameters' can be used. The parameter is included in a snapshot and can hence be restored in between tests. For an example see `Configuring table depth display` below.
 
 Example:
@@ -163,10 +163,10 @@ s:revert()
 assert.are.equal(1, assert:get_parameter("my_param_name"))
 ```
 
-##Customizing argument formatting
+## Customizing argument formatting
 luassert comes preloaded with argument formatters for common Lua types, but it is easy to roll your own. Customizing them is especially useful for limiting table depth and for userdata types.
 
-###Configuring table depth display
+### Configuring table depth display
 The default table formatter allows you to customize the levels displayed by setting the `TableFormatLevel` parameter (setting it to -1 displays all levels).
 
 Example:
@@ -223,7 +223,7 @@ Expected:
     [3] = 'water' }
   [world] = 'mundo' }
 ```
-###Customized formatters
+### Customized formatters
 The formatters are functions taking a single argument that needs to be converted to a string representation. The formatter should examine the value provided, if it can format the value, it should return the formatted string, otherwise it should return `nil`.
 Formatters can be added through `assert:add_formatter(formatter_func)`, and removed by calling `assert:remove_formatter(formatter_func)`.
 
