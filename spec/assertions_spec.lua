@@ -70,6 +70,44 @@ describe("Test Assertions", function()
     assert.is_not.same(nil, "a string")
   end)
 
+  it("Checks same() assertion to handle NaN and infs properly", function()
+    assert.same(1.0/0.0, 1.0/0.0)
+    assert.is_not.same(1.0/0.0, -1.0/0.0)
+    if tostring(0.0/0.0) ~= tostring(1.0/0.0) then
+      -- Only check this if there are NaN values.
+      assert.is_not.same(0.0/0.0, -1.0/0.0)
+      assert.is_not.same(1.0/0.0, 0.0/0.0)
+      assert.is_not.same(1.0/0.0, -(0.0/0.0))
+      assert.is_not.same(-1.0/0.0, -(0.0/0.0))
+      assert.is_not.same(-1.0/0.0, -(0.0/0.0))
+    end
+    assert.same(0.0/0.0, 0.0/0.0)
+    assert.same(-(0.0/0.0), -(0.0/0.0))
+    if tostring(-(0.0/0.0)) ~= tostring(0.0/0.0) then
+      -- Only check this if there are both NaN and -NaN values.
+      assert.is_not.same(-(0.0/0.0), 0.0/0.0)
+    end
+  end)
+
+  it("Checks same() assertion to handle NaN and infs properly inside a table", function()
+    assert.same({1.0/0.0}, {1.0/0.0})
+    assert.is_not.same({1.0/0.0}, {-1.0/0.0})
+    if tostring(0.0/0.0) ~= tostring(1.0/0.0) then
+      -- Only check this if there are NaN values.
+      assert.is_not.same({0.0/0.0}, {-1.0/0.0})
+      assert.is_not.same({1.0/0.0}, {0.0/0.0})
+      assert.is_not.same({1.0/0.0}, {-(0.0/0.0)})
+      assert.is_not.same({-1.0/0.0}, {-(0.0/0.0)})
+      assert.is_not.same({-1.0/0.0}, {-(0.0/0.0)})
+    end
+    assert.same({0.0/0.0}, {0.0/0.0})
+    assert.same({-(0.0/0.0)}, {-(0.0/0.0)})
+    if tostring(-(0.0/0.0)) ~= tostring(0.0/0.0) then
+      -- Only check this if there are both NaN and -NaN values.
+      assert.is_not.same({-(0.0/0.0)}, {0.0/0.0})
+    end
+  end)
+
   it("Checks same() assertion ignores __pairs metamethod", function()
     local t1 = setmetatable({1,2,3}, {__pairs = function(t) return nil end})
     local t2 = {1,2,3}
@@ -181,6 +219,14 @@ describe("Test Assertions", function()
     assert.equals(nil, nil)
     assert.is_not.equals("a string", nil)
     assert.is_not.equals(nil, "a string")
+  end)
+
+  it("Checks equals() assertion to handle NaN and infs properly", function()
+    if 0.0/0.0 ~= 0.0/0.0 then
+      -- Only perform check if there are NaNs
+      assert.is_not.equals(0.0/0.0, 0.0/0.0)
+      assert.is_not.equals(-(0.0/0.0), -(0.0/0.0))
+    end
   end)
 
   it("Checks to see if table1 only contains unique elements", function()

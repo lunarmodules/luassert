@@ -134,7 +134,7 @@ local function same(state, arguments, level)
     set_failure_message(state, arguments[3])
     return result
   end
-  local result = arguments[1] == arguments[2]
+  local result = util.same(arguments[1], arguments[2])
   -- switch arguments for proper output message
   util.tinsert(arguments, 1, util.tremove(arguments, 2))
   set_failure_message(state, arguments[3])
