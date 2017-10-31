@@ -44,7 +44,7 @@ function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
     end
   end
   for k2,_ in next, t2 do
-    -- only check wether each element has a t1 counterpart, actual comparison
+    -- only check whether each element has a t1 counterpart, actual comparison
     -- has been done in first loop above
     if t1[k2] == nil then return false, {k2} end
   end

@@ -8,7 +8,7 @@ how best to do so.
 
 Here's some examples of things you might want to make a pull request for:
 
-* New langauge translations
+* New language translations
 * New features
 * Bugfixes
 * Inefficient blocks of code
@@ -30,9 +30,9 @@ Look at existing code to get a good feel for the patterns we use.
 
 ## Using Git appropriately
 
-1. [Fork the repository](https://github.com/Olivine-Labs/luassert/fork_select) to
+1. [Fork the repository](https://help.github.com/articles/fork-a-repo) to
 your Github account.
-2. Create a *topical branch* - a branch whose name is succint but explains what
+2. Create a *topical branch* - a branch whose name is succinct and explains what
 you're doing, such as "klingon-translations"
 3. Make your changes, committing at logical breaks.
 4. Push your branch to your personal account
@@ -41,5 +41,5 @@ you're doing, such as "klingon-translations"
 
 Please note - if you want to change multiple things that don't depend on each 
 other, make sure you check the master branch back out before making more
-changes - that way we can take in each change seperately.
+changes - that way we can take in each change separately.
 
