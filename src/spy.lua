@@ -21,6 +21,7 @@ local spy_mt = {
 local spy   -- must make local before defining table, because table contents refers to the table (recursion)
 spy = {
   new = function(callback)
+    callback = callback or function() end
     if not util.callable(callback) then
       error("Cannot spy on type '" .. type(callback) .. "', only on functions or callable elements", util.errorlevel())
     end
