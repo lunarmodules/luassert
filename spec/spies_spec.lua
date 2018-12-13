@@ -217,4 +217,10 @@ describe("Tests dealing with spies", function()
      assert.spy(s).was_not.returned_with("foobar")
   end)
 
+  it("checks spy.new can be constructed without arguments", function()
+    local s = spy.new()
+    s()
+    assert.spy(s).was.called(1)
+  end)
+
 end)
