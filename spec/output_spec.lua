@@ -72,8 +72,9 @@ describe("Output testing using string comparison with the has_error assertion", 
 
   it("Should compare error strings correctly; table-string", function()
     --assert.has_error(function() error({}) end, "string")
-    local output = getoutput(function() error({}) end, "string")
-    local ok = output:find("Caught:\n%(table%) { }")
+    local t = {}
+    local output = getoutput(function() error(t) end, "string")
+    local ok = output:find("Caught:\n%("..tostring(t).."%) { }")
     assert(ok, "Output check 1 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
     local ok = output:find("Expected:\n%(string%) 'string'")
     assert(ok, "Output check 2 failed, comparing table-string;\n    " .. output:gsub("\n","\n    "))
@@ -81,19 +82,22 @@ describe("Output testing using string comparison with the has_error assertion", 
 
   it("Should compare error strings correctly; string-table", function()
     --assert.has_error(function() error("string") end, {})
-    local output = getoutput(function() error("string") end, {})
+    local t = {}
+    local output = getoutput(function() error("string") end, t)
     local ok = output:find("Caught:\n%(string%) 'string'")
     assert(ok, "Output check 1 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
-    local ok = output:find("Expected:\n%(table%) { }")
+    local ok = output:find("Expected:\n%("..tostring(t).."%) { }")
     assert(ok, "Output check 2 failed, comparing string-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
   it("Should compare error objects correctly; table-table", function()
     --assert.has_error(function() error({}) end, { "table" })
-    local output = getoutput(function() error({}) end, { "table" })
-    local ok = output:find("Caught:\n%(table%) { }")
+    local t = {}
+    local t2 = { "table" }
+    local output = getoutput(function() error(t) end, t2)
+    local ok = output:find("Caught:\n%("..tostring(t).."%) { }")
     assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
-    local ok = output:find("Expected:\n%(table%) {\n  %[1] = 'table' }")
+    local ok = output:find("Expected:\n%("..tostring(t2).."%) {\n  %[1] = 'table' }")
     assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
@@ -108,10 +112,11 @@ describe("Output testing using string comparison with the same assertion", funct
 
   it("Should compare tables correctly", function()
     -- assert.are.same({1}, {2})
-    local output = getoutput({1}, {2})
-    local ok = output:find("Passed in:\n(table) {\n *[1] = 2 }", nil, true)
+    local t1, t2 = {1}, {2}
+    local output = getoutput(t1, t2)
+    local ok = output:find("Passed in:\n("..tostring(t2)..") {\n *[1] = 2 }", nil, true)
     assert(ok, "Output check 1 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
-    local ok = output:find("Expected:\n(table) {\n *[1] = 1 }", nil, true)
+    local ok = output:find("Expected:\n("..tostring(t1)..") {\n *[1] = 1 }", nil, true)
     assert(ok, "Output check 2 failed, comparing table-table;\n    " .. output:gsub("\n","\n    "))
   end)
 
@@ -301,18 +306,19 @@ describe("Output testing using custom failure message", function()
   end)
 
   it("Should convert objects to string", function()
-    local t = setmetatable({},{__tostring=function(t) return "empty table" end})
-    assert.is_equal("(table) { }", geterror("is_true", false, {}))
+    local t = {}
+    local t_tostring = setmetatable({},{__tostring=function(t) return "empty table" end})
+    assert.is_equal("("..tostring(t)..") { }", geterror("is_true", false, t))
     assert.is_equal("(number) 999", geterror("is_true", false, 999))
     assert.is_equal("(boolean) true", geterror("is_true", false, true))
     assert.is_equal("(boolean) false", geterror("is_true", false, false))
-    assert.is_equal("empty table", geterror("is_true", false, t))
+    assert.is_equal("empty table", geterror("is_true", false, t_tostring))
 
-    assert.is_equal("(table) { }", geterror2("is_true", false, {}))
+    assert.is_equal("("..tostring(t)..") { }", geterror2("is_true", false, t))
     assert.is_equal("(number) 999", geterror2("is_true", false, 999))
     assert.is_equal("(boolean) true", geterror2("is_true", false, true))
     assert.is_equal("(boolean) false", geterror2("is_true", false, false))
-    assert.is_equal("empty table", geterror2("is_true", false, t))
+    assert.is_equal("empty table", geterror2("is_true", false, t_tostring))
   end)
 
 end)
@@ -422,18 +428,19 @@ for _,ss in ipairs({"spy", "stub"}) do
     end)
 
     it("Should convert objects to string", function()
-      local t = setmetatable({},{__tostring=function(t) return "empty table" end})
-      assert.is_equal("(table) { }", geterror("was_called", {}, {}))
+      local t = {}
+      local t_tostring = setmetatable({},{__tostring=function(t) return "empty table" end})
+      assert.is_equal("("..tostring(t)..") { }", geterror("was_called", {}, t))
       assert.is_equal("(number) 999", geterror("was_called", {}, 999))
       assert.is_equal("(boolean) true", geterror("was_called", {}, true))
       assert.is_equal("(boolean) false", geterror("was_called", {}, false))
-      assert.is_equal("empty table", geterror("was_called", {}, t))
+      assert.is_equal("empty table", geterror("was_called", {}, t_tostring))
 
-      assert.is_equal("(table) { }", geterror2("was_called", {}, {}))
+      assert.is_equal("("..tostring(t)..") { }", geterror2("was_called", {}, t))
       assert.is_equal("(number) 999", geterror2("was_called", {}, 999))
       assert.is_equal("(boolean) true", geterror2("was_called", {}, true))
       assert.is_equal("(boolean) false", geterror2("was_called", {}, false))
-      assert.is_equal("empty table", geterror2("was_called", {}, t))
+      assert.is_equal("empty table", geterror2("was_called", {}, t_tostring))
     end)
 
   end)

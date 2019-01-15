@@ -17,7 +17,7 @@ describe("Test Formatters", function()
   after_each(function()
     snapshot:revert()
   end)
-  
+
   it("Checks to see if types are returned as strings", function()
     assert.is.same(assert:format({ "a string", ["n"] = 1 })[1], "(string) 'a string'")
     assert.is.same(assert:format({ true, ["n"] = 1 })[1], "(boolean) true")
@@ -37,38 +37,47 @@ describe("Test Formatters", function()
   end)
 
   it("Checks to see if tables are recursively serialized", function()
-    assert.is.same(assert:format({ {}, ["n"] = 1 })[1], "(table) { }")
-    assert.is.same(assert:format({ { 2, 3, 4, [-5] = 7}, ["n"] = 1 })[1], [[(table) {
+    local t = {}
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], "("..tostring(t)..") { }")
+    t = { 2, 3, 4, [-5] = 7}
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = 2
   [2] = 3
   [3] = 4
   [-5] = 7 }]])
-    assert.is.same(assert:format({ { 1, ["k1"] = "v1", ["k2"] = "v2"}, ["n"] = 1 })[1], [[(table) {
+    t = { 1, ["k1"] = "v1", ["k2"] = "v2"}
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = 1
   [k1] = 'v1'
   [k2] = 'v2' }]])
-    assert.is.same(assert:format({ { "{\n }\n" }, ["n"] = 1 })[1], [[(table) {
+    t = { "{\n }\n" }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = '{
  }
 ' }]])
   end)
 
   it("Checks to see if TableFormatLevel parameter limits table formatting depth", function()
-    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table) {
+    local t = { { { { 1 } } } }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = {
     [1] = {
       [1] = { ... more } } } }]])
-    assert.is.same(assert:format({ { { { } } }, ["n"] = 1 })[1], [[(table) {
+    t = { { { } } }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = {
     [1] = { } } }]])
     assert:set_parameter("TableFormatLevel", 0)
-    assert.is.same(assert:format({ { }, ["n"] = 1 })[1], "(table) { }")
-    assert.is.same(assert:format({ { 1 }, ["n"] = 1 })[1], "(table) { ... more }")
+    t = { }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], "("..tostring(t)..") { }")
+    t = { 1 }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], "("..tostring(t)..") { ... more }")
   end)
 
   it("Checks to see if TableFormatLevel parameter can display all levels", function()
     assert:set_parameter("TableFormatLevel", -1)
-    assert.is.same(assert:format({ { { { { 1 } } } }, ["n"] = 1 })[1], [[(table) {
+    local t = { { { { 1 } } } }
+    assert.is.same(assert:format({ t, ["n"] = 1 })[1], [[(]]..tostring(t)..[[) {
   [1] = {
     [1] = {
       [1] = {
@@ -80,7 +89,7 @@ describe("Test Formatters", function()
     local t = {{1,2},{3,4}}
     local fmtargs = { {crumbs = {1,2}} }
     local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
-    local expected = "(table) {\n  [1] = {\n    [1] = 1\n    [2] = 2 }\n *[2] = {\n   *[1] = 3\n    [2] = 4 } }"
+    local expected = "("..tostring(t)..") {\n  [1] = {\n    [1] = 1\n    [2] = 2 }\n *[2] = {\n   *[1] = 3\n    [2] = 4 } }"
     assert.is.equal(expected, formatted)
   end)
 
@@ -89,7 +98,7 @@ describe("Test Formatters", function()
     local t = {1,2,3}
     local fmtargs = { {crumbs = {2}} }
     local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
-    local expected = "(table) {\n  [1] = 1\n**[2] = 2\n  [3] = 3 }"
+    local expected = "("..tostring(t)..") {\n  [1] = 1\n**[2] = 2\n  [3] = 3 }"
     assert.is.equal(expected, formatted)
   end)
 
@@ -101,7 +110,7 @@ describe("Test Formatters", function()
     local t = {1,2,3}
     local fmtargs = { {crumbs = {2}} }
     local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
-    local expected = string.format("(table) {\n  [1] = 1\n %s[2] = 2\n  [3] = 3 }", colors.red("*"))
+    local expected = string.format("("..tostring(t)..") {\n  [1] = 1\n %s[2] = 2\n  [3] = 3 }", colors.red("*"))
     assert.is.equal(expected, formatted)
   end)
 
@@ -110,7 +119,7 @@ describe("Test Formatters", function()
     t[3] = t
     assert:set_parameter("TableFormatShowRecursion", true)
     local formatted = assert:format({t, n = 1})[1]
-    local expected = "(table) {\n  [1] = 1\n  [2] = 2\n  [3] = { ... recursive } }"
+    local expected = "("..tostring(t)..") {\n  [1] = 1\n  [2] = 2\n  [3] = { ... recursive } }"
     assert.is.equal(expected, formatted)
   end)
 
@@ -137,7 +146,7 @@ describe("Test Formatters", function()
     assert.is.same(type(formatted[3]), "string")
     assert.is.same(type(formatted[4]), "nil")
   end)
-  
+
   it("checks arguments not being formatted if set to do so", function()
     local arg1 = "argument1"
     local arg2 = "argument2"
@@ -146,7 +155,7 @@ describe("Test Formatters", function()
     arguments = assert:format(arguments)
     assert.is.same(arg1, arguments[1])
   end)
-  
+
   it("checks extra formatters inserted to be called first", function()
     local expected = "formatted result"
     local f = function(value)
@@ -155,11 +164,11 @@ describe("Test Formatters", function()
       end
     end
     local s = spy.new(f)
-    
+
     assert:add_formatter(s)
     assert.are_equal(expected, assert:format({"some string"})[1])
     assert.spy(s).was.called(1)
     assert:remove_formatter(s)
   end)
-  
+
 end)

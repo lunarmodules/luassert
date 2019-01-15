@@ -123,6 +123,20 @@ local function fmt_table(arg, fmtargs)
   local errcolor = assert:get_parameter("TableErrorHighlightColor") or "none"
   local crumbs = fmtargs and fmtargs.crumbs or {}
   local cache = {}
+  local type_desc
+
+  if getmetatable(arg) == nil then
+    type_desc = "(" .. tostring(arg) .. ") "
+  elseif not pcall(setmetatable, arg, getmetatable(arg)) then
+    -- cannot set same metatable, so it is protected, skip id
+    type_desc = "(table) "
+  else
+    -- unprotected metatable, temporary remove the mt
+    local mt = getmetatable(arg)
+    setmetatable(arg, nil)
+    type_desc = "(" .. tostring(arg) .. ") "
+    setmetatable(arg, mt)
+  end
 
   local function ft(t, l, with_crumbs)
     if showrec and cache[t] and cache[t] > 0 then
@@ -165,7 +179,7 @@ local function fmt_table(arg, fmtargs)
     return result .. " }"
   end
 
-  return "(table) " .. ft(arg, 1, true)
+  return type_desc .. ft(arg, 1, true)
 end
 
 local function fmt_function(arg)
