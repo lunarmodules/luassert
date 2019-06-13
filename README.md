@@ -123,6 +123,17 @@ match.any_of(m1, m2, ...) -- argument matches at least one of the matchers m1 to
 match.none_of(m1, m2, ...) -- argument does not match any of the matchers m1 to mn
 ```
 
+If you're creating a spy for methods that mutate any properties on `self` you should should use `match.is_ref(obj)`:
+```lua
+local t = { cnt = 0, }
+function t:incrby(i) self.cnt = self.cnt + i end
+
+local s = spy.on(t, "incrby")
+t:incrby(2)
+
+assert.spy(s).was_called_with(match.is_ref(t), 2)
+```
+
 ## Snapshots
 To be able to revert changes created by tests, inserting spies and stubs for example, luassert supports 'snapshots'. A snapshot includes the following;
 
