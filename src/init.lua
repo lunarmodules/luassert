@@ -2,7 +2,7 @@ local assert = require('luassert.assert')
 
 assert._COPYRIGHT   = "Copyright (c) 2018 Olivine Labs, LLC."
 assert._DESCRIPTION = "Extends Lua's built-in assertions to provide additional tests and the ability to create your own."
-assert._VERSION     = "Luassert 1.7.11"
+assert._VERSION     = "Luassert 1.8.0"
 
 -- load basic asserts
 require('luassert.assertions')
