@@ -39,8 +39,7 @@ local __state_meta = {
         end
       end
 
-      local arguments = {...}
-      arguments.n = select('#', ...) -- add argument count for trailing nils
+      local arguments = util.make_arglist(...)
       local val, retargs = assertion.callback(self, arguments, util.errorlevel())
 
       if not val == self.mod then
@@ -57,8 +56,7 @@ local __state_meta = {
       end
       return ...
     else
-      local arguments = {...}
-      arguments.n = select('#', ...)
+      local arguments = util.make_arglist(...)
       self.tokens = {}
 
       for _, key in ipairs(keys) do

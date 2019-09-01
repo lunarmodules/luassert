@@ -1,3 +1,5 @@
+local util = require("luassert.util")
+
 local function returnnils()
   -- force the return of nils in an argument array
   return nil, nil, "this is not nil"
@@ -144,6 +146,24 @@ describe("Test Formatters", function()
     assert.is.same(type(formatted[2]), "string")
     assert.is.same(type(formatted[3]), "string")
     assert.is.same(type(formatted[4]), "nil")
+  end)
+
+  it("checks matcher formatting", function()
+    local pattern = match.match("pattern")
+    local patternformatted = assert:format({ pattern, ["n"] = 1 })[1]
+    assert.is.same("(matcher) is.match((string) 'pattern')",
+                   patternformatted)
+    local nostring = match.no.string()
+    local nostringformatted = assert:format({nostring, ["n"] = 1})[1]
+    assert.is.same("(matcher) no.string()",
+                   nostringformatted)
+  end)
+
+  it("checks arglist formatting", function()
+    local arglist = util.make_arglist("word", nil, 4, nil)
+    local formatted = assert:format({ arglist, ["n"] = 1 })[1]
+    assert.is.same(formatted,
+                   "(values list) ((string) 'word', (nil), (number) 4, (nil))")
   end)
 
   it("checks arguments not being formatted if set to do so", function()

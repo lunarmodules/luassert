@@ -4,6 +4,7 @@ describe("Tests dealing with spies", function()
   local test = {}
 
   before_each(function()
+    assert:set_parameter("TableFormatLevel", 3)
     test = {key = function()
       return "derp"
     end}
@@ -54,7 +55,16 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.returned_with(_, _, _, _) -- does not match if too many args
     assert.spy(s).was.returned_with({ foo = { bar = { "test" } } }) -- matches original table
     assert.spy(s).was_not.returned_with(t) -- does not match modified table
-    assert.has_error(function() assert.spy(s).was.returned_with(5, 6) end)
+    assert.error_matches(
+      function() assert.spy(s).returned_with(5, 6) end,
+      "Function never returned matching arguments.\n"
+      .. "Returned %(last call if any%):\n"
+      .. "%(values list%) %(%(table: 0x%x+%) {\n"
+      .. "  %[foo%] = {\n"
+      .. "    %[bar%] = {\n"
+      .. "      %[1%] = 'test' } } }.\n"
+      .. "Expected:\n"
+      .. "%(values list%) %(%(number%) 5, %(number%) 6%)")
   end)
 
   it("checks called() and called_with() assertions", function()
@@ -77,7 +87,16 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.called_with(_, _, _, _) -- does not match if too many args
     assert.spy(s).was.called_with({ foo = { bar = { "test" } } }) -- matches original table
     assert.spy(s).was_not.called_with(t) -- does not match modified table
-    assert.has_error(function() assert.spy(s).was.called_with(5, 6) end)
+    assert.error_matches(
+      function() assert.spy(s).was.called_with(5, 6) end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with %(last call if any%):\n"
+      .. "%(values list%) %(%(table: 0x%x+%) {\n"
+      .. "  %[foo%] = {\n"
+      .. "    %[bar%] = {\n"
+      .. "      %[1%] = 'test' } } }%)\n"
+      .. "Expected:\n"
+      .. "%(values list%) %(%(number%) 5, %(number%) 6%)")
   end)
 
   it("checks called() and called_with() assertions using refs", function()
@@ -109,7 +128,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.at_least(1)
     assert.spy(s).was.called.at_least(2)
     assert.spy(s).was_not.called.at_least(3)
-    assert.has_error(function() assert.spy(s).was.called.at_least() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.at_least() end,
+      "attempt to compare nil with number")
   end)
 
   it("checks called_at_most() assertions", function()
@@ -120,7 +141,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.at_most(3)
     assert.spy(s).was.called.at_most(2)
     assert.spy(s).was_not.called.at_most(1)
-    assert.has_error(function() assert.spy(s).was.called.at_most() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.at_most() end,
+      "attempt to compare number with nil")
   end)
 
   it("checks called_more_than() assertions", function()
@@ -131,7 +154,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.more_than(0)
     assert.spy(s).was.called.more_than(1)
     assert.spy(s).was_not.called.more_than(2)
-    assert.has_error(function() assert.spy(s).was.called.more_than() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.more_than() end,
+      "attempt to compare nil with number")
   end)
 
   it("checks called_less_than() assertions", function()
@@ -142,10 +167,12 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.less_than(4)
     assert.spy(s).was.called.less_than(3)
     assert.spy(s).was_not.called.less_than(2)
-    assert.has_error(function() assert.spy(s).was.called.less_than() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.less_than() end,
+      "attempt to compare number with nil")
   end)
 
-  it("checkis if called()/called_with assertions fail on non-spies ", function()
+  it("checks if called()/called_with assertions fail on non-spies ", function()
     assert.has_error(assert.was.called)
     assert.has_error(assert.was.called_at_least)
     assert.has_error(assert.was.called_at_most)
@@ -223,4 +250,87 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called(1)
   end)
 
+  it("reports some argumentslist the spy was called_with when none matches", function()
+    local s = spy.new(function() end)
+    s("herp", nil, "bust", nil)
+    assert.error_matches(
+      function() assert.spy(s).was.called_with() end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with (last call if any):\n"
+      .. "(values list) ((string) 'herp', (nil), (string) 'bust', (nil))\n"
+      .. "Expected:\n"
+      .. "(values list) ()",
+      1, true)
+  end)
+
+  it("reports some matching call argumentslist when none should match", function()
+    assert:set_parameter("TableFormatLevel", 4)
+    local s = spy.new(function() end)
+    s({}, nil, {}, nil)
+    s("herp", nil, "bust", nil)
+    s({}, nil, {}, nil)
+    assert.error_matches(
+      function()
+        assert.spy(s).was_not.called_with(match.match("er"), nil, match.string(), nil)
+      end,
+      "Function was called with matching arguments at least once.\n"
+      .. "Called with (last matching call):\n"
+      .. "(values list) ((string) 'herp', (nil), (string) 'bust', (nil))\n"
+      .. "Did not expect:\n"
+      .. "(values list) ((matcher) is.match((string) 'er'), (nil), (matcher) is.string(), (nil))",
+      1, true)
+  end)
+
+  it("makes legible errors when never called", function()
+    local s = spy.new(function() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called_with("derp", nil, "bust", nil) end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with (last call if any):\n"
+      .. "(nil)\n"
+      .. "Expected:\n"
+      .. "(values list) ((string) 'derp', (nil), (string) 'bust', (nil))",
+      1, true)
+  end)
+
+  it("reports some return values from the spy when none mathes", function()
+    local s = spy.new(function(...) return ... end)
+    s("herp", nil, "bust", nil)
+    assert.error_matches(
+      function() assert.spy(s).returned_with("derp", nil, "bust", nil) end,
+      "Function never returned matching arguments.\n"
+      .. "Returned (last call if any):\n"
+      .. "(values list) ((string) 'herp', (nil), (string) 'bust', (nil))\n"
+      .. "Expected:\n"
+      .. "(values list) ((string) 'derp', (nil), (string) 'bust', (nil))",
+      1, true)
+  end)
+
+  it("reports some matching return values when none should match", function()
+    assert:set_parameter("TableFormatLevel", 4)
+    local s = spy.new(function(...) return ... end)
+    s({}, nil, {}, nil)
+    s("herp", nil, "bust", nil)
+    s({}, nil, {}, nil)
+    assert.error_matches(
+      function()
+        assert.spy(s).has_not.returned_with(match.matches("er"), nil, match.is_string(), nil)
+      end,
+      "Function returned matching arguments at least once.\n"
+      .. "Returned (last matching call):\n"
+      .. "(values list) ((string) 'herp', (nil), (string) 'bust', (nil))",
+      1, true)
+  end)
+
+  it("makes legible errors when never returned", function()
+    local s = spy.new(function(...) return ... end)
+    assert.error_matches(
+      function() assert.spy(s).returned_with() end,
+      "Function never returned matching arguments.\n"
+      .. "Returned (last call if any):\n"
+      .. "(nil)\n"
+      .. "Expected:\n"
+      .. "(values list) ()",
+      1, true)
+  end)
 end)

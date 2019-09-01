@@ -13,7 +13,14 @@ describe("Tests dealing with stubs", function()
     stub(test, "key")
     test.key("derp")
     assert.stub(test.key).was.called_with("derp")
-    assert.errors(function() assert.stub(test.key).was.called_with("herp") end)
+    assert.error_matches(
+      function() assert.stub(test.key).was.called_with("herp") end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with (last call if any):\n"
+        .. "(values list) ((string) 'derp')\n"
+        .. "Expected:\n"
+        .. "(values list) ((string) 'herp')",
+      1, true)
   end)
 
   it("checks to see if stub keeps track of number of calls", function()
@@ -33,7 +40,14 @@ describe("Tests dealing with stubs", function()
     assert.stub(s).was_not.called(3)
     assert.stub(s).was_not.called_with({1, 2, 3}) -- mind the accolades
     assert.stub(s).was.called_with(1, 2, 3)
-    assert.has_error(function() assert.stub(s).was.called_with(5, 6) end)
+    assert.error_matches(
+      function() assert.stub(s).was.called_with(5, 6) end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with (last call if any):\n"
+        .. "(values list) ((string) 'a', (string) 'b', (string) 'c')\n"
+        .. "Expected:\n"
+        .. "(values list) ((number) 5, (number) 6)",
+      1, true)
   end)
 
   it("checks stub to fail when spying on non-callable elements", function()
