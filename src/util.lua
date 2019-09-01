@@ -100,6 +100,17 @@ function util.copyargs(args)
 end
 
 -----------------------------------------------
+-- Clear an arguments or return values list from a table
+-- @param arglist the table to clear of arguments or return values and their count
+-- @return No return values
+function util.cleararglist(arglist)
+  for idx = arglist.n, 1, -1 do
+    util.tremove(arglist, idx)
+  end
+  arglist.n = nil
+end
+
+-----------------------------------------------
 -- Test specs against an arglist in deepcopy and refs flavours.
 -- @param args deepcopy arglist
 -- @param argsrefs refs arglist
