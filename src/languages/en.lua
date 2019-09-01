@@ -37,8 +37,8 @@ s:set("assertion.called_less_than.positive", "Expected to be called less than %s
 s:set("assertion.called_with.positive", "Function was never called with the arguments")
 s:set("assertion.called_with.negative", "Function was called with the arguments at least once")
 
-s:set("assertion.returned_with.positive", "Function was not returned with the arguments")
-s:set("assertion.returned_with.negative", "Function was returned with the arguments")
+s:set("assertion.returned_with.positive", "Function never returned the arguments")
+s:set("assertion.returned_with.negative", "Function returned the arguments at least once")
 
 s:set("assertion.returned_arguments.positive", "Expected to be called with %s argument(s), but was called with %s")
 s:set("assertion.returned_arguments.negative", "Expected not to be called with %s argument(s), but was called with %s")
