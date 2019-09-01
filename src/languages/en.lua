@@ -34,8 +34,8 @@ s:set("assertion.called_at_most.positive", "Expected to be called at most %s tim
 s:set("assertion.called_more_than.positive", "Expected to be called more than %s time(s), but was called %s time(s)")
 s:set("assertion.called_less_than.positive", "Expected to be called less than %s time(s), but was called %s time(s)")
 
-s:set("assertion.called_with.positive", "Function was not called with the arguments")
-s:set("assertion.called_with.negative", "Function was called with the arguments")
+s:set("assertion.called_with.positive", "Function was never called with the arguments")
+s:set("assertion.called_with.negative", "Function was called with the arguments at least once")
 
 s:set("assertion.returned_with.positive", "Function was not returned with the arguments")
 s:set("assertion.returned_with.negative", "Function was returned with the arguments")
