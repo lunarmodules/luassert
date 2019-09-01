@@ -27,7 +27,7 @@ function stub.new(object, key, ...)
   local stubfunc = function(...)
     local args = {...}
     args.n = select('#', ...)
-    local match = util.matchargs(oncalls, args)
+    local match = util.matchoncalls(oncalls, args)
     if match then
       return callbacks[match](...)
     end
