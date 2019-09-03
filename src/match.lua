@@ -31,6 +31,7 @@ local state_mt = {
         name = matcher.name,
         mod = self.mod,
         callback = matches,
+        arguments = arguments,
       }, matcher_mt)
     else
       local arguments = util.make_arglist(...)
