@@ -1,4 +1,6 @@
 local util = {}
+local arglist_mt = {}
+
 function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
   local ty1 = type(t1)
   local ty2 = type(t2)
@@ -328,6 +330,17 @@ function util.extract_keys(nspace, tokens)
   end
 
   return keys
+end
+
+-- store argument list for or return values of a function in a table
+function util.make_arglist(...)
+  local arglist = { ... }
+  arglist.n = select('#', ...) -- add values count for trailing nils
+  return setmetatable(arglist, arglist_mt)
+end
+
+function util.is_arglist(object)
+  return type(object) == "table" and getmetatable(object) == arglist_mt
 end
 
 return util
