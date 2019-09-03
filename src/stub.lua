@@ -25,8 +25,7 @@ function stub.new(object, key, ...)
   local oncalls = {}
   local callbacks = {}
   local stubfunc = function(...)
-    local args = {...}
-    args.n = select('#', ...)
+    local args = util.make_arglist(...)
     local match = util.matchoncalls(oncalls, args)
     if match then
       return callbacks[match](...)
@@ -69,8 +68,7 @@ function stub.new(object, key, ...)
   }
 
   s.on_call_with = function(...)
-    local match_args = {...}
-    match_args.n = select('#', ...)
+    local match_args = util.make_arglist(...)
     match_args = util.copyargs(match_args)
     return {
       returns = function(...)

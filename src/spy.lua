@@ -5,12 +5,10 @@ local util = require('luassert.util')
 -- Spy metatable
 local spy_mt = {
   __call = function(self, ...)
-    local arguments = {...}
-    arguments.n = select('#',...)  -- add argument count for trailing nils
+    local arguments = util.make_arglist(...)
     table.insert(self.calls, util.copyargs(arguments))
     local function get_returns(...)
-      local returnvals = {...}
-      returnvals.n = select('#',...)  -- add argument count for trailing nils
+      local returnvals = util.make_arglist(...)
       table.insert(self.returnvals, util.copyargs(returnvals))
       return ...
     end
