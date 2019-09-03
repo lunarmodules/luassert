@@ -60,6 +60,7 @@ end
 function util.shallowcopy(t)
   if type(t) ~= "table" then return t end
   local copy = {}
+  setmetatable(copy, getmetatable(t))
   for k,v in next, t do
     copy[k] = v
   end
@@ -93,6 +94,7 @@ end
 -- @return the copy of the arguments
 function util.copyargs(args)
   local copy = {}
+  setmetatable(copy, getmetatable(args))
   local match = require 'luassert.match'
   local spy = require 'luassert.spy'
   for k,v in pairs(args) do
