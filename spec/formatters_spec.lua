@@ -140,7 +140,7 @@ describe("Test Formatters", function()
 
   it("Checks to see if table containing nils is returned with same number of entries #test", function()
     local t = { returnnils(), ["n"] = 3 }
-    formatted = assert:format(t)
+    local formatted = assert:format(t)
     assert.is.same(type(formatted[1]), "string")
     assert.is.same(type(formatted[2]), "string")
     assert.is.same(type(formatted[3]), "string")
