@@ -4,6 +4,7 @@ describe("Tests dealing with spies", function()
   local test = {}
 
   before_each(function()
+    assert:set_parameter("TableFormatLevel", 3)
     test = {key = function()
       return "derp"
     end}
