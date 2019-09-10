@@ -57,4 +57,30 @@ describe("Tests dealing with mocks", function()
     mock(test)
     assert(test.foo == test)
   end)
+
+  it("should try to show why called_with fails", function()
+    mock(test)
+    test.key()
+    assert.error_matches(
+      function () assert.spy(test.key).was.called_with(5) end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with (last call if any):\n"
+      .. "(values list) ()\n"
+      .. "Expected:\n"
+      .. "(values list) ((number) 5)",
+      1, true)
+  end)
+
+  it("should try to show why returned_with fails", function()
+    mock(test)
+    test.key()
+    assert.error_matches(
+      function () assert.spy(test.key).returned_with(5) end,
+      "Function never returned matching arguments.\n"
+      .. "Returned (last call if any):\n"
+      .. "(values list) ((string) 'derp')\n"
+      .. "Expected:\n"
+      .. "(values list) ((number) 5)",
+      1, true)
+  end)
 end)
