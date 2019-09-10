@@ -110,7 +110,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.at_least(1)
     assert.spy(s).was.called.at_least(2)
     assert.spy(s).was_not.called.at_least(3)
-    assert.has_error(function() assert.spy(s).was.called.at_least() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.at_least() end,
+      "attempt to compare nil with number")
   end)
 
   it("checks called_at_most() assertions", function()
@@ -121,7 +123,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.at_most(3)
     assert.spy(s).was.called.at_most(2)
     assert.spy(s).was_not.called.at_most(1)
-    assert.has_error(function() assert.spy(s).was.called.at_most() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.at_most() end,
+      "attempt to compare number with nil")
   end)
 
   it("checks called_more_than() assertions", function()
@@ -132,7 +136,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.more_than(0)
     assert.spy(s).was.called.more_than(1)
     assert.spy(s).was_not.called.more_than(2)
-    assert.has_error(function() assert.spy(s).was.called.more_than() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.more_than() end,
+      "attempt to compare nil with number")
   end)
 
   it("checks called_less_than() assertions", function()
@@ -143,7 +149,9 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was.called.less_than(4)
     assert.spy(s).was.called.less_than(3)
     assert.spy(s).was_not.called.less_than(2)
-    assert.has_error(function() assert.spy(s).was.called.less_than() end)
+    assert.error_matches(
+      function() assert.spy(s).was.called.less_than() end,
+      "attempt to compare number with nil")
   end)
 
   it("checks if called()/called_with assertions fail on non-spies ", function()
