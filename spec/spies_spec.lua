@@ -146,7 +146,7 @@ describe("Tests dealing with spies", function()
     assert.has_error(function() assert.spy(s).was.called.less_than() end)
   end)
 
-  it("checkis if called()/called_with assertions fail on non-spies ", function()
+  it("checks if called()/called_with assertions fail on non-spies ", function()
     assert.has_error(assert.was.called)
     assert.has_error(assert.was.called_at_least)
     assert.has_error(assert.was.called_at_most)
