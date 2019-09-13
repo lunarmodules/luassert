@@ -144,9 +144,15 @@ end
 -- arguments/returned values.
 -- @param argslist list of arguments/returned values to search
 -- @param specs arguments/return values to match against argslist
--- @return the first matching arguments/returned values if a match is found, otherwise nil
+-- @return the last matching arguments/returned values if a match is found, otherwise nil
 function util.matchargs(argslist, specs)
-  for _, val in ipairs(argslist) do
+  -- Search the arguments/returned values last to first to give the
+  -- most helpful answer possible. In the cases where you can place
+  -- your assertions between calls to check this gives you the best
+  -- information if no calls match. In the cases where you can't do
+  -- that there is no good way to predict what would work best.
+  for ii = #argslist, 1, -1 do
+    val = argslist[ii]
     if matcharg(val.vals, val.refs, specs) then
       return val
     end
