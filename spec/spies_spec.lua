@@ -1,4 +1,5 @@
-local match = require 'luassert.match'
+local match = require('luassert.match')
+local util = require('luassert.util')
 
 describe("Tests dealing with spies", function()
   local test = {}
@@ -221,6 +222,115 @@ describe("Tests dealing with spies", function()
     local s = spy.new()
     s()
     assert.spy(s).was.called(1)
+  end)
+
+  describe("with 'self' modifier", function()
+    before_each(function()
+      test = {
+        value = "derp",
+        modified = false,
+        key = function(self) return self.value end,
+        self_modify = function(self)
+          self.modified = true
+        end
+      }
+    end)
+
+    it("checks if a spy actually executes the internal function", function()
+      spy.on(test, "key")
+      assert(test:key() == "derp")
+    end)
+
+    it("checks to see if spy keeps track of arguments", function()
+      spy.on(test, "key")
+
+      test:key("derp")
+
+      assert.spy(test.key).was.self.called_with("derp")
+      assert.errors(function() assert.spy(test.key).was.self.called_with("herp") end)
+    end)
+
+    it("checks called_with assertions", function()
+      local s = spy.on(test, "key")
+      local shallowcopy = util.shallowcopy(test)
+      local deepcopy = util.deepcopy(test)
+      local t = { foo = { bar = { "test" } } }
+      local _ = match._
+
+      test.key(shallowcopy, "shallowcopy")
+      test.key(deepcopy, "deepcopy")
+
+      test:key(1, 2, 3)
+      test:key("a", "b", "c")
+      test:key(t)
+
+      t.foo.bar = "value"
+
+      assert.spy(s).was_not.self.called_with("shallowcopy") -- shallow copies don't match refs
+      assert.spy(s).was_not.self.called_with("deepcopy") -- deep copies don't match refs
+      assert.spy(s).was_not.self.called_with({1, 2, 3}) -- mind the accolades
+      assert.spy(s).was.self.called_with(1, 2, 3)
+      assert.spy(s).was.self.called_with(_, 2, 3) -- matches don't care
+      assert.spy(s).was.self.called_with(_, _, _) -- matches multiple don't cares
+      assert.spy(s).was_not.self.called_with(_, _, _, _) -- does not match if too many args
+      assert.spy(s).was.self.called_with({ foo = { bar = { "test" } } }) -- matches original table
+      assert.spy(s).was_not.self.called_with(t) -- does not match modified table
+      assert.has_error(function() assert.spy(s).was.self.called_with(5, 6) end)
+
+      s = spy.on(test, "self_modify")
+
+      assert.is_false(test.modified)
+
+      test:self_modify("self_modified")
+
+      assert.is_true(test.modified)
+      assert.spy(s).was.self.called_with("self_modified") -- self modified tables do match refs
+    end)
+
+    it("checks called_with assertions using refs", function()
+      local s = spy.on(test, "key")
+      local t1 = { foo = { bar = { "test" } } }
+      local t2 = { foo = { bar = { "test" } } }
+
+      test:key(t1)
+      t1.foo.bar = "value"
+
+      assert.spy(s).was.self.called_with(t2)
+      assert.spy(s).was_not.self.called_with(match.is_ref(t2))
+      assert.spy(s).was.self.called_with(match.is_ref(t1))
+    end)
+
+    it("checks if 'self' modifier fails on pure callback spies", function()
+      local s = spy.new(function() end)
+
+      s(s, "test")
+
+      assert.error_matches(
+        function() assert.spy(s).was.self.called_with("test") end,
+        "'self' must be used with a 'spy.on' spy"
+      )
+    end)
+
+    it("checks if all non-called_with assertions fail", function()
+      local s = spy.on(test, "key")
+
+      assert.error_matches(assert.spy(s).was.self.called, "'self' cannot be used with")
+      assert.error_matches(assert.spy(s).was.self.called_at_least, "'self' cannot be used with")
+      assert.error_matches(assert.spy(s).was.self.called_at_most, "'self' cannot be used with")
+      assert.error_matches(assert.spy(s).was.self.called_more_than, "'self' cannot be used with")
+      assert.error_matches(assert.spy(s).was.self.called_less_than, "'self' cannot be used with")
+      assert.error_matches(assert.spy(s).was.self.returned_with, "'self' cannot be used with")
+    end)
+
+    it("checks if called*/returned_with assertions fail on non-spies", function()
+      assert.has_error(assert.was.self.called_with)
+      assert.has_error(assert.was.self.called)
+      assert.has_error(assert.was.self.called_at_least)
+      assert.has_error(assert.was.self.called_at_most)
+      assert.has_error(assert.was.self.called_more_than)
+      assert.has_error(assert.was.self.called_less_than)
+      assert.has_error(assert.was.self.returned_with)
+    end)
   end)
 
 end)

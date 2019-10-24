@@ -1,6 +1,7 @@
 -- module will return spy table, and register its assertions with the main assert engine
 local assert = require('luassert.assert')
 local util = require('luassert.util')
+local match = require('luassert.match')
 
 -- Spy metatable
 local spy_mt = {
@@ -85,18 +86,54 @@ spy = {
   end
 }
 
+local SPY_STATE_KEY = "payload"
+local SELF_STATE_KEY = "__self_state"
+
 local function set_spy(state, arguments, level)
-  state.payload = arguments[1]
+  local level = (level or 1) + 1
+
+  if not spy.is_spy(arguments[1]) then
+    error("'spy' must be called with a spy instance", level)
+  end
+
+  rawset(state, SPY_STATE_KEY, arguments[1])
+
   if arguments[2] ~= nil then
     state.failure_message = arguments[2]
   end
 end
 
+local function set_self(state, _, level)
+  local level = (level or 1) + 1
+
+  if rawget(state, SELF_STATE_KEY) then
+    error("'self' already set", level)
+  end
+
+  local payload = rawget(state, SPY_STATE_KEY)
+
+  if not spy.is_spy(payload) then
+    error("'self' must be chained after 'spy(aspy)'", level)
+  end
+
+  if payload.target_table == nil then
+    error("'self' must be used with a 'spy.on' spy", level)
+  end
+
+  rawset(state, SELF_STATE_KEY, true)
+end
+
 local function returned_with(state, arguments, level)
   local level = (level or 1) + 1
-  local payload = rawget(state, "payload")
-  if payload and payload.returned_with then
-    return state.payload:returned_with(arguments)
+
+  if rawget(state, SELF_STATE_KEY) then
+    error("'self' cannot be used with 'returned_with'", level)
+  end
+
+  local payload = rawget(state, SPY_STATE_KEY)
+
+  if spy.is_spy(payload) then
+    return payload:returned_with(arguments)
   else
     error("'returned_with' must be chained after 'spy(aspy)'", level)
   end
@@ -104,31 +141,44 @@ end
 
 local function called_with(state, arguments, level)
   local level = (level or 1) + 1
-  local payload = rawget(state, "payload")
-  if payload and payload.called_with then
-    return state.payload:called_with(arguments)
-  else
+  local payload = rawget(state, SPY_STATE_KEY)
+
+  if not spy.is_spy(payload) then
     error("'called_with' must be chained after 'spy(aspy)'", level)
   end
+
+  if rawget(state, SELF_STATE_KEY) then
+    util.tinsert(arguments, 1, match.is_ref(payload.target_table))
+  end
+
+  return payload:called_with(arguments)
 end
 
 local function called(state, arguments, level, compare)
   local level = (level or 1) + 1
+
+  if rawget(state, SELF_STATE_KEY) then
+    error("'self' cannot be used with 'called'", level)
+  end
+
   local num_times = arguments[1]
+
   if not num_times and not state.mod then
     state.mod = true
     num_times = 0
   end
-  local payload = rawget(state, "payload")
-  if payload and type(payload) == "table" and payload.called then
-    local result, count = state.payload:called(num_times, compare)
+
+  local payload = rawget(state, SPY_STATE_KEY)
+
+  if spy.is_spy(payload) then
+    local result, count = payload:called(num_times, compare)
     arguments[1] = tostring(num_times or ">0")
     util.tinsert(arguments, 2, tostring(count))
     arguments.nofmt = arguments.nofmt or {}
     arguments.nofmt[1] = true
     arguments.nofmt[2] = true
     return result
-  elseif payload and type(payload) == "function" then
+  elseif type(payload) == "function" then
     error("When calling 'spy(aspy)', 'aspy' must not be the original function, but the spy function replacing the original", level)
   else
     error("'called' must be chained after 'spy(aspy)'", level)
@@ -156,6 +206,7 @@ local function called_less_than(state, arguments, level)
 end
 
 assert:register("modifier", "spy", set_spy)
+assert:register("modifier", "self", set_self)
 assert:register("assertion", "returned_with", returned_with, "assertion.returned_with.positive", "assertion.returned_with.negative")
 assert:register("assertion", "called_with", called_with, "assertion.called_with.positive", "assertion.called_with.negative")
 assert:register("assertion", "called", called, "assertion.called.positive", "assertion.called.negative")
