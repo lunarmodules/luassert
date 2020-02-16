@@ -342,7 +342,7 @@ function util.make_arglist(...)
 end
 
 function util.is_arglist(object)
-  return type(object) == "table" and getmetatable(object) == arglist_mt
+  return getmetatable(object) == arglist_mt
 end
 
 return util
