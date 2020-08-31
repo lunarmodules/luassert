@@ -6,12 +6,12 @@ describe("Test Assertions", function()
     local message = "the message"
     local third_arg = "three"
     local fourth_arg = "four"
-    one, two, three, four, five = assert(test, message, third_arg, fourth_arg)
+    local one, two, three, four, five = assert(test, message, third_arg, fourth_arg)
     assert(one == test and two == message and three == third_arg and
            four == fourth_arg and five == nil,
            "Expected input values to be outputted as well when an assertion does not fail")
   end)
-  
+
   it("Checks assert() handles more than two return values", function()
     local res, err = pcall(assert, false, "some error", "a string")
     assert(not res)
@@ -27,7 +27,7 @@ describe("Test Assertions", function()
     assert.is.Nil(assert:get_level("hello world"))
     assert.is.Nil(assert:get_level(nil))
   end)
-  
+
   it("Checks asserts can be reused", function()
     local is_same = assert.is_same
     local orig_same = tablex.deepcopy(is_same)
@@ -484,7 +484,6 @@ describe("Test Assertions", function()
   end)
 
   it("Checks error_matches does not compare error objects", function()
-    local func = function() end
     assert.no_error_matches(function() error({ "table" }) end, "table")
   end)
 

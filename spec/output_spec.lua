@@ -2,7 +2,7 @@ local unpack = require 'luassert.compatibility'.unpack
 
 describe("Output testing using string comparison with the equal assertion", function()
   local getoutput = function(...)
-    local success, message = pcall(assert.are.equal, ...)
+    local _, message = pcall(assert.are.equal, ...)
     if message == nil then return nil end
     return tostring(message)
   end
@@ -29,7 +29,7 @@ end)
 
 describe("Output testing using string comparison with the has_error assertion", function()
   local getoutput = function(...)
-    local success, message = pcall(assert.has_error, ...)
+    local _, message = pcall(assert.has_error, ...)
     if message == nil then return nil end
     return tostring(message)
   end
@@ -105,7 +105,7 @@ end)
 
 describe("Output testing using string comparison with the same assertion", function()
   local getoutput = function(...)
-    local success, message = pcall(assert.are.same, ...)
+    local _, message = pcall(assert.are.same, ...)
     if message == nil then return nil end
     return tostring(message)
   end
@@ -138,14 +138,14 @@ describe("Output testing using custom failure message", function()
     local argcnt = select("#", ...)
     local args = {...}
     args[argcnt+1] = key .. " fails"
-    local success, message = pcall(assert[key], unpack(args, 1, argcnt+1))
+    local _, message = pcall(assert[key], unpack(args, 1, argcnt+1))
     if message == nil then return nil end
     message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
     return message
   end
 
   local geterror2 = function(key, ...)
-    local success, message = pcall(assert.message(key .. " fails")[key], ...)
+    local _, message = pcall(assert.message(key .. " fails")[key], ...)
     if message == nil then return nil end
     message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
     return message
@@ -329,7 +329,7 @@ for _,ss in ipairs({"spy", "stub"}) do
 
     local geterror = function(key, args, ...)
       local err = select('#', ...) == 0 and key .. " failed" or ...
-      local success, message = pcall(assert[ss](test.key, err)[key], unpack(args))
+      local _, message = pcall(assert[ss](test.key, err)[key], unpack(args))
       if message == nil then return nil end
       message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
       return message
@@ -337,7 +337,7 @@ for _,ss in ipairs({"spy", "stub"}) do
 
     local geterror2 = function(key, args, ...)
       local err = select('#', ...) == 0 and key .. " failed" or ...
-      local success, message = pcall(assert.message(err).spy(test.key)[key], unpack(args))
+      local _, message = pcall(assert.message(err).spy(test.key)[key], unpack(args))
       if message == nil then return nil end
       message = tostring(message):gsub("\n.*", ""):gsub("^.-:%d+: ", "", 1)
       return message

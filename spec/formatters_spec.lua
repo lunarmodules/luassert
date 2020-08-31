@@ -1,7 +1,6 @@
 local function returnnils()
   -- force the return of nils in an argument array
-  local a,b
-  return a, b, "this is not nil"
+  return nil, nil, "this is not nil"
 end
 
 describe("Test Formatters", function()
@@ -140,7 +139,7 @@ describe("Test Formatters", function()
 
   it("Checks to see if table containing nils is returned with same number of entries #test", function()
     local t = { returnnils(), ["n"] = 3 }
-    formatted = assert:format(t)
+    local formatted = assert:format(t)
     assert.is.same(type(formatted[1]), "string")
     assert.is.same(type(formatted[2]), "string")
     assert.is.same(type(formatted[3]), "string")
