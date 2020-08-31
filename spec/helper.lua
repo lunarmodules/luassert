@@ -1,5 +1,5 @@
 -- busted helper file to prevent crashes on LuaJIT ffi module being
--- garbage collected due to Busted cleaning up the test enviornment
+-- garbage collected due to Busted cleaning up the test environment
 --
 -- usage:
 --   busted --helper=spec/helper.lua

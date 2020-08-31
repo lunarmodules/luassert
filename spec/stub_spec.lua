@@ -8,7 +8,7 @@ describe("Tests dealing with stubs", function()
       return "derp"
     end}
   end)
-  
+
   it("checks to see if stub keeps track of arguments", function()
     stub(test, "key")
     test.key("derp")
@@ -59,7 +59,7 @@ describe("Tests dealing with stubs", function()
      assert.is_table(s)
      s()
      s()
-     assert.stub(s).was.called(2)  
+     assert.stub(s).was.called(2)
      assert.are.equal(calls, 0)   -- its a stub, so no calls
      local old_s = s
      s = s:revert()
@@ -75,8 +75,7 @@ describe("Tests dealing with stubs", function()
      assert.is_table(s)
      s()
      s()
-     assert.stub(s).was.called(2)  
-     local old_s = s
+     assert.stub(s).was.called(2)
      s = s:revert()
      assert.is_nil(s)
   end)
@@ -86,8 +85,7 @@ describe("Tests dealing with stubs", function()
      assert.is_table(s)
      s()
      s()
-     assert.stub(s).was.called(2)  
-     local old_s = s
+     assert.stub(s).was.called(2)
      s = s:revert()
      assert.is_nil(s)
   end)

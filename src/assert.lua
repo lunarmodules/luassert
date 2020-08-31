@@ -135,25 +135,25 @@ obj = {
   set_parameter = function(self, name, value)
     astate.set_parameter(name, value)
   end,
-  
+
   get_parameter = function(self, name)
     return astate.get_parameter(name)
-  end,  
-  
+  end,
+
   add_spy = function(self, spy)
     astate.add_spy(spy)
   end,
-  
+
   snapshot = function(self)
     return astate.snapshot()
   end,
-  
+
   level = function(self, level)
     return setmetatable({
         level = level
       }, level_mt)
   end,
-  
+
   -- returns the level if a level-value, otherwise nil
   get_level = function(self, level)
     if getmetatable(level) ~= level_mt then

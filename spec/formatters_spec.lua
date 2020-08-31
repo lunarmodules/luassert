@@ -1,7 +1,6 @@
 local function returnnils()
   -- force the return of nils in an argument array
-  local a,b
-  return a, b, "this is not nil"
+  return nil, nil, "this is not nil"
 end
 
 describe("Test Formatters", function()
@@ -17,7 +16,7 @@ describe("Test Formatters", function()
   after_each(function()
     snapshot:revert()
   end)
-  
+
   it("Checks to see if types are returned as strings", function()
     assert.is.same(assert:format({ "a string", ["n"] = 1 })[1], "(string) 'a string'")
     assert.is.same(assert:format({ true, ["n"] = 1 })[1], "(boolean) true")
@@ -131,13 +130,13 @@ describe("Test Formatters", function()
 
   it("Checks to see if table containing nils is returned with same number of entries #test", function()
     local t = { returnnils(), ["n"] = 3 }
-    formatted = assert:format(t)
+    local formatted = assert:format(t)
     assert.is.same(type(formatted[1]), "string")
     assert.is.same(type(formatted[2]), "string")
     assert.is.same(type(formatted[3]), "string")
     assert.is.same(type(formatted[4]), "nil")
   end)
-  
+
   it("checks arguments not being formatted if set to do so", function()
     local arg1 = "argument1"
     local arg2 = "argument2"
@@ -146,7 +145,7 @@ describe("Test Formatters", function()
     arguments = assert:format(arguments)
     assert.is.same(arg1, arguments[1])
   end)
-  
+
   it("checks extra formatters inserted to be called first", function()
     local expected = "formatted result"
     local f = function(value)
@@ -155,11 +154,11 @@ describe("Test Formatters", function()
       end
     end
     local s = spy.new(f)
-    
+
     assert:add_formatter(s)
     assert.are_equal(expected, assert:format({"some string"})[1])
     assert.spy(s).was.called(1)
     assert:remove_formatter(s)
   end)
-  
+
 end)
