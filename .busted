@@ -1,5 +1,7 @@
 return {
   default = {
-    helper = "./spec/helper.lua"
+    helper = "./spec/helper.lua",
+    verbose = true,
+    output = "gtest",
   },
 }

@@ -15,10 +15,13 @@ before_install:
   - source .travis/setenv_lua.sh
 
 install:
-  - luarocks make
   - luarocks install busted
+  - luarocks install luacheck
+  - luarocks remove luassert --force && luarocks make
 
-script: busted spec
+script:
+  - luacheck .
+  - busted
 
 branches:
   only:
