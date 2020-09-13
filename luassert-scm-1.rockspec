@@ -1,8 +1,9 @@
 package = "luassert"
-version = "1.8.0-0"
+version = "scm-1"
 source = {
-  url = "https://github.com/Olivine-Labs/luassert/archive/v1.8.0.tar.gz",
-  dir = "luassert-1.8.0"
+  url = "git://github.com/Olivine-Labs/luassert.git",
+  --dir = "luassert-1.8.0"
+  tag = "master"
 }
 description = {
   summary = "Lua Assertions Extension",
