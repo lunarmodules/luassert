@@ -1,7 +1,7 @@
 local s = require 'say'
 local astate = require 'luassert.state'
 local util = require 'luassert.util'
-local unpack = require 'luassert.compatibility'.unpack
+local unpack = util.unpack
 local obj   -- the returned module table
 local level_mt = {}
 

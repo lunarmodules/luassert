@@ -1,4 +1,4 @@
-local unpack = require 'luassert.compatibility'.unpack
+local unpack = require 'luassert.util'.unpack
 
 describe("Output testing using string comparison with the equal assertion", function()
   local getoutput = function(...)

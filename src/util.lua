@@ -1,6 +1,14 @@
 local util = {}
 local arglist_mt = {}
 
+-- have pack/unpack both respect the 'n' field
+local _unpack = table.unpack or unpack
+local unpack = function(t, i, j) return _unpack(t, i or 1, j or t.n or #t) end
+local pack = function(...) return { n = select("#", ...), ... } end
+util.pack = pack
+util.unpack = unpack
+
+
 function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
   local ty1 = type(t1)
   local ty2 = type(t2)
@@ -335,13 +343,17 @@ function util.extract_keys(nspace, tokens)
   return keys
 end
 
--- store argument list for or return values of a function in a table
+-----------------------------------------------
+-- store argument list for return values of a function in a table.
+-- The table will get a metatable to identify it as an arglist
 function util.make_arglist(...)
   local arglist = { ... }
   arglist.n = select('#', ...) -- add values count for trailing nils
   return setmetatable(arglist, arglist_mt)
 end
 
+-----------------------------------------------
+-- check a table to be an arglist type.
 function util.is_arglist(object)
   return getmetatable(object) == arglist_mt
 end
