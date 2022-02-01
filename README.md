@@ -1,7 +1,8 @@
 Luassert
 ========
 
-[![Build Status](https://secure.travis-ci.org/Olivine-Labs/luassert.png)](http://secure.travis-ci.org/Olivine-Labs/luassert)
+[![Luacheck Lint Status](https://img.shields.io/github/workflow/status/Olivine-Labs/luassert/Luacheck?label=Luacheck&logo=Lua)](https://github.com/Olivine-Labs/luassert/actions?workflow=Luacheck)
+[![Luassert Test Status](https://img.shields.io/github/workflow/status/Olivine-Labs/luassert/Luassert?label=Linux%20Build&logo=Github)](https://github.com/Olivine-Labs/luassert/actions?workflow=Luassert)
 
 luassert extends Lua's built-in assertions to provide additional tests and the ability to create your own. You can modify chains of assertions with `not`.
 
@@ -46,8 +47,8 @@ assert.has_property("name", { name = "jack" })
 
 ```
 
-When writing your own assertions you can also use modifiers to set specific objects to work against. An example 
-is the [`array` modifier](https://github.com/Olivine-Labs/luassert/blob/master/src/array.lua) with its 
+When writing your own assertions you can also use modifiers to set specific objects to work against. An example
+is the [`array` modifier](https://github.com/Olivine-Labs/luassert/blob/master/src/array.lua) with its
 accompanying `holes` assertion.
 
 Which can be used as;
