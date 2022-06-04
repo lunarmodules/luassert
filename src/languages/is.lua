@@ -1,6 +1,6 @@
 local s = require('say')
 
-s:set_namespace('en')
+s:set_namespace('is')
 
 s:set("assertion.same.positive", "Átti von á að vera eins.\nSett inn:\n%s\nBjóst við:\n%s")
 s:set("assertion.same.negative", "Átti von á að ekki vera eins.\nSett inn:\n%s\nBjóst ekki við:\n%s")
