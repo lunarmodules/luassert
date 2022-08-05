@@ -87,6 +87,12 @@ describe("Test Formatters", function()
 
 
   it("Checks to see if error character is applied only to key chain marked with crumbs", function()
+    local old_color = assert:get_parameter("TableErrorHighlightColor")
+    finally(function()
+      assert:set_parameter("TableErrorHighlightColor", old_color)
+    end)
+
+    assert:set_parameter("TableErrorHighlightColor", "none")
     local t = {{1,2},{3,4}}
     local fmtargs = { {crumbs = {1,2}} }
     local formatted = assert:format({t, n = 1, fmtargs = fmtargs})[1]
@@ -95,6 +101,14 @@ describe("Test Formatters", function()
   end)
 
   it("Checks to see if TableErrorHighlightCharacter changes error character", function()
+    local old_color = assert:get_parameter("TableErrorHighlightColor")
+    local old_char = assert:get_parameter("TableErrorHighlightCharacter")
+    finally(function()
+      assert:set_parameter("TableErrorHighlightColor", old_color)
+      assert:set_parameter("TableErrorHighlightCharacter", old_char)
+    end)
+
+    assert:set_parameter("TableErrorHighlightColor", "none")
     assert:set_parameter("TableErrorHighlightCharacter", "**")
     local t = {1,2,3}
     local fmtargs = { {crumbs = {2}} }

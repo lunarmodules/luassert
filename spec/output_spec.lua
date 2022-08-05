@@ -112,6 +112,17 @@ describe("Output testing using string comparison with the same assertion", funct
 
   it("Should compare tables correctly", function()
     -- assert.are.same({1}, {2})
+
+    local old_color = assert:get_parameter("TableErrorHighlightColor")
+    local old_char = assert:get_parameter("TableErrorHighlightCharacter")
+    finally(function()
+      assert:set_parameter("TableErrorHighlightColor", old_color)
+      assert:set_parameter("TableErrorHighlightCharacter", old_char)
+    end)
+
+    assert:set_parameter("TableErrorHighlightColor", "none")
+    assert:set_parameter("TableErrorHighlightCharacter", "*")
+
     local t1, t2 = {1}, {2}
     local output = getoutput(t1, t2)
     local ok = output:find("Passed in:\n("..tostring(t2)..") {\n *[1] = 2 }", nil, true)
@@ -122,6 +133,17 @@ describe("Output testing using string comparison with the same assertion", funct
 
   it("Should compare tables correctly and highlight differences", function()
     -- assert.are.same(t1, t2)
+
+    local old_color = assert:get_parameter("TableErrorHighlightColor")
+    local old_char = assert:get_parameter("TableErrorHighlightCharacter")
+    finally(function()
+      assert:set_parameter("TableErrorHighlightColor", old_color)
+      assert:set_parameter("TableErrorHighlightCharacter", old_char)
+    end)
+
+    assert:set_parameter("TableErrorHighlightColor", "none")
+    assert:set_parameter("TableErrorHighlightCharacter", "**")
+
     local t1 = {1, {"a", "b", {"foo", "bar"} }, "c"}
     local t2 = {1, {"a", "b", {"bar", "bar"} }, "c"}
     local output = getoutput(t1, t2)
