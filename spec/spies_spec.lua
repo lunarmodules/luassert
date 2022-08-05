@@ -130,7 +130,7 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.called.at_least(3)
     assert.error_matches(
       function() assert.spy(s).was.called.at_least() end,
-      "attempt to compare nil with number")
+      "attempt to compare %a+ with %a+")  -- nil with number, order non-deterministic
   end)
 
   it("checks called_at_most() assertions", function()
@@ -143,7 +143,7 @@ describe("Tests dealing with spies", function()
     assert.spy(s).was_not.called.at_most(1)
     assert.error_matches(
       function() assert.spy(s).was.called.at_most() end,
-      "attempt to compare number with nil")
+      "attempt to compare %a+ with %a+")  -- nil with number, order non-deterministic
   end)
 
   it("checks called_more_than() assertions", function()
