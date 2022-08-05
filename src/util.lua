@@ -274,6 +274,7 @@ end
 function util.callable(object)
   return type(object) == "function" or type((debug.getmetatable(object) or {}).__call) == "function"
 end
+
 -----------------------------------------------
 -- Checks an element has tostring.
 -- The type must either be a string or have a metatable
