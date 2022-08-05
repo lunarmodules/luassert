@@ -89,7 +89,7 @@ function util.deepcopy(t, deepmt, cache)
     copy[k] = (spy.is_spy(v) and v or util.deepcopy(v, deepmt, cache))
   end
   if deepmt then
-    debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t, nil, cache)))
+    debug.setmetatable(copy, util.deepcopy(debug.getmetatable(t), false, cache))
   else
     debug.setmetatable(copy, debug.getmetatable(t))
   end
