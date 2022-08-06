@@ -39,13 +39,15 @@ build = {
     ["luassert.matchers.composite"] = "src/matchers/composite.lua",
     ["luassert.formatters.init"] = "src/formatters/init.lua",
     ["luassert.formatters.binarystring"] = "src/formatters/binarystring.lua",
-    ["luassert.languages.en"] = "src/languages/en.lua",
     ["luassert.languages.ar"] = "src/languages/ar.lua",
+    ["luassert.languages.de"] = "src/languages/de.lua",
+    ["luassert.languages.en"] = "src/languages/en.lua",
     ["luassert.languages.fr"] = "src/languages/fr.lua",
+    ["luassert.languages.is"] = "src/languages/is.lua",
+    ["luassert.languages.ja"] = "src/languages/ja.lua",
     ["luassert.languages.nl"] = "src/languages/nl.lua",
     ["luassert.languages.ru"] = "src/languages/ru.lua",
     ["luassert.languages.ua"] = "src/languages/ua.lua",
     ["luassert.languages.zh"] = "src/languages/zh.lua",
-    ["luassert.languages.ja"] = "src/languages/ja.lua",
   }
 }
