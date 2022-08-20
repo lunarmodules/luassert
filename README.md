@@ -1,12 +1,14 @@
 Luassert
 ========
 
-[![Luacheck Lint Status](https://img.shields.io/github/workflow/status/Olivine-Labs/luassert/Luacheck?label=Luacheck&logo=Lua)](https://github.com/Olivine-Labs/luassert/actions?workflow=Luacheck)
-[![Luassert Test Status](https://img.shields.io/github/workflow/status/Olivine-Labs/luassert/Luassert?label=Linux%20Build&logo=Github)](https://github.com/Olivine-Labs/luassert/actions?workflow=Luassert)
+[![Busted](https://img.shields.io/github/workflow/status/lunarmodules/say/Busted?label=Busted=Lua)](https://github.com/lunarmodules/say/actions?workflow=Busted)
+[![Luacheck](https://img.shields.io/github/workflow/status/lunarmodules/say/Luacheck?label=Luacheck&logo=Lua)](https://github.com/lunarmodules/say/actions?workflow=Luacheck)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/lunarmodules/say?label=Tag&logo=GitHub)](https://github.com/lunarmodules/say/releases)
+[![Luarocks](https://img.shields.io/luarocks/v/lunarmodules/say?label=Luarocks&logo=Lua)](https://luarocks.org/modules/lunarmodules/say)
 
 luassert extends Lua's built-in assertions to provide additional tests and the ability to create your own. You can modify chains of assertions with `not`.
 
-Check out [busted](http://www.olivinelabs.com/busted#asserts) for extended examples.
+Check out [busted](https://lunarmodules.github.io/busted/#asserts) for extended examples.
 
 ```lua
 assert = require("luassert")
@@ -48,7 +50,7 @@ assert.has_property("name", { name = "jack" })
 ```
 
 When writing your own assertions you can also use modifiers to set specific objects to work against. An example
-is the [`array` modifier](https://github.com/Olivine-Labs/luassert/blob/master/src/array.lua) with its
+is the [`array` modifier](https://github.com/lunarmodules/luassert/blob/master/src/array.lua) with its
 accompanying `holes` assertion.
 
 Which can be used as;
