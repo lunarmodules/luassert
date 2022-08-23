@@ -1,40 +1,22 @@
-local package_name = "luassert"
-local package_version = "scm"
-local rockspec_revision = "1"
-local github_account_name = "lunarmodules"
-local github_repo_name = package_name
-local git_checkout = package_version == "scm" and "master" or package_version
-
-rockspec_format = "3.0"
-package = package_name
-version = package_version .. "-" .. rockspec_revision
-
+package = "luassert"
+version = "1.8.0-0"
 source = {
-  url = "git+https://github.com/"..github_account_name.."/"..github_repo_name..".git",
-  branch = git_checkout
+  url = "https://github.com/Olivine-Labs/luassert/archive/v1.8.0.tar.gz",
+  dir = "luassert-1.8.0"
 }
 description = {
-  summary = "Lua assertions extension",
+  summary = "Lua Assertions Extension",
   detailed = [[
     Adds a framework that allows registering new assertions
     without compromising builtin assertion functionality.
   ]],
-  homepage = "https://lunarmodules.github.io/busted/",
+  homepage = "http://olivinelabs.com/busted/",
   license = "MIT <http://opensource.org/licenses/MIT>"
 }
 dependencies = {
   "lua >= 5.1",
   "say >= 1.2-1"
 }
-
-test_dependencies = {
-  "busted",
-}
-
-test = {
-  type = "busted",
-}
-
 build = {
   type = "builtin",
   modules = {
@@ -56,15 +38,13 @@ build = {
     ["luassert.matchers.composite"] = "src/matchers/composite.lua",
     ["luassert.formatters.init"] = "src/formatters/init.lua",
     ["luassert.formatters.binarystring"] = "src/formatters/binarystring.lua",
-    ["luassert.languages.ar"] = "src/languages/ar.lua",
-    ["luassert.languages.de"] = "src/languages/de.lua",
     ["luassert.languages.en"] = "src/languages/en.lua",
+    ["luassert.languages.ar"] = "src/languages/ar.lua",
     ["luassert.languages.fr"] = "src/languages/fr.lua",
-    ["luassert.languages.is"] = "src/languages/is.lua",
-    ["luassert.languages.ja"] = "src/languages/ja.lua",
     ["luassert.languages.nl"] = "src/languages/nl.lua",
     ["luassert.languages.ru"] = "src/languages/ru.lua",
     ["luassert.languages.ua"] = "src/languages/ua.lua",
     ["luassert.languages.zh"] = "src/languages/zh.lua",
+    ["luassert.languages.ja"] = "src/languages/ja.lua",
   }
 }
