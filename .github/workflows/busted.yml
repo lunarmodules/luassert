@@ -33,7 +33,8 @@ jobs:
           luarocks make
 
       - name: Run regression tests
-        run: busted -c -v
+        # disable the paths to force use of installed rockspec
+        run: busted -c -v --lpath="" --cpath="" --Xoutput "--color"'
 
       - name: Report test coverage
         if: success()
