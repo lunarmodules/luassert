@@ -9,7 +9,7 @@ package = package_name
 version = package_version .. "-" .. rockspec_revision
 
 source = {
-  url = "git+https://github.com/"..github_account_name.."/"..github_repo_name..".git"
+  url = "git+https://github.com/" .. github_account_name .. "/" .. github_repo_name .. ".git"
 }
 
 if package_version == "scm" then source.branch = "master" else source.tag = "v" .. package_version end
