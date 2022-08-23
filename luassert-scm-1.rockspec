@@ -26,7 +26,7 @@ description = {
 
 dependencies = {
   "lua >= 5.1",
-  "say >= 1.2-1"
+  "say >= 1.4.0-1"
 }
 
 test_dependencies = {
