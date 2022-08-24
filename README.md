@@ -1,10 +1,10 @@
 Luassert
 ========
 
-[![Busted](https://img.shields.io/github/workflow/status/lunarmodules/say/Busted?label=Busted=Lua)](https://github.com/lunarmodules/say/actions?workflow=Busted)
-[![Luacheck](https://img.shields.io/github/workflow/status/lunarmodules/say/Luacheck?label=Luacheck&logo=Lua)](https://github.com/lunarmodules/say/actions?workflow=Luacheck)
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/lunarmodules/say?label=Tag&logo=GitHub)](https://github.com/lunarmodules/say/releases)
-[![Luarocks](https://img.shields.io/luarocks/v/lunarmodules/say?label=Luarocks&logo=Lua)](https://luarocks.org/modules/lunarmodules/say)
+[![Busted](https://img.shields.io/github/workflow/status/lunarmodules/luassert/Busted?label=Busted=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Busted)
+[![Luacheck](https://img.shields.io/github/workflow/status/lunarmodules/luassert/Luacheck?label=Luacheck&logo=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Luacheck)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/lunarmodules/luassert?label=Tag&logo=GitHub)](https://github.com/lunarmodules/luassert/releases)
+[![Luarocks](https://img.shields.io/luarocks/v/lunarmodules/luassert?label=Luarocks&logo=Lua)](https://luarocks.org/modules/lunarmodules/luassert)
 
 luassert extends Lua's built-in assertions to provide additional tests and the ability to create your own. You can modify chains of assertions with `not`.
 
