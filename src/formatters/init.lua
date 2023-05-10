@@ -221,7 +221,7 @@ local function fmt_matcher(arg)
   for idx = 1, arg.arguments.n do
     table.insert(args, assert:format({ arg.arguments[idx], n = 1, })[1])
   end
-  return string.format("(matcher) %s%s(%s)",
+  return string.format("(matcher) " .. (arg.name == "_" and "_ *anything*" or "%s%s(%s)"),
                        not_inverted[arg.mod],
                        tostring(arg.name),
                        table.concat(args, ", "))

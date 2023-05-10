@@ -175,6 +175,8 @@ describe("Test Formatters", function()
     local nostringformatted = assert:format({nostring, ["n"] = 1})[1]
     assert.is.same("(matcher) no.string()",
                    nostringformatted)
+    local anythingmatcherformatted = assert:format({match._, ["n"] = 1})[1]
+    assert.is.same("(matcher) _ *anything*", anythingmatcherformatted)
   end)
 
   it("checks arglist formatting", function()

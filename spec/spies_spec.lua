@@ -65,7 +65,18 @@ describe("Tests dealing with spies", function()
       .. "      %[1%] = 'test' } } }.\n"
       .. "Expected:\n"
       .. "%(values list%) %(%(number%) 5, %(number%) 6%)")
-  end)
+    -- assertion can format the `_` anything matcher appropriately in the fail message
+    assert.error_matches(
+      function() assert.spy(s).returned_with(5, _) end,
+      "Function never returned matching arguments.\n"
+      .. "Returned %(last call if any%):\n"
+      .. "%(values list%) %(%(table: 0x%x+%) {\n"
+      .. "  %[foo%] = {\n"
+      .. "    %[bar%] = {\n"
+      .. "      %[1%] = 'test' } } }.\n"
+      .. "Expected:\n"
+      .. "%(values list%) %(%(number%) 5, %(matcher%) _ %*anything%*%)")
+  end) -- (matcher) _ *anything*
 
   it("checks called() and called_with() assertions", function()
     local s = spy.new(function() end)
@@ -97,6 +108,17 @@ describe("Tests dealing with spies", function()
       .. "      %[1%] = 'test' } } }%)\n"
       .. "Expected:\n"
       .. "%(values list%) %(%(number%) 5, %(number%) 6%)")
+    -- assertion can format the `_` anything matcher appropriately in the fail message
+    assert.error_matches(
+      function() assert.spy(s).was.called_with(5, _) end,
+      "Function was never called with matching arguments.\n"
+      .. "Called with %(last call if any%):\n"
+      .. "%(values list%) %(%(table: 0x%x+%) {\n"
+      .. "  %[foo%] = {\n"
+      .. "    %[bar%] = {\n"
+      .. "      %[1%] = 'test' } } }%)\n"
+      .. "Expected:\n"
+      .. "%(values list%) %(%(number%) 5, %(matcher%) _ %*anything%*%)")
   end)
 
   it("checks called() and called_with() assertions using refs", function()
