@@ -1,8 +1,8 @@
 Luassert
 ========
 
-[![Busted](https://img.shields.io/github/workflow/status/lunarmodules/luassert/Busted?label=Busted=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Busted)
-[![Luacheck](https://img.shields.io/github/workflow/status/lunarmodules/luassert/Luacheck?label=Luacheck&logo=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Luacheck)
+[![Busted](https://img.shields.io/github/actions/workflow/status/lunarmodules/luassert/busted.yml?branch=master&label=Busted&logo=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Busted)
+[![Luacheck](https://img.shields.io/github/actions/workflow/status/lunarmodules/luassert/luacheck.yml?branch=master&label=Luacheck&logo=Lua)](https://github.com/lunarmodules/luassert/actions?workflow=Luacheck)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/lunarmodules/luassert?label=Tag&logo=GitHub)](https://github.com/lunarmodules/luassert/releases)
 [![Luarocks](https://img.shields.io/luarocks/v/lunarmodules/luassert?label=Luarocks&logo=Lua)](https://luarocks.org/modules/lunarmodules/luassert)
 
