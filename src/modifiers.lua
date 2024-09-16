@@ -10,6 +10,9 @@ local function is_not(state)
   return state
 end
 
+assert:register("modifier", "a", is)
+assert:register("modifier", "an", is)
+assert:register("modifier", "the", is)
 assert:register("modifier", "is", is)
 assert:register("modifier", "are", is)
 assert:register("modifier", "was", is)
