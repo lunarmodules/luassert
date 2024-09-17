@@ -56,10 +56,10 @@ end
 
 -- Register the proper assertion messages
 say:set("assertion.array_holes.positive", [[
-Expected array to have holes, but none was found.
+Expected array to have holes, but none were found.
 ]])
 say:set("assertion.array_holes.negative", [[
-Expected array to not have holes, hole found at position: %s
+Expected array to not have holes, but found a hole at index: %s
 ]])
 
 -- Register the assertion, and the modifier
