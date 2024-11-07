@@ -40,8 +40,8 @@ s:set("assertion.called_with.negative", "Function was called with matching argum
 s:set("assertion.returned_with.positive", "Function never returned matching arguments.\nReturned (last call if any):\n%s\nExpected:\n%s")
 s:set("assertion.returned_with.negative", "Function returned matching arguments at least once.\nReturned (last matching call):\n%s\nDid not expect:\n%s")
 
-s:set("assertion.returned_arguments.positive", "Expected to be called with %s argument(s), but was called with %s")
-s:set("assertion.returned_arguments.negative", "Expected not to be called with %s argument(s), but was called with %s")
+s:set("assertion.returned_arguments.positive", "Expected %s results(s) to be returned, but got %s")
+s:set("assertion.returned_arguments.negative", "Expected not %s results(s) to be returned, but got %s")
 
 -- errors
 s:set("assertion.internal.argtolittle", "the '%s' function requires a minimum of %s arguments, got: %s")
