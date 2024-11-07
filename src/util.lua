@@ -40,23 +40,58 @@ function util.deepcompare(t1,t2,ignore_mt,cycles,thresh1,thresh2)
   cycles[1][t1] = cycles[1][t1] + 1
   cycles[2][t2] = cycles[2][t2] + 1
 
+  local table_keys = {{}, {}} -- keys of type 'table' that we'll handle later
+
   for k1,v1 in next, t1 do
     local v2 = t2[k1]
-    if v2 == nil then
+    if v2 == nil and type(k1) == 'table' then
+      table.insert(table_keys[1], k1)
+    elseif v2 == nil then
       return false, {k1}
-    end
-
-    local same, crumbs = util.deepcompare(v1,v2,nil,cycles,thresh1,thresh2)
-    if not same then
-      crumbs = crumbs or {}
-      table.insert(crumbs, k1)
-      return false, crumbs
+    else
+      local same, crumbs = util.deepcompare(v1,v2,nil,cycles,thresh1,thresh2)
+      if not same then
+        crumbs = crumbs or {}
+        table.insert(crumbs, k1)
+        return false, crumbs
+      end
     end
   end
   for k2,_ in next, t2 do
     -- only check whether each element has a t1 counterpart, actual comparison
     -- has been done in first loop above
-    if t1[k2] == nil then return false, {k2} end
+    if t1[k2] == nil then
+      if type(k2) == 'table' then
+        table.insert(table_keys[2], k2)
+      else
+        return false, {k2}
+      end
+    end
+  end
+
+  -- try to match up every pair with every other pair. remove a matched pair
+  -- or fail if no match was found.
+  for _, k1 in ipairs(table_keys[1]) do
+    local key_same, value_same = false, false
+    local key_crumbs, value_crumbs = nil, nil
+    for j, k2 in ipairs(table_keys[2]) do
+      key_same, key_crumbs = util.deepcompare(k1, k2, nil, cycles, thresh1, thresh2)
+      value_same, value_crumbs = util.deepcompare(t1[k1], t2[k2], nil, cycles, thresh1, thresh2)
+      if key_same and value_same then
+        table.remove(table_keys[2], j)
+        break
+      end
+    end
+    if not key_same or not value_same then
+      local crumbs = key_crumbs or value_crumbs or {}
+      table.insert(crumbs, k1)
+      return false, crumbs
+    end
+  end
+
+  -- check that we've matched all keys from the second table as well
+  if #table_keys[2] > 0 then
+    return false, {table_keys[2][1]}
   end
 
   cycles[1][t1] = cycles[1][t1] - 1
