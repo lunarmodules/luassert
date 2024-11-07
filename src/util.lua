@@ -272,7 +272,14 @@ end
 -- @param object element to inspect on being callable or not
 -- @return boolean, true if the object is callable
 function util.callable(object)
-  return type(object) == "function" or type((debug.getmetatable(object) or {}).__call) == "function"
+  if type(object) == 'function' then
+    return true
+  end
+  local mt = debug.getmetatable(object)
+  if not mt then
+    return false
+  end
+  return type(rawget(mt, "__call")) == "function"
 end
 
 -----------------------------------------------
@@ -282,7 +289,7 @@ end
 -- @param object element to inspect on having tostring or not
 -- @return boolean, true if the object has tostring
 function util.hastostring(object)
-  return type(object) == "string" or type((debug.getmetatable(object) or {}).__tostring) == "function"
+  return type(object) == "string" or type(rawget(debug.getmetatable(object) or {}, "__tostring")) == "function"
 end
 
 -----------------------------------------------
