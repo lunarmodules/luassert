@@ -77,6 +77,14 @@ describe("Test Assertions", function()
     assert.same(t2, t1)
   end)
 
+  it("Checks same() assertion handles table keys properly", function()
+    assert.are.same({ [{}] = 1 }, { [{}] = 1 })
+    assert.are.not_same({ [{}] = 1 }, { [{}] = 2 })
+    assert.are.not_same({ }, { [{}] = 2 })
+    assert.are.not_same({ [{"a"}] = 1 }, { [{"b"}] = 1 })
+    assert.are.not_same({ [{"a"}] = 1, [{"a"}] = 1 }, { [{"b"}] = 1, [{"a"}] = 1, [{"a"}] = 2 })
+  end)
+
   it("Checks same() assertion to handle recursive tables", function()
     local t1 = { k1 = 1, k2 = 2 }
     local t2 = { k1 = 1, k2 = 2 }
@@ -87,6 +95,17 @@ describe("Test Assertions", function()
     assert.same(t1, t2)
     assert.same(t1, t3)
     assert.same(t1, t3)
+  end)
+
+  it("Checks same() assertion handles table keys with recursion properly", function()
+    local a = {}
+    local b = {}
+    local t1 = { [a] = a }
+    local t2 = { [b] = a }
+
+    assert.are.same(t1, t2)
+    assert.are.same({ [{ [{}] = 2 }] = 1 }, { [{ [{}] = 2 }] = 1 })
+    assert.are.not_same({ [{ [{}] = 2 }] = 1 }, { [{ [{}] = 3 }] = 1 })
   end)
 
   it("Checks same() assertion to handle recursive tables that don't match", function()
@@ -168,6 +187,7 @@ describe("Test Assertions", function()
     assert.is_table(c1[2][3][3][3][2][3][3][3][2][3][3][3][2])
     assert.is_nil(m1[2][3][3][3][2][3][3][3][2][3][3][3][2])
     assert.are_not_same(c1, m1)
+    assert.are_not_same({ [c1] = 1 }, { [m1] = 1 })
   end)
 
   it("Checks to see if tables 1 and 2 are equal", function()
@@ -190,6 +210,11 @@ describe("Test Assertions", function()
     local tablenotunique = {table2,table2}
     assert.is.unique(table1)
     assert.is_not.unique(tablenotunique)
+  end)
+
+  it("Checks to see if table1 only contains unique elements, including keys", function()
+    assert.is.not_unique({ [{}] = 1, [{}] = 1 }, true)
+    assert.is.not_unique({{ [{}] = 1 }, { [{}] = 1 }}, true)
   end)
 
   it("Checks near() assertion handles tolerances", function()
