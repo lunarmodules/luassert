@@ -21,6 +21,7 @@ assert.is.Not.True(false)
 assert.is_not_true(false)
 assert.are.equal(1, 1)
 assert.has.errors(function() error("this should fail") end)
+assert.error_matches(function() error("foo bar") end, "foo")
 ```
 
 Extend your own:
