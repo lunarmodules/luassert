@@ -9,18 +9,20 @@ jobs:
       fail-fast: false
       matrix:
         luaVersion: [ "5.4", "5.3", "5.2", "5.1", "luajit" ] # , "luajit-openresty" ]
-    runs-on: ubuntu-22.04
+
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup ‘lua’
-        uses: leafo/gh-actions-lua@v9
+      - uses: luarocks/gh-actions-lua@master
         with:
           luaVersion: ${{ matrix.luaVersion }}
 
-      - name: Setup ‘luarocks’
-        uses: leafo/gh-actions-luarocks@v4
+      - uses: luarocks/gh-actions-luarocks@master
+        with:
+          luaRocksVersion: "3.13.0"
 
       - name: Setup dependencies
         run: |
