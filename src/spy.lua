@@ -90,7 +90,7 @@ spy = {
 
   on = function(target_table, target_key)
     local s = spy.new(target_table[target_key])
-    target_table[target_key] = s
+    rawset(target_table, target_key, s)
     -- store original data
     s.target_table = target_table
     s.target_key = target_key
