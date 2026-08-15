@@ -164,6 +164,10 @@ describe("Test Matchers", function()
     assert.is_false(match.is_same(nil)("a string"))
   end)
 
+  it("Checks same() matcher to handle table keys properly", function()
+    assert.is_true(match.is_same({ [{}] = 1 })({ [{}] = 1}))
+  end)
+
   it("Checks ref() matcher", function()
     local t = {}
     local func = function() end
@@ -218,6 +222,11 @@ describe("Test Matchers", function()
     local tablenotunique = {table2,table2}
     assert.is_true(match.is.unique()(table1))
     assert.is_true(match.is_not.unique()(tablenotunique))
+  end)
+
+  it("Checks to see if table1 only contains unique elements, including table keys", function()
+    assert.is_true(match.is_not.unique(true)({ [{}] = 1, [{}] = 1 }, true))
+    assert.is_true(match.is_not.unique(true)({{ [{}] = 1 }, { [{}] = 1 }}, true))
   end)
 
   it("Checks '_' chaining of modifiers and match", function()
