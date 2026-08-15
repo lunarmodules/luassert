@@ -78,6 +78,18 @@ describe("Tests dealing with spies", function()
       .. "%(values list%) %(%(number%) 5, %(matcher%) _ %*anything%*%)")
   end) -- (matcher) _ *anything*
 
+  it("checks returned_with() order assertions", function()
+    local s = spy.new(function(...) return ... end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy_call(s, 1).was.returned_with(1, 2, 3)
+    assert.spy_call(s, 2).was.returned_with("a", "b", "c")
+    assert.spy_call(s, 1).was_not.returned_with("a", "b", "c")
+    assert.spy_call(s, 2).was_not.returned_with(1, 2, 3)
+    assert.spy_call(s, 3).was_not.returned_with(1, 2, 3)
+  end)
+
   it("checks called() and called_with() assertions", function()
     local s = spy.new(function() end)
     local t = { foo = { bar = { "test" } } }
@@ -140,6 +152,18 @@ describe("Tests dealing with spies", function()
     s(s)
 
     assert.spy(s).was.called_with(s)
+  end)
+
+  it("checks called_with order assertions", function()
+    local s = spy.new(function() end)
+
+    s(1, 2, 3)
+    s("a", "b", "c")
+    assert.spy_call(s, 1).was.called_with(1, 2, 3)
+    assert.spy_call(s, 2).was.called_with("a", "b", "c")
+    assert.spy_call(s, 1).was_not.called_with("a", "b", "c")
+    assert.spy_call(s, 2).was_not.called_with(1, 2, 3)
+    assert.spy_call(s, 3).was_not.called_with(1, 2, 3)
   end)
 
   it("checks called_at_least() assertions", function()
