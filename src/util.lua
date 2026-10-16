@@ -332,8 +332,7 @@ function util.extract_keys(nspace, tokens)
     while i > 1 and longkey and namespace[nspace][longkey] do
       key = longkey
       i = i - 1
-      token = tokens[i]
-      longkey = (token .. '_' .. key)
+      longkey = i > 1 and (tokens[i-1] .. '_' .. key) or nil
     end
 
     if namespace.modifier[key] or namespace[nspace][key] then
