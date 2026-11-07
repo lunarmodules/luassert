@@ -1,4 +1,7 @@
 local tablex = require 'pl.tablex'
+-- Lua 5.5 replaces nil error objects with a string; older runtimes preserve nil.
+local _, nil_error = pcall(error, nil)
+local nil_error_pattern = nil_error and ("^(" .. nil_error:gsub("(%W)", "%%%1") .. ")$")
 
 describe("Test Assertions", function()
   it("Tests backward compatible assert() functionality", function()
@@ -490,8 +493,8 @@ describe("Test Assertions", function()
   end)
 
   it("Checks error_matches compares error strings with pattern", function()
-    assert.error_matches(function() error() end, nil)
-    assert.no_error_matches(function() end, nil)
+    assert.error_matches(function() error() end, nil_error_pattern)
+    assert.no_error_matches(function() end, nil_error_pattern)
     assert.does_error_match(function() error(123) end, "^%d+$")
     assert.error.matches(function() error("string") end, "^%w+$")
     assert.matches.error(function() error("string") end, "str", nil, true)
@@ -579,14 +582,14 @@ describe("Test Assertions", function()
     assert.is_same({{}, {}}, {assert.has_error(function() error({}) end, {})})
     -- Lua 5.3+ returns a non-string error
     assert.is_same({_VERSION < "Lua 5.3" and '0' or 0, 0}, {assert.has_error(function() error(0) end, 0)})
-    assert.is_same({nil, nil}, {assert.has_error(function() error(nil) end, nil)})
+    assert.is_same({nil_error, nil}, {assert.has_error(function() error(nil) end, nil)})
     assert.is_same({nil, "string"}, {assert.has_no_error(function() end, "string")})
   end)
 
   it("Checks assert.error_matches returns captures of thrown error on success", function()
     assert.is_same({"err", "message"}, {assert.error_matches(function() error("err message") end, "(err) (%w+)$")})
     assert.is_same({"err"}, {assert.error_matches(function() error(setmetatable({},{__tostring = function() return "err" end})) end, "err", nil, true)})
-    assert.is_same({}, {assert.error_matches(function() error(nil) end, nil)})
+    assert.is_same({nil_error}, {assert.error_matches(function() error(nil) end, nil_error_pattern)})
   end)
 
   it("Checks assert.no_error_matches returns thrown error on success", function()
