@@ -1,4 +1,5 @@
 local unpack = require 'luassert.util'.unpack
+local _, nil_error = pcall(error, nil)
 
 describe("Output testing using string comparison with the equal assertion", function()
   local getoutput = function(...)
@@ -55,7 +56,8 @@ describe("Output testing using string comparison with the has_error assertion", 
   it("Should compare error strings correctly; nil-string", function()
     --assert.has_error(function() error() end, "string")
     local output = getoutput(function() error() end, "string")
-    local ok = output:find("Caught:\n%(nil%)")
+    local caught = nil_error and ("(string) '" .. nil_error .. "'") or "(nil)"
+    local ok = output:find("Caught:\n" .. caught, 1, true)
     assert(ok, "Output check 1 failed, comparing nil-string;\n    " .. output:gsub("\n","\n    "))
     local ok = output:find("Expected:\n%(string%) 'string'")
     assert(ok, "Output check 2 failed, comparing nil-string;\n    " .. output:gsub("\n","\n    "))
